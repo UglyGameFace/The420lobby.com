@@ -35,7 +35,7 @@ try{
         try {
           await page.waitForFunction(() => {
             const site=document.querySelector('link[href="/styles.css"]');
-            const arcade=document.querySelector('link[href="/sesh-signal-v2.css"]');
+            const arcade=document.querySelector('link[href="/sesh-signal-v3.css"]');
             const hero=document.querySelector(".hero");
             return !!site?.sheet && !!arcade?.sheet && !!hero &&
               getComputedStyle(hero).overflowX==="hidden" &&
@@ -44,7 +44,7 @@ try{
         }catch(error){
           const detail=await page.evaluate(()=>{
             const base=document.querySelector('link[href="/styles.css"]');
-            const arcade=document.querySelector('link[href="/sesh-signal-v2.css"]');
+            const arcade=document.querySelector('link[href="/sesh-signal-v3.css"]');
             return {baseLoaded:!!base?.sheet,arcadeLoaded:!!arcade?.sheet,
               heroOverflow:getComputedStyle(document.querySelector(".hero")).overflowX,
               arcadeDisplay:getComputedStyle(document.querySelector(".arcade-layout")).display};
@@ -65,7 +65,7 @@ try{
                 overflow:style.overflowX,display:style.display};
             }).filter(x=>x.right>innerWidth+2||x.left< -2)
               .sort((a,b)=>b.right-a.right).slice(0,35);
-            const gameLink=document.querySelector('link[href="/sesh-signal-v2.css"]');
+            const gameLink=document.querySelector('link[href="/sesh-signal-v3.css"]');
             return {viewport:innerWidth,doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,
               loaded:!!gameLink?.sheet,arcadeDisplay:getComputedStyle(document.querySelector(".arcade-layout")).display,
               stageHeight:document.querySelector("#sesh-stage").getBoundingClientRect().height,
@@ -90,7 +90,7 @@ try{
         }
         await page.evaluate(()=>{Math.random=()=>0.5;});
         await page.locator("#sesh-start").click();
-        const wisp=page.locator(".sesh-wisp--smoke").first();
+        const wisp=page.locator(".sesh-item--grinder").first();
         await wisp.waitFor({state:"visible",timeout:6000});
         await wisp.click({timeout:3500});
         assert.ok(Number(await page.locator("#sesh-score").textContent())>0,name+" tap did not award points");
