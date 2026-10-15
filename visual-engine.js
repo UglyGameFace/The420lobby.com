@@ -59,7 +59,7 @@
     "  vec3 ember=vec3(0.9,0.54,0.25);",
     "  vec3 color=mix(green,teal,clamp(cloud2*1.12,0.0,1.0));",
     "  color=mix(color,ember,smoothstep(0.75,0.99,cloud2)*0.12);",
-    "  float alpha=(smoke*.42+ring+glow*.065)*smoothstep(1.6,.2,length(p));",
+    "  float alpha=(smoke*.42+ring+glow*.065)*(1.0-smoothstep(0.2,1.6,length(p)));",
     "  alpha*=1.0-uScroll*.3;",
     "  alpha*=smoothstep(0.0,.18,uv.y)*smoothstep(0.0,.12,1.0-uv.y);",
     "  gl_FragColor=vec4(color,clamp(alpha,0.0,0.42));",
