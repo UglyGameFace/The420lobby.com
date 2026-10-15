@@ -29,7 +29,28 @@ try{
         const page=await browser.newPage({viewport:{width,height:mobile?844:900},reducedMotion:"reduce"});
         const errors=[];
         page.on("pageerror",e=>errors.push(e.message));
+        const cssFailures=[];
+        page.on("requestfailed",request=>{if(request.url().endsWith(".css"))cssFailures.push(request.url()+": "+request.failure()?.errorText);});
         await page.goto(url,{waitUntil:"domcontentloaded"});
+        try {
+          await page.waitForFunction(() => {
+            const site=document.querySelector('link[href="/styles.css"]');
+            const arcade=document.querySelector('link[href="/sesh-signal-v2.css"]');
+            const hero=document.querySelector(".hero");
+            return !!site?.sheet && !!arcade?.sheet && !!hero &&
+              getComputedStyle(hero).overflowX==="hidden" &&
+              getComputedStyle(document.querySelector(".arcade-layout")).display==="grid";
+          }, {timeout:11000});
+        }catch(error){
+          const detail=await page.evaluate(()=>{
+            const base=document.querySelector('link[href="/styles.css"]');
+            const arcade=document.querySelector('link[href="/sesh-signal-v2.css"]');
+            return {baseLoaded:!!base?.sheet,arcadeLoaded:!!arcade?.sheet,
+              heroOverflow:getComputedStyle(document.querySelector(".hero")).overflowX,
+              arcadeDisplay:getComputedStyle(document.querySelector(".arcade-layout")).display};
+          });
+          throw new Error(name+"/"+width+" failed to load stylesheets: "+JSON.stringify({detail,cssFailures})+" "+String(error));
+        }
         await page.locator("#hero-heading").waitFor({state:"visible"});
         assert.equal(await page.locator(".logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed smoke logo load");
         assert.equal(await page.locator(".sesh-wisp").count(),0,"No targets before start");
