@@ -93,7 +93,7 @@
       if (x < 0 || x > width || y < 0 || y > height) continue;
       var opacity = Math.max(0.11, Math.min(0.76, (0.48 + 0.3 * Math.sin(time * 0.0007 + s.phase)) * (distance / radius + 0.15)));
       ctx.globalAlpha = opacity;
-      ctx.fillStyle = i % 10 === 0 ? "#c4ff4a" : i % 4 === 0 ? "#dbadff" : "#f1e6ff";
+      ctx.fillStyle = i % 10 === 0 ? "#baff6b" : i % 4 === 0 ? "#f7c679" : "#e4f4dc";
       ctx.beginPath();
       ctx.arc(x, y, s.size * (0.6 + distance / radius), 0, Math.PI * 2);
       ctx.fill();
@@ -208,10 +208,10 @@
   }
 
   var signalData = {
-    community: ["001", "FREQUENCY 001 // CONNECT", "FIND YOUR PEOPLE.", "Hang out, squad up, discover shared interests, and build a community that feels like your corner of the internet."],
-    shield: ["002", "FREQUENCY 002 // PROTECT", "GOOD VIBES. SMART GUARDRAILS.", "Dank Shield combines Discord moderation, onboarding, roles, profiles, sharing, and community management into one toolkit."],
-    cinema: ["003", "FREQUENCY 003 // WATCH", "MAKE IT A MOVIE NIGHT.", "Dank Cinema adds a shared entertainment dimension to the community. Pick a screen, bring your people, and make a night of it."],
-    minecraft: ["004", "FREQUENCY 004 // BUILD", "GET LOST IN A NEW WORLD.", "The 420 Server connects Java and Bedrock players for survival, exploring, building, and creating stories together."]
+    community: ["001", "MODE 001 // THE HANGOUT", "SESH. GAME. REPEAT.", "Pop into voice chat, share a laugh, find people to game with, and unwind in a 420-friendly Discord community."],
+    shield: ["002", "MODE 002 // DANK SHIELD", "KEEP THE GOOD VIBES SAFE.", "Dank Shield helps with Discord moderation, verification, role selection, profiles, sharing, and community management."],
+    cinema: ["003", "MODE 003 // DANK CINEMA", "ROLL CREDITS. PASS SNACKS.", "Grab your friends for movie nights and a shared watch-party experience inside the 420 community."],
+    minecraft: ["004", "MODE 004 // THE 420 SERVER", "BUILD. EXPLORE. CHILL.", "The 420 Server brings Java and Bedrock players together. The new connection address will be posted once confirmed."]
   };
   var tabs = Array.from(document.querySelectorAll(".signal-tab"));
   var panel = document.getElementById("signal-panel");
