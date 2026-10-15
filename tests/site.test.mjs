@@ -11,14 +11,18 @@ const renderer = read("visual-engine.js");
 const leaf = read("assets/botanical-leaf.svg");
 const lounge = read("assets/haunted-lounge.svg");
 const icon = read("favicon.svg");
+const smokeLogo = read("assets/smoke-420.svg");
 
-test("hero communicates a spooky, stoner-friendly gaming hangout immediately", () => {
-  for(const text of ["AFTER","DARK,","WE PLAY","spooky","Discord","Minecraft","sesh","THE 420 LOBBY"]) {
+test("hero communicates a 420-friendly gaming community, not haunted house branding", () => {
+  for(const text of ["AFTER","DARK,","WE PLAY","420 FRIENDLY","Discord","Minecraft","sesh","THE 420 LOBBY"]) {
     assert.ok(html.toLowerCase().includes(text.toLowerCase()),"missing "+text);
   }
   assert.match(html,/id="hero-heading"/);
   assert.match(html,/src="\/assets\/haunted-lounge\.svg"/);
   assert.match(html,/src="\/assets\/botanical-leaf\.svg"/);
+  assert.match(html,/src="\/assets\/smoke-420\.svg"/);
+  const textOnly=html.replace(/<(?:img|meta|link)[^>]*>/g,"");
+  assert.doesNotMatch(textOnly,/haunted|haunt|ghost towns|spooky/i);
   assert.doesNotMatch(html,/UNREAL VIBES|PICK YOUR REALITY|ON ANOTHER FREQUENCY/i);
 });
 
@@ -31,6 +35,15 @@ test("custom botanical art uses seven distinct serrated and veined leaflets", ()
   assert.match(lounge,/ghostly|phantom|spectral/i);
   assert.match(lounge,/gaming controller/i);
   assert.match(icon,/haunted|ghost|\/svg>/i);
+});
+
+test("custom smoke 420 brand has accessible branding without the old clipped square", () => {
+  assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/smoke-420\.svg"/);
+  assert.match(html, /class="logo"[^>]+aria-label="The 420 Lobby home"/);
+  assert.match(smokeLogo, /numbers 420 are formed from flowing luminous smoke/i);
+  assert.match(smokeLogo, /<svg[^>]*viewBox="0 0 420 156"/);
+  assert.doesNotMatch(html,/class="logo-glyph"/);
+  assert.doesNotMatch(css,/\.logo-glyph/);
 });
 
 test("all advertised community experiences remain present", () => {
@@ -82,8 +95,11 @@ test("interaction controller preserves useful controls and reduced motion", () =
 });
 
 test("CSS has original haunted experience and mobile/performance fallbacks",()=>{
-  for(const item of [".hero-scene",".botanical-foreground",".scene-cobweb",".experience-card",".reality-section",".join",".fx-off","prefers-reduced-motion","@media(max-width:760px)","@media(hover:none)"])assert.ok(css.includes(item),item);
+  for(const item of [".hero-scene",".botanical-foreground",".scene-cobweb",".experience-card",".reality-section",".reality-prism",".reality-slit",".logo-smoke",".join",".fx-off","prefers-reduced-motion","@media(max-width:760px)","@media(hover:none)"])assert.ok(css.includes(item),item);
   assert.doesNotMatch(css,/\.portal-ring|--magenta:/);
+  assert.match(css,/grid-template-columns:repeat\(12,minmax\(0,1fr\)\)/);
+  assert.match(css,/experience-card:nth-child\(4n\+1\)/);
+  assert.match(css,/experience-card:nth-child\(n\)\{grid-column:1/);
   assert.match(css,/\.entrance,\.reveal\{opacity:1;/);
   const noComments=css.replace(/\/\*[\s\S]*?\*\//g,"").replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,"");
   let depth=0;
