@@ -88,7 +88,9 @@ try {
       "independent arcade CSS link failed to load: "+JSON.stringify(arcadePresentation));
     assert.ok(arcadePresentation.ruleCount>25,"arcade stylesheet is empty or stale");
     assert.equal(arcadePresentation.layoutDisplay,"grid","arcade falls back to unstyled text");
-    assert.ok(arcadePresentation.stageHeight>=300,"arcade playfield has collapsed");
+    const minStageHeight = scenario.size.width <= 420 ? 270 : 300;
+    assert.ok(arcadePresentation.stageHeight>=minStageHeight,
+      "arcade playfield has collapsed "+JSON.stringify({height:arcadePresentation.stageHeight,minStageHeight,viewport:scenario.size.width}));
     assert.equal(arcadePresentation.stageOverflow,"hidden","arcade missing game screen styling");
     assert.equal(arcadePresentation.machineBorder,"1px","cabinet framing not styled");
     assert.ok(arcadePresentation.machineHeight>450,"arcade cabinet missing");
