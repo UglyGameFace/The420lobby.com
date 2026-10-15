@@ -40,7 +40,10 @@ test("custom botanical art uses seven distinct serrated and veined leaflets", ()
 test("custom smoke 420 brand has accessible branding without the old clipped square", () => {
   assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/smoke-420\.svg"/);
   assert.match(html, /class="logo"[^>]+aria-label="The 420 Lobby home"/);
-  assert.match(smokeLogo, /numbers 420 are formed from flowing luminous smoke/i);
+  assert.match(smokeLogo, /digits 420 take shape as swirling, feathery, translucent white vapor/i);
+  assert.match(smokeLogo, /fractalNoise/);
+  assert.match(smokeLogo, /feDisplacementMap/);
+  assert.doesNotMatch(smokeLogo,/stroke-width="23"|stroke-width="16"|filter="url\(#aura\)"/);
   assert.match(smokeLogo, /<svg[^>]*viewBox="0 0 420 156"/);
   assert.doesNotMatch(html,/class="logo-glyph"/);
   assert.doesNotMatch(css,/\.logo-glyph/);
