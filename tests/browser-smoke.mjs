@@ -42,7 +42,7 @@ try {
     await page.evaluate(()=>document.fonts.ready);
     const initialHeroOpacity = await page.locator("#hero-heading").evaluate(el=>getComputedStyle(el).opacity);
     assert.equal(initialHeroOpacity,"1","hero text must be readable immediately, not hidden behind scroll observer");
-    assert.equal(await page.title(),"The 420 Lobby | After Dark, We Play");
+    assert.equal(await page.title(),"The 420 Lobby | After Cheers, We Play");
     assert.equal(await page.locator(".experience-card").count(),4);
     assert.equal(await page.locator(".card-body").count(),4,"custom feature card content needs to be present");
     assert.equal(await page.locator("#sesh-stage").count(),1,"arcade field is missing");
