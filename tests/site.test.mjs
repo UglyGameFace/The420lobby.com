@@ -76,7 +76,7 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.doesNotMatch(css,/\.logo-glyph/);
   assert.match(css,/\.fx-toggle #fx-label\{display:none\}/);
   assert.match(css,/\.scene-label\{display:none\}/);
-  assert.match(css,/\.logo-smoke\{width:129px;height:62px/);
+  assert.match(css,/\.logo-smoke\{width:124px;height:60px/);
   assert.match(html, /class="fx-switch"/);
 });
 
