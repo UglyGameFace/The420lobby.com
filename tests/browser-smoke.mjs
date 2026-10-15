@@ -175,6 +175,7 @@ try {
       await firstWisp.click({timeout:5000});
       const points=Number(await page.locator("#sesh-score").textContent());
       assert.ok(points>0,"tapping a grinder should award points");
+      assert.ok(await page.locator('[data-kit="grinder"]').evaluate(el=>el.classList.contains("is-collected")),"grinder should visibly advance kit tracker");
       await page.locator("#sesh-pause").click();
       assert.equal(await page.locator("#sesh-stage").getAttribute("data-mode"),"paused");
       const frozen=await page.locator("#sesh-time").textContent();
@@ -197,6 +198,7 @@ try {
       assert.match(await broken.getAttribute("aria-label"),/avoid clicking/);
       await broken.click({timeout:5000});
       assert.equal(await page.locator("#sesh-combo").textContent(),"x0","broken glass must wipe combo");
+      assert.equal(await page.locator(".sesh-kit-tracker .is-collected").count(),0,"broken glass must reset kit tracker");
       assert.match(await page.locator("#sesh-announcement").textContent(),/Broken glass/);
       await page.evaluate(()=>{Math.random=()=>0.96;});
       await page.locator("#sesh-start").click();
