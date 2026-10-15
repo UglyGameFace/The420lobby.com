@@ -50,6 +50,21 @@ test("approved Cheers hero retains actual text, independent motion and original 
   assert.match(jointArt, /<\/svg>\s*$/);
 });
 
+test("cheers joint stays integrated inside the lettering with a flickering ember", () => {
+  assert.match(html, /class="cheers-roll"[^>]*>.*class="cheers-ember"/s);
+  const rollRule = cheersCss.match(/\.hero-heading-cheers \.cheers-roll\{([^}]*)\}/s)?.[1] ?? "";
+  const width = Number(rollRule.match(/width:\s*([\d.]+)%/)?.[1]);
+  const left = Number(rollRule.match(/left:\s*([\d.]+)%/)?.[1]);
+  assert.ok(width > 0 && left >= 0, "joint geometry must be percentage-based");
+  assert.ok(left + width <= 100, "joint must not overshoot past CHEERS onto WE PLAY");
+  assert.match(cheersCss, /@keyframes cheers-ember/);
+  assert.match(cheersCss, /\.hero-heading-cheers \.cheers-ember\{[^}]*animation:cheers-ember/);
+  const fxOff = cheersCss.match(/html\.fx-off[^{]*\{[^}]*\}/s)?.[0] ?? "";
+  assert.ok(fxOff.includes(".cheers-ember"), "ember flicker must stop with FX off");
+  const reduced = cheersCss.match(/prefers-reduced-motion:reduce\)\{([\s\S]*?)\n\}/)?.[0] ?? "";
+  assert.ok(reduced.includes(".cheers-ember"), "ember flicker must stop under reduced motion");
+});
+
 test("custom botanical art uses seven distinct serrated and veined leaflets", () => {
   assert.equal((leaf.match(/transform="rotate\(-?\d+ 300 464\)"/g)||[]).length,7);
   assert.ok((leaf.match(/<path/g)||[]).length>35);
