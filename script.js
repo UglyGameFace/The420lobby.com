@@ -116,8 +116,8 @@
       stopStars();
       root.style.setProperty("--hero-shift", "0px");
       root.style.setProperty("--interlude-shift", "0px");
-      root.style.setProperty("--mouse-x", "0");
-      root.style.setProperty("--mouse-y", "0");
+      root.style.setProperty("--mouse-x", "0px");
+      root.style.setProperty("--mouse-y", "0px");
       showAllReveals();
     }
   }
@@ -185,8 +185,8 @@
       if (!motionOn) return;
       pointerX = (event.clientX / Math.max(1, window.innerWidth) - 0.5) * 2;
       pointerY = (event.clientY / Math.max(1, window.innerHeight) - 0.5) * 2;
-      root.style.setProperty("--mouse-x", pointerX.toFixed(3));
-      root.style.setProperty("--mouse-y", pointerY.toFixed(3));
+      root.style.setProperty("--mouse-x", (pointerX * 13).toFixed(2) + "px");
+      root.style.setProperty("--mouse-y", (pointerY * 11).toFixed(2) + "px");
     }, { passive: true });
 
     document.querySelectorAll(".tilt").forEach(function (card) {
