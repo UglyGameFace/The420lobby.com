@@ -35,7 +35,7 @@ try{
         try {
           await page.waitForFunction(() => {
             const site=document.querySelector('link[href="/styles.css"]');
-            const arcade=document.querySelector('link[href="/sesh-signal-v2.css"]');
+            const arcade=document.querySelector('link[href="/sesh-signal-v3.css"]');
             const hero=document.querySelector(".hero");
             return !!site?.sheet && !!arcade?.sheet && !!hero &&
               getComputedStyle(hero).overflowX==="hidden" &&
@@ -44,7 +44,7 @@ try{
         }catch(error){
           const detail=await page.evaluate(()=>{
             const base=document.querySelector('link[href="/styles.css"]');
-            const arcade=document.querySelector('link[href="/sesh-signal-v2.css"]');
+            const arcade=document.querySelector('link[href="/sesh-signal-v3.css"]');
             return {baseLoaded:!!base?.sheet,arcadeLoaded:!!arcade?.sheet,
               heroOverflow:getComputedStyle(document.querySelector(".hero")).overflowX,
               arcadeDisplay:getComputedStyle(document.querySelector(".arcade-layout")).display};
@@ -53,7 +53,11 @@ try{
         }
         await page.locator("#hero-heading").waitFor({state:"visible"});
         assert.equal(await page.locator(".logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed smoke logo load");
-        assert.equal(await page.locator(".sesh-wisp").count(),0,"No targets before start");
+        assert.equal(await page.locator(".sesh-item").count(),0,"No targets before start");
+        const logoBounds=await page.locator(".logo-smoke").boundingBox();
+        if(mobile){
+          assert.ok(logoBounds && logoBounds.width<=150,"WebKit must honor mobile smoke logo width: "+JSON.stringify(logoBounds));
+        }
         const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
         if(overflow>2) {
           const details=await page.evaluate(()=>{
@@ -65,8 +69,15 @@ try{
                 overflow:style.overflowX,display:style.display};
             }).filter(x=>x.right>innerWidth+2||x.left< -2)
               .sort((a,b)=>b.right-a.right).slice(0,35);
-            const gameLink=document.querySelector('link[href="/sesh-signal-v2.css"]');
-            return {viewport:innerWidth,doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,
+            const headerElements=["html","body",".header-shell",".logo",".logo-smoke",".logo-type",".header-actions","#fx-toggle","#menu-toggle",".desktop-nav"].map(selector=>{
+              const node=document.querySelector(selector);
+              if(!node)return {selector,missing:true};
+              const r=node.getBoundingClientRect(),computed=getComputedStyle(node);
+              return {selector,left:r.left,right:r.right,width:r.width,display:computed.display,
+                font:computed.font,whiteSpace:computed.whiteSpace,overflowX:computed.overflowX};
+            });
+            const gameLink=document.querySelector('link[href="/sesh-signal-v3.css"]');
+            return {viewport:innerWidth,doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,headerElements,
               loaded:!!gameLink?.sheet,arcadeDisplay:getComputedStyle(document.querySelector(".arcade-layout")).display,
               stageHeight:document.querySelector("#sesh-stage").getBoundingClientRect().height,
               candidates};
@@ -90,7 +101,7 @@ try{
         }
         await page.evaluate(()=>{Math.random=()=>0.5;});
         await page.locator("#sesh-start").click();
-        const wisp=page.locator(".sesh-wisp--smoke").first();
+        const wisp=page.locator(".sesh-item--grinder").first();
         await wisp.waitFor({state:"visible",timeout:6000});
         await wisp.click({timeout:3500});
         assert.ok(Number(await page.locator("#sesh-score").textContent())>0,name+" tap did not award points");

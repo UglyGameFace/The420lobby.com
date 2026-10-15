@@ -22,7 +22,7 @@
   const state = {
     mode: "idle", score: 0, combo: 0, best: 0, charge: 0,
     boostMs: 0, elapsed: 0, nextSpawn: 300, lastFrame: 0,
-    nextId: 0, raf: 0, caught: 0, avoided: 0, targets: []
+    nextId: 0, raf: 0, caught: 0, avoided: 0, kit: [], targets: []
   };
 
   function safeBest() {
@@ -35,6 +35,14 @@
     try { window.localStorage.setItem(BEST_KEY, String(score)); }
     catch (_) { /* Private browsing or disabled storage: game still works. */ }
   }
+  const SAFE_GEAR = ["lighter","grinder","papers"];
+  const HAZARDS = ["broken-bong","broken-pipe"];
+  const ITEM_LABELS = {
+    lighter:"Pocket lighter",grinder:"Herb grinder",papers:"Rolling papers",
+    "clean-glass":"Clean glass piece", "broken-bong":"Broken bong glass",
+    "broken-pipe":"Broken glass pipe"
+  };
+  const isHazard = kind => HAZARDS.includes(kind);
   function announce(text) { announcement.textContent = text; }
   function updateHud() {
     scoreLabel.textContent = String(state.score).padStart(4, "0");
@@ -49,6 +57,11 @@
     boostButton.disabled = state.mode !== "playing" || state.charge < 100 || state.boostMs > 0;
     boostButton.textContent = state.boostMs > 0 ? "CHILL MODE ACTIVE" : "ACTIVATE CHILL MODE";
     stage.classList.toggle("chill-mode", state.boostMs > 0);
+    document.querySelectorAll(".sesh-kit-tracker [data-kit]").forEach(slot => {
+      const collected=state.kit.includes(slot.dataset.kit);
+      slot.classList.toggle("is-collected",collected);
+      slot.querySelector("b").textContent=collected?"✓":"○";
+    });
   }
   function updateControls() {
     startButton.textContent = state.mode === "playing" || state.mode === "paused" ? "RESTART ROUND" : "START NEW ROUND";
@@ -103,64 +116,80 @@
     state.targets.splice(at,1);
     if (document.activeElement === target.element) stage.focus({preventScroll:true});
     target.element.remove();
-    if (missed && target.kind !== "static" && state.mode === "playing") {
-      state.combo = 0;
-      announce("Wisp drifted away. Catch the next one!");
-    } else if (missed && target.kind === "static") {
-      state.avoided++;
-    }
+    if (missed && !isHazard(target.kind) && state.mode === "playing") {
+      state.combo=0;
+      announce("An item drifted away. Catch the next one!");
+    } else if (missed && isHazard(target.kind)) state.avoided++;
   }
   function catchTarget(target) {
     if (state.mode !== "playing" || !state.targets.includes(target)) return;
-    const {kind, x, y} = target;
-    if (kind === "static") {
-      state.score = Math.max(0,state.score-15);
-      state.combo = 0;
-      showBurst(x,y,"−15","var(--ember)");
-      announce("Interference! Avoid violet static.");
+    const {kind,x,y}=target;
+    if (isHazard(kind)) {
+      state.score=Math.max(0,state.score-20);
+      state.combo=0;
+      state.kit=[];
+      showBurst(x,y,"−20","var(--ember)");
+      announce("Broken glass! Combo and sesh-kit progress reset. Leave cracked glass alone.");
       playNote(170,.15,"static");
     } else {
       state.combo++;
       state.caught++;
-      const points = (kind === "rare" ? 40 : 10 + Math.min(state.combo,10)*2)
-        * (state.boostMs > 0 ? 2 : 1);
-      state.score += points;
-      if (state.boostMs === 0) state.charge = Math.min(100,state.charge+(kind === "rare" ? 40 : 18));
-      showBurst(x,y,"+"+points,kind === "rare" ? "var(--ember)" : "var(--lime)");
-      if (kind === "rare") announce("Golden cloud! Bonus "+points+" points.");
-      else if (state.combo % 5 === 0) announce("Combo "+state.combo+". You're in the zone!");
-      else announce("Wisp caught. "+points+" points.");
-      playNote(kind === "rare" ? 640 : 325 + Math.min(400,state.combo*32),.11,"collect");
+      const rare = kind === "clean-glass";
+      let points=(rare ? 45 : 10+Math.min(state.combo,10)*2)*(state.boostMs>0?2:1);
+      state.score+=points;
+      if(state.boostMs===0)state.charge=Math.min(100,state.charge+(rare?40:20));
+      let message=ITEM_LABELS[kind]+" collected. +"+points+".";
+      if(SAFE_GEAR.includes(kind) && !state.kit.includes(kind)){
+        state.kit.push(kind);
+        if(state.kit.length===SAFE_GEAR.length){
+          const kitBonus=75*(state.boostMs>0?2:1);
+          state.score+=kitBonus;
+          state.charge=Math.min(100,state.charge+30);
+          state.kit=[];
+          showBurst(x,y,"KIT +"+kitBonus,"var(--lime)");
+          message="Full sesh kit complete! Lighter, grinder and papers. Bonus "+kitBonus+".";
+          playNote(740,.21,"collect");
+        }
+      }
+      if(message.startsWith("Full sesh"))announce(message);
+      else {
+        showBurst(x,y,"+"+points,rare?"var(--ember)":"var(--lime)");
+        announce(message);
+        playNote(rare?640:325+Math.min(400,state.combo*32),.11,"collect");
+      }
     }
     removeTarget(target,false);
     updateHud();
   }
   function random(min,max) { return min + Math.random()*(max-min); }
   function spawn() {
-    const limit = slowMotion() ? 3 : 5;
-    if (state.targets.length >= limit) return;
-    const choice = Math.random();
-    const kind = choice < .17 ? "static" : choice > .88 ? "rare" : "smoke";
-    let x = random(13,86), y = random(19,81);
-    // Keep new targets apart, including on small phone screens.
-    for (let n=0;n<10 && state.targets.some(t=>Math.hypot(t.x-x,t.y-y)<19);n++) {
-      x = random(13,86); y = random(19,81);
+    const limit=slowMotion()?3:5;
+    if(state.targets.length>=limit)return;
+    const choice=Math.random();
+    const kind=choice<.12?"broken-bong":choice<.23?"broken-pipe":
+      choice<.47?"lighter":choice<.70?"grinder":
+      choice<.90?"papers":"clean-glass";
+    let x=random(16,84),y=random(17,82);
+    for(let n=0;n<10 && state.targets.some(t=>Math.hypot(t.x-x,t.y-y)<22);n++){
+      x=random(16,84);y=random(17,82);
     }
-    const element = document.createElement("button");
-    element.type = "button";
-    element.className = "sesh-wisp sesh-wisp--"+kind;
-    element.setAttribute("aria-label",kind === "static" ? "Violet static, avoid" :
-      kind === "rare" ? "Golden smoke, catch for bonus points" : "Green smoke, catch for points");
-    element.setAttribute("title",kind === "static" ? "Avoid static" : "Catch this wisp");
-    element.textContent = kind === "static" ? "✕" : kind === "rare" ? "✦" : "〰";
-    element.style.left = x+"%"; element.style.top = y+"%";
-    element.style.setProperty("--wisp-tilt",Math.round(random(-25,25))+"deg");
-    const life = slowMotion() ? 3700 : Math.max(1550,2600-state.elapsed/DURATION*700);
-    const target = {
-      id:++state.nextId, kind, x, y, originY:y, age:0,
-      life: state.boostMs>0 ? life*1.5 : life,
-      element, phase:random(0,7)
-    };
+    const element=document.createElement("button");
+    element.type="button";
+    element.className="sesh-item sesh-item--"+kind+(isHazard(kind)?" sesh-item--hazard":"");
+    element.setAttribute("aria-label",ITEM_LABELS[kind]+(isHazard(kind)?", avoid clicking":", tap to collect"));
+    element.setAttribute("title",ITEM_LABELS[kind]+(isHazard(kind)?" · BROKEN · AVOID":" · COLLECT"));
+    const symbol=document.createElementNS("http://www.w3.org/2000/svg","svg");
+    symbol.setAttribute("class","sesh-item-art");
+    symbol.setAttribute("viewBox","0 0 100 100");
+    symbol.setAttribute("aria-hidden","true");
+    const use=document.createElementNS("http://www.w3.org/2000/svg","use");
+    use.setAttribute("href","/assets/sesh-gear.svg#"+kind);
+    symbol.append(use);
+    element.append(symbol);
+    element.style.left=x+"%";element.style.top=y+"%";
+    const life=slowMotion()?4100:Math.max(2100,3200-state.elapsed/DURATION*800);
+    const target={id:++state.nextId,kind,x,y,age:0,
+      life:state.boostMs>0?life*1.4:life,element};
     element.addEventListener("click",()=>catchTarget(target));
     state.targets.push(target);
     layer.append(element);
@@ -188,9 +217,9 @@
     if(state.raf)cancelAnimationFrame(state.raf);
     state.raf=0;clearObjects();
     if(state.score>state.best){state.best=state.score;saveBest(state.best);}
-    const title = state.score >= 700 ? "LOBBY LEGEND" : state.score >= 400 ? "CLOUD MASTER"
+    const title = state.score >= 700 ? "LOBBY LEGEND" : state.score >= 400 ? "SESH MASTER"
       : state.score >= 180 ? "CERTIFIED VIBER" : "FRESH IN THE LOBBY";
-    overlayMessage(title,"Round complete · "+state.score+" points · "+state.caught+" wisps caught.");
+    overlayMessage(title,"Round complete · "+state.score+" points · "+state.caught+" items collected.");
     resultText.textContent = "You scored "+state.score+" points. "+title+". Personal best: "+state.best+".";
     updateControls();
     announce("Round over. "+state.score+" points. "+title+".");
@@ -213,10 +242,9 @@
     for(const target of [...state.targets]){
       target.age+=dt;
       if(target.age>=target.life){removeTarget(target,true);continue;}
-      // The hit target stays stationary for reliable taps and keyboard focus.
-      // Smoke wisps animate only through pseudo-elements, not their button bounds.
+      // Hit targets remain stationary for touch, keyboard and browser automation.
       const lifeLeft = Math.max(0,1-target.age/target.life);
-      // Keep hitbox geometry fixed. Only visual opacity fades over its lifespan.
+      // Only translucency changes; neither bounds nor click area changes.
       target.element.style.setProperty("--wisp-opacity",Math.max(.37,Math.min(1,lifeLeft*1.6)).toFixed(3));
     }
     const seconds=Math.ceil((DURATION-state.elapsed)/1000);
@@ -229,11 +257,16 @@
     state.raf=0;clearObjects();
     Object.assign(state,{
       mode:"playing",score:0,combo:0,charge:0,boostMs:0,elapsed:0,
-      nextSpawn:250,lastFrame:0,nextId:0,caught:0,avoided:0
+      nextSpawn:250,lastFrame:0,nextId:0,caught:0,avoided:0,kit:[]
     });
     lastAnnouncedTime=-1;overlay.hidden=true;resultText.textContent="";
-    updateControls();announce("Round started. Catch green wisps, avoid violet static.");
+    updateControls();announce("Round started. Collect lighter, grinder and papers. Avoid broken glass.");
     stage.focus({preventScroll:true});
+    // Keep the playfield immediately visible on phones when the round begins.
+    if(window.innerWidth<=900){
+      try{stage.scrollIntoView({behavior:"instant",block:"center"});}
+      catch(_){stage.scrollIntoView();}
+    }
     state.raf=requestAnimationFrame(frame);
   }
   function boost() {
@@ -244,7 +277,7 @@
     updateHud();
   }
   function shareText() {
-    const title = state.score >= 700 ? "Lobby Legend" : state.score >= 400 ? "Cloud Master" :
+    const title = state.score >= 700 ? "Lobby Legend" : state.score >= 400 ? "Sesh Master" :
       state.score >= 180 ? "Certified Viber" : "Fresh in the Lobby";
     return "I scored "+state.score+" on Sesh Signal ("+title+") in The 420 Lobby! Can you beat it? https://the420lobby.com/#sesh-signal";
   }

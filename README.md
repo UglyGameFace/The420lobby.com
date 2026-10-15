@@ -3,11 +3,11 @@
 **Discord:** https://discord.gg/the420lobby  
 **Cloudflare Pages project:** `the420lobby-com`
 
-## Active task: Sesh Signal community arcade
+## Active task: Sesh Signal custom-accessory gameplay and responsive layout
 
 PR #3's custom smoke branding is already in production `main`. This feature adds a fully playable, standalone 42-second 420-themed arcade game as the next single active task, without modifying Dank Shield or claiming any live Discord integration.
 
-**Rules:** Collect drifting green smoke (+10 plus combo), grab rare gold clouds (+40), avoid violet static (-15 and combo reset). After charging the meter, activate five seconds of double-point Chill Mode. Tap on Android or navigate targets with keyboard Tab/Enter. Press B with focus inside the playfield to activate the boost.
+**Rules:** Collect realistic illustrated lighter, grinder and papers items. Completing all three distinct items in a run grants +75 bonus and extra Chill Mode charge. An intact glass piece grants a rare +45. Broken bongs and broken glass pipes are negative hazards: tapping costs 20 points and resets combo and kit progress. Targets remain stationary for reliable mobile taps. Chill Mode doubles points for five seconds.
 
 **Results:** Show round score, combo, elapsed time, personal best, player tier, and optional share/copy to Discord. The best score is stored only in this browser's localStorage and may disappear if storage is cleared. No account, analytics SDK, leaderboard backend, prize, or permission to affect Discord roles is involved.
 
@@ -17,8 +17,10 @@ PR #3's custom smoke branding is already in production `main`. This feature adds
 - `index.html`: semantic content, internal links, verified Discord invite, no invented stats or Minecraft ports.
 - `styles.css`: sole authoritative theme and layout stylesheet. Responsive and reduced-motion designs included.
 - `script.js`: the marketing site's DOM interaction and scroll/parallax coordinator.
-- `sesh-signal.js`: independent mini-game state, local scoring, one animation loop, share/copy and optional sound. No server calls.
-- `sesh-signal-v2.css`: the **sole** Sesh Signal arcade stylesheet, linked independently from the marketing site's `styles.css`. It uses a new URL to prevent stale site CSS caches from rendering arcade controls as raw text. Version its filename on future breaking visual changes.
+- `sesh-signal.js`: independent mini-game state, set-completion bonuses, glass hazards, local scoring, one animation loop, share/copy and optional sound. No server calls.
+- `assets/sesh-gear.svg`: six original accessory illustrations used in actual game targets.
+- `sesh-signal-v3.css`: dedicated, cache-versioned responsive arcade design. Old arcade CSS must not be used.
+- `sesh-signal-v3.css`: the **sole** Sesh Signal arcade stylesheet, linked independently from the marketing site's `styles.css`. It uses a new URL to prevent stale site CSS caches from rendering arcade controls as raw text. Version its filename on future breaking visual changes.
 - `visual-engine.js`: GPU WebGL shader, owned behind `window.LobbyAtmosphere`. No Three.js download, CDNs, or build step. Shader falls back to CSS if WebGL is unavailable.
 - `assets/haunted-lounge.svg`: existing atmospheric CRT gaming illustration, retained as visual background only. Its filename is legacy; no haunted-house copy is promoted.
 - `assets/smoke-420.svg`: procedural vapor lettering formed by turbulence, displacement, feathered clouds, and translucent density, deliberately replacing the clipping-paper CSS brand mark.
@@ -68,3 +70,7 @@ Suggested delivery order:
 5. **Member portal** (only if truly needed): Discord OAuth2 with server-side token handling, account-scoped permissions, access controls, and abuse protection. Do not build this before the read-only integration is proven stable.
 
 All live data should explicitly label stale/unavailable status. Keep Cloudflare Pages lightweight and do not make Dank Shield production runtime dependent on the marketing website.
+
+## Mobile acceptance
+
+Game controls and the playing field sit together in `.arcade-play`, with a compact visible collect/avoid key and expanded instructions in native `<details>`. The gameplay must be visible and tappable at 320, 360, 390, 412 and tablet/desktop widths. Test both useful accessory taps and broken-glass hazards and confirm reduced-motion and save-data fallbacks. No prizes or member rewards are granted.
