@@ -188,6 +188,25 @@ try {
     await page.close();
     console.log("PASS "+scenario.name+" "+scenario.size.width+"x"+scenario.size.height+": links, artwork, navigation, effects toggle, no overflow");
   }
+  // Regression: an old browser-cached copy of styles.css must NOT erase the game.
+  const stale=await browser.newPage({viewport:{width:390,height:844}});
+  await stale.route("**/styles.css",route=>route.fulfill({
+    status:200,contentType:"text/css",body:":root{--lime:#b8f875} body{margin:0}"
+  }));
+  await stale.goto(address,{waitUntil:"domcontentloaded"});
+  const resilient=await stale.evaluate(()=>{
+    const arcade=document.querySelector(".arcade-layout");
+    const stage=document.querySelector("#sesh-stage");
+    const machine=document.querySelector(".arcade-machine");
+    return {display:getComputedStyle(arcade).display,
+      stageHeight:stage.getBoundingClientRect().height,
+      machineBorder:getComputedStyle(machine).borderTopWidth};
+  });
+  assert.equal(resilient.display,"grid","old cached site CSS hides arcade layout");
+  assert.ok(resilient.stageHeight>=300,"old cached site CSS hides the game board");
+  assert.equal(resilient.machineBorder,"1px","arcade must be styled independently of cached global CSS");
+  await stale.close();
+  console.log("PASS stale-global-CSS simulation: independently styled game remains visible");
   const reduced=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
   await reduced.goto(address,{waitUntil:"domcontentloaded"});
   assert.equal(await reduced.locator("#fx-toggle").getAttribute("aria-pressed"),"false");
