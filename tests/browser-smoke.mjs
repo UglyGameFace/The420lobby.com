@@ -43,6 +43,9 @@ try {
     assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),4);
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
+    assert.equal(await page.locator("img.logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");
+    assert.equal(await page.locator(".logo-glyph").count(),0,"outdated sticky-note mark still present");
+    assert.equal(await page.locator(".reality-prism").count(),1,"optical prism missing");
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
     assert.ok(overflow<=2,scenario.name+" horizontal overflow "+overflow+"px");
     if (scenario.mobile) {
