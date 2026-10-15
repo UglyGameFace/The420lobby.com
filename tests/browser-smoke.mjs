@@ -35,6 +35,9 @@ try {
     page.on("pageerror",error=>errors.push(error.message));
     await page.goto(address,{waitUntil:"domcontentloaded"});
     await page.locator("#hero-heading").waitFor({state:"visible"});
+    await page.evaluate(()=>document.fonts.ready);
+    const initialHeroOpacity = await page.locator("#hero-heading").evaluate(el=>getComputedStyle(el).opacity);
+    assert.equal(initialHeroOpacity,"1","hero text must be readable immediately, not hidden behind scroll observer");
     assert.equal(await page.title(),"The 420 Lobby | After Dark, We Play");
     assert.equal(await page.locator(".experience-card").count(),4);
     assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),4);
