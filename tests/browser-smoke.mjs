@@ -67,7 +67,7 @@ try {
       assert.ok(layout.menu.right <= layout.viewport+1,"menu is offscreen");
       assert.ok(layout.heading.left >= 0 && layout.heading.right <= layout.viewport+2,
         "hero headline exceeds mobile viewport");
-      assert.equal(await page.locator(".scene-label").evaluate(el=>getComputedStyle(el).display),"none",
+      assert.equal(await page.locator(".scene-label").first().evaluate(el=>getComputedStyle(el).display),"none",
         "decorative scene label should not cover the mobile header");
       assert.equal(await page.locator("#fx-label").evaluate(el=>getComputedStyle(el).display),"none",
         "wide effects label must collapse on mobile");
