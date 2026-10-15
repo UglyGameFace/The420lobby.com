@@ -6,6 +6,8 @@ import vm from "node:vm";
 const read = (name) => fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html = read("index.html");
 const css = read("styles.css");
+const cheersCss = read("cheers-hero-v1.css");
+const jointArt = read("assets/cheers-joint.svg");
 const arcadeCss = read("sesh-signal-v3.css");
 const client = read("script.js");
 const renderer = read("visual-engine.js");
@@ -17,7 +19,7 @@ const game = read("sesh-signal.js");
 const gear = read("assets/sesh-gear.svg");
 
 test("hero communicates a 420-friendly gaming community, not haunted house branding", () => {
-  for(const text of ["AFTER","DARK,","WE PLAY","420 FRIENDLY","Discord","Minecraft","sesh","THE 420 LOBBY"]) {
+  for(const text of ["AFTER","CHEERS,","WE PLAY","420 FRIENDLY","Discord","Minecraft","sesh","THE 420 LOBBY"]) {
     assert.ok(html.toLowerCase().includes(text.toLowerCase()),"missing "+text);
   }
   assert.match(html,/id="hero-heading"/);
@@ -27,6 +29,25 @@ test("hero communicates a 420-friendly gaming community, not haunted house brand
   const textOnly=html.replace(/<(?:img|meta|link)[^>]*>/g,"");
   assert.doesNotMatch(textOnly,/haunted|haunt|ghost towns|spooky/i);
   assert.doesNotMatch(html,/UNREAL VIBES|PICK YOUR REALITY|ON ANOTHER FREQUENCY/i);
+});
+
+test("approved Cheers hero retains actual text, independent motion and original joint artwork", () => {
+  assert.match(html, /<h1[^>]*aria-label="After cheers, we play\."/);
+  assert.match(html, /class="headline-cheers"/);
+  assert.match(html, /class="cheers-word">CHEERS,/);
+  assert.match(html, /src="\/assets\/cheers-joint\.svg"/);
+  assert.match(html, /href="\/cheers-hero-v1\.css"/);
+  assert.match(html, /The 420 Lobby \| After Cheers, We Play/);
+  assert.doesNotMatch(html, /headline-hollow">DARK,/);
+  assert.match(cheersCss, /\.hero-heading-cheers \.headline-cheers/);
+  assert.match(cheersCss, /@keyframes cheers-rise/);
+  assert.match(cheersCss, /html\.fx-off/);
+  assert.match(cheersCss, /prefers-reduced-motion:reduce/);
+  for(const width of ["max-width:760px","max-width:420px","max-width:360px"]) assert.ok(cheersCss.includes(width),width);
+  assert.match(jointArt, /<svg[^>]*viewBox="0 0 780 128"/);
+  assert.match(jointArt, /feTurbulence/);
+  assert.match(jointArt, /id="coal"/);
+  assert.match(jointArt, /<\/svg>\s*$/);
 });
 
 test("custom botanical art uses seven distinct serrated and veined leaflets", () => {
@@ -120,6 +141,7 @@ test("CSS has original haunted experience and mobile/performance fallbacks",()=>
 test("static Pages hosting remains build-free", () => {
   assert.match(html,/<link rel="stylesheet" href="\/styles\.css">/);
   assert.match(html,/<link rel="stylesheet" href="\/sesh-signal-v3\.css">/);
+  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css">/);
   assert.match(html,/<script defer src="\/script\.js"><\/script>/);
   assert.match(html,/<script defer src="\/visual-engine\.js"><\/script>/);
   assert.doesNotMatch(html,/https?:\/\/cdn\..*\/.*\.js/);

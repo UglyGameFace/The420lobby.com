@@ -42,7 +42,7 @@ try {
     await page.evaluate(()=>document.fonts.ready);
     const initialHeroOpacity = await page.locator("#hero-heading").evaluate(el=>getComputedStyle(el).opacity);
     assert.equal(initialHeroOpacity,"1","hero text must be readable immediately, not hidden behind scroll observer");
-    assert.equal(await page.title(),"The 420 Lobby | After Dark, We Play");
+    assert.equal(await page.title(),"The 420 Lobby | After Cheers, We Play");
     assert.equal(await page.locator(".experience-card").count(),4);
     assert.equal(await page.locator(".card-body").count(),4,"custom feature card content needs to be present");
     assert.equal(await page.locator("#sesh-stage").count(),1,"arcade field is missing");
@@ -99,6 +99,8 @@ try {
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
     assert.equal(await page.locator("img.logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");
+    assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,"approved joint art failed to load");
+    assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,","hero slogan regressed");
     assert.equal(await page.locator(".logo-glyph").count(),0,"outdated sticky-note mark still present");
     const layout = await page.evaluate(() => {
       const get = selector => {
@@ -139,6 +141,15 @@ try {
     assert.ok(smokeMargins.edge < Math.max(4,smokeMargins.total*.005),
       "smoke numerals bleed past their artwork boundaries");
     assert.equal(await page.locator(".reality-prism").count(),1,"optical prism missing");
+    const cheersArt=await page.locator(".headline-cheers").evaluate(el=>{
+      const r=el.getBoundingClientRect();
+      const roll=el.querySelector(".cheers-roll img").getBoundingClientRect();
+      const font=getComputedStyle(el).fontFamily;
+      return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,rollHeight:roll.height,font};
+    });
+    assert.ok(cheersArt.rollHeight>8,"joint must be visibly scaled");
+    assert.ok(cheersArt.left>=0 && cheersArt.right<=scenario.size.width+2,
+      "Cheers text must fit viewport: "+JSON.stringify(cheersArt));
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
     assert.ok(overflow<=2,scenario.name+" horizontal overflow "+overflow+"px");
     if (scenario.mobile) {

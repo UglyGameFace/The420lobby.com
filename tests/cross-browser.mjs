@@ -53,6 +53,8 @@ try{
         }
         await page.locator("#hero-heading").waitFor({state:"visible"});
         assert.equal(await page.locator(".logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed smoke logo load");
+        assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed joint art load");
+        assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,");
         assert.equal(await page.locator(".sesh-item").count(),0,"No targets before start");
         const logoBounds=await page.locator(".logo-smoke").boundingBox();
         if(mobile){
