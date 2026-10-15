@@ -6,6 +6,7 @@ import vm from "node:vm";
 const read = (name) => fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html = read("index.html");
 const css = read("styles.css");
+const arcadeCss = read("sesh-signal-v2.css");
 const client = read("script.js");
 const renderer = read("visual-engine.js");
 const leaf = read("assets/botanical-leaf.svg");
@@ -117,6 +118,7 @@ test("CSS has original haunted experience and mobile/performance fallbacks",()=>
 
 test("static Pages hosting remains build-free", () => {
   assert.match(html,/<link rel="stylesheet" href="\/styles\.css">/);
+  assert.match(html,/<link rel="stylesheet" href="\/sesh-signal-v2\.css">/);
   assert.match(html,/<script defer src="\/script\.js"><\/script>/);
   assert.match(html,/<script defer src="\/visual-engine\.js"><\/script>/);
   assert.doesNotMatch(html,/https?:\/\/cdn\..*\/.*\.js/);
@@ -163,7 +165,25 @@ test("custom arcade styling supports touch, keyboard, and phones", () => {
     ".sesh-target-layer", ".sesh-overlay[hidden]", ".sesh-wisp",
     ".sesh-wisp--rare", ".sesh-wisp--static", ".sesh-stage.chill-mode",
     "@media(max-width:350px)", "prefers-reduced-motion"
-  ]) assert.ok(css.includes(selector), "missing arcade style "+selector);
-  assert.match(css,/touch-action:manipulation/);
-  assert.match(css,/\.arcade-screenreader/);
+  ]) assert.ok(arcadeCss.includes(selector), "missing arcade style "+selector);
+  assert.match(arcadeCss,/touch-action:manipulation/);
+  assert.match(arcadeCss,/\.arcade-screenreader/);
+});
+
+
+test("arcade CSS is independently versioned and not hidden in stale global styles", () => {
+  assert.match(html, /href="\/styles\.css">[\s\S]*href="\/sesh-signal-v2\.css">/);
+  assert.match(arcadeCss,/\.sesh-arcade\{/);
+  assert.match(arcadeCss,/\.sesh-stage\{/);
+  assert.match(arcadeCss,/\.arcade-machine\{/);
+  assert.doesNotMatch(css,/\.sesh-arcade\{/);
+  const allLinks = [...html.matchAll(/<link\b[^>]*\brel="stylesheet"[^>]*>/g)];
+  assert.ok(allLinks.some(m=>m[0].includes("/sesh-signal-v2.css")),"independent arcade stylesheet not linked");
+  let depth = 0;
+  for (const ch of arcadeCss.replace(/\/\*[\s\S]*?\*\//g,"").replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,"")) {
+    if(ch === "{") depth++;
+    if(ch === "}") depth--;
+    assert.ok(depth >= 0,"arcade CSS has unmatched closing brace");
+  }
+  assert.equal(depth,0,"arcade CSS has unmatched opening brace");
 });

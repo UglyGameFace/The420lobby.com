@@ -47,6 +47,33 @@ try {
     assert.equal(await page.locator(".card-body").count(),4,"custom feature card content needs to be present");
     assert.equal(await page.locator("#sesh-stage").count(),1,"arcade field is missing");
     assert.equal(await page.locator("#sesh-start").count(),1,"arcade start is missing");
+
+    const arcadePresentation = await page.evaluate(() => {
+      const select = s => document.querySelector(s);
+      const cssReady = select('link[href="/sesh-signal-v2.css"]');
+      const machine = select(".arcade-machine"), stage = select("#sesh-stage");
+      const layout = select(".arcade-layout");
+      return {
+        linkPresent: !!cssReady,
+        sheetLoaded: !!cssReady?.sheet,
+        ruleCount: cssReady?.sheet?.cssRules?.length ?? 0,
+        layoutDisplay: getComputedStyle(layout).display,
+        stageHeight: stage.getBoundingClientRect().height,
+        stageOverflow: getComputedStyle(stage).overflow,
+        machineBorder: getComputedStyle(machine).borderTopWidth,
+        overlayDisplay: getComputedStyle(select("#sesh-overlay")).display,
+        machineHeight: machine.getBoundingClientRect().height
+      };
+    });
+    assert.ok(arcadePresentation.linkPresent && arcadePresentation.sheetLoaded,
+      "independent arcade CSS link failed to load: "+JSON.stringify(arcadePresentation));
+    assert.ok(arcadePresentation.ruleCount>25,"arcade stylesheet is empty or stale");
+    assert.equal(arcadePresentation.layoutDisplay,"grid","arcade falls back to unstyled text");
+    assert.ok(arcadePresentation.stageHeight>=300,"arcade playfield has collapsed");
+    assert.equal(arcadePresentation.stageOverflow,"hidden","arcade missing game screen styling");
+    assert.equal(arcadePresentation.machineBorder,"1px","cabinet framing not styled");
+    assert.ok(arcadePresentation.machineHeight>450,"arcade cabinet missing");
+
     assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),4);
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
@@ -146,6 +173,10 @@ try {
       await page.locator(".arcade-machine").screenshot({path:"artifacts/"+scenario.name+"-arcade.png",animations:"disabled"});
       console.log("PASS "+scenario.name+" arcade: spawn, score, pause, resume, audio toggle, restart");
     }
+    if(scenario.name==="desktop" || scenario.name==="mobile" || scenario.name==="narrow-mobile") {
+      await page.locator("#sesh-signal").scrollIntoViewIfNeeded();
+      await page.locator(".arcade-machine").screenshot({path:"artifacts/"+scenario.name+"-arcade-styled.png",animations:"disabled",timeout:10000});
+    }
     await page.screenshot({path:"artifacts/"+scenario.name+".png",animations:"disabled",timeout:10000});
     for (const selector of ["#vibe","#experiences","#sesh-signal",".hangout-card",".shield-card",".cinema-card",".minecraft-card","#after-dark",".community-proof","#join"]) {
       await page.locator(selector).scrollIntoViewIfNeeded();
@@ -157,6 +188,25 @@ try {
     await page.close();
     console.log("PASS "+scenario.name+" "+scenario.size.width+"x"+scenario.size.height+": links, artwork, navigation, effects toggle, no overflow");
   }
+  // Regression: an old browser-cached copy of styles.css must NOT erase the game.
+  const stale=await browser.newPage({viewport:{width:390,height:844}});
+  await stale.route("**/styles.css",route=>route.fulfill({
+    status:200,contentType:"text/css",body:":root{--lime:#b8f875} body{margin:0}"
+  }));
+  await stale.goto(address,{waitUntil:"domcontentloaded"});
+  const resilient=await stale.evaluate(()=>{
+    const arcade=document.querySelector(".arcade-layout");
+    const stage=document.querySelector("#sesh-stage");
+    const machine=document.querySelector(".arcade-machine");
+    return {display:getComputedStyle(arcade).display,
+      stageHeight:stage.getBoundingClientRect().height,
+      machineBorder:getComputedStyle(machine).borderTopWidth};
+  });
+  assert.equal(resilient.display,"grid","old cached site CSS hides arcade layout");
+  assert.ok(resilient.stageHeight>=300,"old cached site CSS hides the game board");
+  assert.equal(resilient.machineBorder,"1px","arcade must be styled independently of cached global CSS");
+  await stale.close();
+  console.log("PASS stale-global-CSS simulation: independently styled game remains visible");
   const reduced=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
   await reduced.goto(address,{waitUntil:"domcontentloaded"});
   assert.equal(await reduced.locator("#fx-toggle").getAttribute("aria-pressed"),"false");
