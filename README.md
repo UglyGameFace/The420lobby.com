@@ -5,7 +5,7 @@
 
 ## Active task: Custom smoke identity & cinematic community redesign v4
 
-The site's visual effects should be moody and eerie, but its brand voice must advertise a welcoming 420-friendly Discord gaming community, not a haunted house. This follow-up repairs the paper-like header mark with a custom hand-drawn smoke `420`, replaces haunted-house copy, reshapes the repetitive feature grid into an asymmetric composition and extends the existing optical scroll scene. The original botanical leaf and WebGL fog system stay in place.
+The site's visual effects should be moody and eerie, but its brand voice must advertise a welcoming 420-friendly Discord gaming community, not a haunted house. This follow-up repairs the paper-like header mark with a procedural cloud-formed smoke `420`, replaces haunted-house copy, reshapes the repetitive feature grid into an asymmetric composition and extends the existing optical scroll scene. The original botanical leaf and WebGL fog system stay in place.
 
 ### Architecture / ownership
 - `index.html`: semantic content, internal links, verified Discord invite, no invented stats or Minecraft ports.
@@ -13,7 +13,7 @@ The site's visual effects should be moody and eerie, but its brand voice must ad
 - `script.js`: sole DOM interaction and scroll/parallax coordinator.
 - `visual-engine.js`: GPU WebGL shader, owned behind `window.LobbyAtmosphere`. No Three.js download, CDNs, or build step. Shader falls back to CSS if WebGL is unavailable.
 - `assets/haunted-lounge.svg`: existing atmospheric CRT gaming illustration, retained as visual background only. Its filename is legacy; no haunted-house copy is promoted.
-- `assets/smoke-420.svg`: custom path-based smoke numerals 420, deliberately replacing the clipping-paper CSS brand mark.
+- `assets/smoke-420.svg`: procedural vapor lettering formed by turbulence, displacement, feathered clouds, and translucent density, deliberately replacing the clipping-paper CSS brand mark.
 - `assets/botanical-leaf.svg`: seven individual serrated leaflets, veins, tapering and a stem, not generic blade shapes.
 - `favicon.svg`: existing icon, unchanged in this scope.
 - `tests/site.test.mjs`: static regression checks.
