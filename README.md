@@ -8,7 +8,7 @@ Immersive, mobile-responsive public landing page for The 420 Lobby, Dank Shield,
 - Cinematic 3D portal, scroll depth, hover-tilt cards, particle field, light sweeps, glowing neon accents, and interactive signal console.
 - Accessibility: skip link, keyboard-operable signal tabs and menu, motion toggle, system reduced-motion preference, no-JavaScript readable content.
 - No Minecraft IP or ports are published. Waiting for updated official connection details.
-- Discord invite URL intentionally not filled in until the vanity slug is clarified (`the420lobby` versus `the420lobbybur`).
+- Confirmed Discord vanity invite: `https://discord.gg/the420lobby`. Header, hero, community feature, and final Join CTA link directly to it.
 - No external runtime dependency or build system. Web fonts are optional with local fallbacks.
 
 ## Cloudflare Pages deployment
@@ -27,6 +27,6 @@ Run `node --test tests/site.test.mjs` (Node 20+). A matching GitHub Actions work
 
 ## Before public launch
 
-- Confirm exact Discord invite URL and replace the temporary invite placeholder with a verified external CTA.
+- Verify the Discord invite opens the intended server during real browser testing.
 - Insert verified Minecraft server hostname and current ports only after they are supplied.
 - Test Cloudflare preview, mobile performance, links, browser accessibility, and existing DNS/mail continuity.
