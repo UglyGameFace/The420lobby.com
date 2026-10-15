@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 128" role="img" aria-label="A smoldering hand-rolled joint with a glowing ember">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0.16" y2="1">
+      <stop stop-color="#604d2e"/><stop offset=".15" stop-color="#bea77b"/>
+      <stop offset=".35" stop-color="#e2c798"/><stop offset=".58" stop-color="#a58c63"/>
+      <stop offset=".8" stop-color="#795e3d"/><stop offset="1" stop-color="#493823"/>
+    </linearGradient>
+    <linearGradient id="tip" x1="0" x2="1" y1="0" y2="0">
+      <stop stop-color="#cf762f"/><stop offset=".35" stop-color="#f7c059"/>
+      <stop offset=".7" stop-color="#f76528"/><stop offset="1" stop-color="#ad1e0d"/>
+    </linearGradient>
+    <linearGradient id="ash" x1="0" y1="0" x2="1" y2=".8">
+      <stop stop-color="#5b5752"/><stop offset=".5" stop-color="#bcb5a6"/><stop offset="1" stop-color="#484440"/>
+    </linearGradient>
+    <radialGradient id="coal"><stop stop-color="#fff4a9"/><stop offset=".25" stop-color="#ffaf42"/><stop offset=".66" stop-color="#fb491d"/><stop offset="1" stop-color="#5b0905"/></radialGradient>
+    <radialGradient id="halo"><stop stop-color="#ef692b" stop-opacity=".65"/><stop offset="1" stop-color="#c12b18" stop-opacity="0"/></radialGradient>
+    <filter id="fiber" x="-5%" y="-50%" width="110%" height="200%">
+      <feTurbulence type="fractalNoise" baseFrequency=".09 .36" numOctaves="3" seed="11" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="gray"/>
+      <feComponentTransfer in="gray" result="subtle"><feFuncA type="linear" slope=".13"/></feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="subtle" mode="multiply"/>
+    </filter>
+    <filter id="glow" x="-170%" y="-250%" width="440%" height="600%"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="2.5"/></filter>
+    <clipPath id="bodyclip"><path d="M57 60 Q69 56 84 56 L669 57 Q687 59 689 72 Q686 85 668 87 L83 86 Q65 85 57 79Z"/></clipPath>
+  </defs>
+  <g transform="rotate(-1.1 370 73)">
+    <ellipse cx="387" cy="95" rx="333" ry="12" fill="#000" opacity=".32" filter="url(#soft)"/>
+    <path d="M57 60 Q69 56 84 56 L669 57 Q687 59 689 72 Q686 85 668 87 L83 86 Q65 85 57 79Z" fill="url(#paper)" stroke="#4b3823" stroke-width="2"/>
+    <g clip-path="url(#bodyclip)" filter="url(#fiber)">
+      <rect x="58" y="55" width="633" height="32" fill="url(#paper)"/>
+      <path d="M61 63 Q238 65 398 62 T686 63" stroke="#ffedbe" stroke-opacity=".35" stroke-width="2" fill="none"/>
+      <path d="M61 79 Q328 83 689 78" stroke="#382d1f" stroke-opacity=".46" stroke-width="3" fill="none"/>
+      <path d="M160 59 179 86 M232 58 243 85 M393 58 414 87 M511 58 519 87 M602 59 614 87" stroke="#766142" stroke-width="1.2" opacity=".35"/>
+      <path d="M90 56 99 86 M97 57 106 85 M105 57 113 85" stroke="#f5e3ac" stroke-width="2" opacity=".43"/>
+    </g>
+    <path d="M57 60 Q44 67 54 80 L84 86 86 56Z" fill="#c7ac7e" stroke="#745537" stroke-width="2"/>
+    <path d="M675 58 Q690 59 695 64 L700 80 Q693 86 675 86Z" fill="url(#ash)" stroke="#433d37" stroke-width="1.8"/>
+    <path d="M672 59 Q683 63 678 86" fill="none" stroke="#2e2218" stroke-width="3"/>
+    <ellipse cx="699" cy="72" rx="20" ry="32" fill="url(#halo)" filter="url(#glow)"/>
+    <path d="M695 63 Q704 65 707 72 Q706 80 695 83 Q699 73 695 63Z" fill="url(#coal)" stroke="#74200f" stroke-width="2"/>
+    <path d="M701 65 703 70 700 75 704 79 M696 69 699 72 696 77" stroke="#ffe2a6" stroke-width="1.4" opacity=".92" fill="none"/>
+    <path d="M689 60 694 64 696 71 691 77 695 83" stroke="#d4ccc1" stroke-width="2" fill="none" opacity=".46"/>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke="#e0edda" opacity=".47">
+    <path d="M702 57 Q709 39 695 30 T696 7" stroke-width="5" filter="url(#soft)"/>
+    <path d="M715 59 Q742 35 719 18 T731 2" stroke-width="3" filter="url(#soft)"/>
+    <path d="M693 51 Q678 27 693 10" stroke-width="2" opacity=".65"/>
+  </g>
+</svg>
