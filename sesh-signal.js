@@ -258,7 +258,10 @@
     updateControls();announce("Round started. Collect lighter, grinder and papers. Avoid broken glass.");
     stage.focus({preventScroll:true});
     // Keep the playfield immediately visible on phones when the round begins.
-    if(window.innerWidth<=900)stage.scrollIntoView({behavior:"instant",block:"center"});
+    if(window.innerWidth<=900){
+      try{stage.scrollIntoView({behavior:"instant",block:"center"});}
+      catch(_){stage.scrollIntoView();}
+    }
     state.raf=requestAnimationFrame(frame);
   }
   function boost() {
