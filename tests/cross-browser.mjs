@@ -49,6 +49,7 @@ try{
           assert.ok(controls.mark.right+3<=controls.fx.left,name+" header logo and FX overlap");
           assert.ok(controls.fx.right+3<=controls.menu.left,name+" FX and menu overlap");
         }
+        await page.evaluate(()=>{Math.random=()=>0.5;});
         await page.locator("#sesh-start").click();
         const wisp=page.locator(".sesh-wisp--smoke").first();
         await wisp.waitFor({state:"visible",timeout:6000});
