@@ -57,6 +57,11 @@
     boostButton.disabled = state.mode !== "playing" || state.charge < 100 || state.boostMs > 0;
     boostButton.textContent = state.boostMs > 0 ? "CHILL MODE ACTIVE" : "ACTIVATE CHILL MODE";
     stage.classList.toggle("chill-mode", state.boostMs > 0);
+    document.querySelectorAll(".sesh-kit-tracker [data-kit]").forEach(slot => {
+      const collected=state.kit.includes(slot.dataset.kit);
+      slot.classList.toggle("is-collected",collected);
+      slot.querySelector("b").textContent=collected?"✓":"○";
+    });
   }
   function updateControls() {
     startButton.textContent = state.mode === "playing" || state.mode === "paused" ? "RESTART ROUND" : "START NEW ROUND";
