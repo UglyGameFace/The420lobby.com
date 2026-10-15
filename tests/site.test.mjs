@@ -124,6 +124,8 @@ test("static Pages hosting remains build-free", () => {
 test("Sesh Signal is an actual arcade game section, not a placeholder", () => {
   assert.match(html,/id="sesh-signal"/);
   assert.match(html,/id="sesh-stage"/);
+  assert.match(html, /class="arcade-machine" aria-label="Sesh Signal mini-game"/);
+  assert.doesNotMatch(html,/class="arcade-machine reveal"/);
   assert.match(html,/id="sesh-start"/);
   assert.match(html,/id="sesh-pause"[^>]*disabled/);
   assert.match(html,/id="sesh-boost"[^>]*disabled/);
