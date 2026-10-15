@@ -6,7 +6,7 @@ import vm from "node:vm";
 const read = (name) => fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html = read("index.html");
 const css = read("styles.css");
-const arcadeCss = read("sesh-signal-v2.css");
+const arcadeCss = read("sesh-signal-v3.css");
 const client = read("script.js");
 const renderer = read("visual-engine.js");
 const leaf = read("assets/botanical-leaf.svg");
@@ -14,6 +14,7 @@ const lounge = read("assets/haunted-lounge.svg");
 const icon = read("favicon.svg");
 const smokeLogo = read("assets/smoke-420.svg");
 const game = read("sesh-signal.js");
+const gear = read("assets/sesh-gear.svg");
 
 test("hero communicates a 420-friendly gaming community, not haunted house branding", () => {
   for(const text of ["AFTER","DARK,","WE PLAY","420 FRIENDLY","Discord","Minecraft","sesh","THE 420 LOBBY"]) {
@@ -162,8 +163,8 @@ test("Sesh Signal uses timed real interaction with pause, focus, and safe local 
 test("custom arcade styling supports touch, keyboard, and phones", () => {
   for(const selector of [
     ".sesh-arcade", ".arcade-layout", ".arcade-machine",
-    ".sesh-target-layer", ".sesh-overlay[hidden]", ".sesh-wisp",
-    ".sesh-wisp--rare", ".sesh-wisp--static", ".sesh-stage.chill-mode",
+    ".sesh-target-layer", ".sesh-overlay[hidden]", ".sesh-item",
+    ".sesh-item--clean-glass", ".sesh-item--hazard", ".sesh-item-art", ".sesh-stage.chill-mode",
     "@media(max-width:350px)", "prefers-reduced-motion"
   ]) assert.ok(arcadeCss.includes(selector), "missing arcade style "+selector);
   assert.match(arcadeCss,/touch-action:manipulation/);
@@ -178,7 +179,7 @@ test("arcade CSS is independently versioned and not hidden in stale global style
   assert.match(arcadeCss,/\.arcade-machine\{/);
   assert.doesNotMatch(css,/\.sesh-arcade\{/);
   const allLinks = [...html.matchAll(/<link\b[^>]*\brel="stylesheet"[^>]*>/g)];
-  assert.ok(allLinks.some(m=>m[0].includes("/sesh-signal-v2.css")),"independent arcade stylesheet not linked");
+  assert.ok(allLinks.some(m=>m[0].includes("/sesh-signal-v3.css")),"independent arcade stylesheet not linked");
   let depth = 0;
   for (const ch of arcadeCss.replace(/\/\*[\s\S]*?\*\//g,"").replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,"")) {
     if(ch === "{") depth++;
@@ -186,4 +187,35 @@ test("arcade CSS is independently versioned and not hidden in stale global style
     assert.ok(depth >= 0,"arcade CSS has unmatched closing brace");
   }
   assert.equal(depth,0,"arcade CSS has unmatched opening brace");
+});
+
+
+test("Sesh accessories are custom illustrated rather than emoji placeholders", () => {
+  for(const id of ["lighter","grinder","papers","clean-glass","broken-bong","broken-pipe"]){
+    assert.match(gear,new RegExp('<symbol id="'+id+'"'));
+    assert.ok(game.includes('"'+id+'"'),"missing playable accessory "+id);
+  }
+  assert.match(game,/createElementNS\("http:\/\/www\.w3\.org\/2000\/svg","svg"\)/);
+  assert.match(game,/assets\/sesh-gear\.svg#/);
+  assert.match(html,/COLLECT USEFUL GEAR/);
+  assert.match(html,/AVOID BROKEN GLASS/);
+  assert.match(html,/<details class="arcade-help">/);
+  assert.match(html,/class="arcade-play"/);
+  assert.match(html,/class="arcade-rules-strip"/);
+});
+
+test("kit synergy, intact bonus and broken glass penalty are gameplay rules", () => {
+  assert.match(game,/SAFE_GEAR = \["lighter","grinder","papers"\]/);
+  assert.match(game,/HAZARDS = \["broken-bong","broken-pipe"\]/);
+  assert.match(game,/state\.kit\.push\(kind\)/);
+  assert.match(game,/state\.kit\.length===SAFE_GEAR\.length/);
+  assert.match(game,/kitBonus=75/);
+  assert.match(game,/kind === "clean-glass"/);
+  assert.match(game,/state\.score=Math\.max\(0,state\.score-20\)/);
+  assert.match(game,/state\.kit=\[\]/);
+  assert.match(game,/state\.combo=0/);
+  assert.match(game,/isHazard\(kind\)/);
+  assert.match(arcadeCss,/\.sesh-item--hazard::after/);
+  assert.match(arcadeCss,/\.arcade-controls\{display:grid/);
+  assert.match(arcadeCss,/\.arcade-play/);
 });
