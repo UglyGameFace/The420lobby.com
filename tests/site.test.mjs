@@ -44,7 +44,7 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(smokeLogo, /fractalNoise/);
   assert.match(smokeLogo, /feDisplacementMap/);
   assert.doesNotMatch(smokeLogo,/stroke-width="23"|stroke-width="16"|filter="url\(#aura\)"/);
-  assert.match(smokeLogo, /<svg[^>]*viewBox="0 0 420 156"/);
+  assert.match(smokeLogo, /<svg[^>]*viewBox="0 0 420 168"/);
   assert.doesNotMatch(html,/class="logo-glyph"/);
   assert.doesNotMatch(css,/\.logo-glyph/);
 });
