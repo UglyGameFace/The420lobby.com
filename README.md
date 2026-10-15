@@ -18,6 +18,7 @@ PR #3's custom smoke branding is already in production `main`. This feature adds
 - `styles.css`: sole authoritative theme and layout stylesheet. Responsive and reduced-motion designs included.
 - `script.js`: the marketing site's DOM interaction and scroll/parallax coordinator.
 - `sesh-signal.js`: independent mini-game state, local scoring, one animation loop, share/copy and optional sound. No server calls.
+- `sesh-signal-v2.css`: the **sole** Sesh Signal arcade stylesheet, linked independently from the marketing site's `styles.css`. It uses a new URL to prevent stale site CSS caches from rendering arcade controls as raw text. Version its filename on future breaking visual changes.
 - `visual-engine.js`: GPU WebGL shader, owned behind `window.LobbyAtmosphere`. No Three.js download, CDNs, or build step. Shader falls back to CSS if WebGL is unavailable.
 - `assets/haunted-lounge.svg`: existing atmospheric CRT gaming illustration, retained as visual background only. Its filename is legacy; no haunted-house copy is promoted.
 - `assets/smoke-420.svg`: procedural vapor lettering formed by turbulence, displacement, feathered clouds, and translucent density, deliberately replacing the clipping-paper CSS brand mark.
