@@ -24,6 +24,7 @@ jobs:
         run: |
           node --check script.js
           node --check visual-engine.js
+          node --check sesh-signal.js
       - name: Static site regression tests
         run: node --test tests/site.test.mjs
       - name: Install browser smoke-test tooling
