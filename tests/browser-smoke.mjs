@@ -47,10 +47,29 @@ try {
     assert.equal(await page.locator(".card-body").count(),4,"custom feature card content needs to be present");
     assert.equal(await page.locator("#sesh-stage").count(),1,"arcade field is missing");
     assert.equal(await page.locator("#sesh-start").count(),1,"arcade start is missing");
+    assert.equal(await page.locator(".arcade-play").count(),1,"mobile game wrapper is missing");
+    const gameGeometry=await page.evaluate(()=>{
+      const get=s=>document.querySelector(s).getBoundingClientRect();
+      const machine=get(".arcade-machine"), start=get("#sesh-start"), stage=get("#sesh-stage"), shell=get(".arcade-shell");
+      const copy=get(".arcade-copy"), play=get(".arcade-play");
+      return {machineTop:machine.top,stageTop:stage.top,startBottom:start.bottom,
+        machineRight:machine.right,playRight:play.right,copyBottom:copy.bottom,stageHeight:stage.height,
+        shellRight:shell.right,viewport:innerWidth};
+    });
+    assert.ok(gameGeometry.machineRight<=gameGeometry.viewport+2,"game cabinet overflows page");
+    assert.ok(gameGeometry.playRight<=gameGeometry.viewport+2,"game controls overflow page");
+    if(scenario.mobile){
+      assert.ok(gameGeometry.machineTop-gameGeometry.startBottom>=0 &&
+        gameGeometry.machineTop-gameGeometry.startBottom<105,
+        "game board must sit near start/pause controls on mobile "+JSON.stringify(gameGeometry));
+      assert.ok(gameGeometry.machineTop-gameGeometry.copyBottom<160,
+        "mobile intro is too far away from playable arcade "+JSON.stringify(gameGeometry));
+    }
+
 
     const arcadePresentation = await page.evaluate(() => {
       const select = s => document.querySelector(s);
-      const cssReady = select('link[href="/sesh-signal-v2.css"]');
+      const cssReady = select('link[href="/sesh-signal-v3.css"]');
       const machine = select(".arcade-machine"), stage = select("#sesh-stage");
       const layout = select(".arcade-layout");
       return {
@@ -137,8 +156,8 @@ try {
       await page.locator("#sesh-signal").scrollIntoViewIfNeeded();
       await page.evaluate(()=>{Math.random=()=>0.5;});
       await page.locator("#sesh-start").click();
-      await page.locator(".sesh-wisp--smoke").first().waitFor({state:"visible",timeout:6500});
-      const firstWisp=page.locator(".sesh-wisp--smoke").first();
+      await page.locator(".sesh-item--grinder").first().waitFor({state:"visible",timeout:6500});
+      const firstWisp=page.locator(".sesh-item--grinder").first();
       const relativeHitbox = () => firstWisp.evaluate(button => {
         const b=button.getBoundingClientRect();
         const board=document.querySelector("#sesh-stage").getBoundingClientRect();
@@ -155,7 +174,7 @@ try {
       // A real click must work, even if the browser needs to scroll the page to the board.
       await firstWisp.click({timeout:5000});
       const points=Number(await page.locator("#sesh-score").textContent());
-      assert.ok(points>0,"tapping a green wisp should award points");
+      assert.ok(points>0,"tapping a grinder should award points");
       await page.locator("#sesh-pause").click();
       assert.equal(await page.locator("#sesh-stage").getAttribute("data-mode"),"paused");
       const frozen=await page.locator("#sesh-time").textContent();
@@ -171,7 +190,22 @@ try {
       assert.equal(await page.locator("#sesh-score").textContent(),"0000","restarting resets the score");
       await page.locator("#sesh-pause").click();
       await page.locator(".arcade-machine").screenshot({path:"artifacts/"+scenario.name+"-arcade.png",animations:"disabled"});
-      console.log("PASS "+scenario.name+" arcade: spawn, score, pause, resume, audio toggle, restart");
+      await page.evaluate(()=>{Math.random=()=>0.08;});
+      await page.locator("#sesh-start").click();
+      const broken=page.locator(".sesh-item--broken-bong").first();
+      await broken.waitFor({state:"visible",timeout:6500});
+      assert.match(await broken.getAttribute("aria-label"),/avoid clicking/);
+      await broken.click({timeout:5000});
+      assert.equal(await page.locator("#sesh-combo").textContent(),"x0","broken glass must wipe combo");
+      assert.match(await page.locator("#sesh-announcement").textContent(),/Broken glass/);
+      await page.evaluate(()=>{Math.random=()=>0.96;});
+      await page.locator("#sesh-start").click();
+      const rare=page.locator(".sesh-item--clean-glass").first();
+      await rare.waitFor({state:"visible",timeout:6500});
+      await rare.click({timeout:5000});
+      assert.ok(Number(await page.locator("#sesh-score").textContent())>=45,"intact glass must award bonus");
+      await page.locator("#sesh-pause").click();
+            console.log("PASS "+scenario.name+" arcade: accessories, glass hazards, score, pause, resume, audio toggle, restart");
     }
     if(scenario.name==="desktop" || scenario.name==="mobile" || scenario.name==="narrow-mobile") {
       await page.locator("#sesh-signal").scrollIntoViewIfNeeded();
