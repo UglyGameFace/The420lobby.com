@@ -29,12 +29,21 @@ test("every same-page link targets a real ID", () => {
 test("does not publish obsolete or unconfirmed Minecraft ports", () => {
   assert.doesNotMatch(html, /212\.192\.28\.160|25571|25845/);
   assert.doesNotMatch(html, /minecraft:\/\/|bedrock:\/\//);
-  assert.match(html, /official invite and Minecraft connection details/i);
+  assert.match(html, /Minecraft server connection details are being updated/i);
 });
 
-test("only verified outbound links are allowed", () => {
-  const outbound = [...html.matchAll(/<a\b[^>]*\bhref="(https?:[^"]+)"/g)].map((match) => match[1]);
-  assert.deepEqual(outbound, []);
+test("all Discord join CTAs use the verified vanity invite", () => {
+  const outbound = [...html.matchAll(/<a\b[^>]*\bhref="(https?:[^"]+)"[^>]*>/g)];
+  assert.equal(outbound.length, 4, "expected header, hero, community card, and final join CTA");
+  for (const [, destination] of outbound) {
+    assert.equal(destination, "https://discord.gg/the420lobby", "no unapproved external links");
+  }
+  for (const [tag] of outbound) {
+    assert.match(tag, /\btarget="_blank"/);
+    assert.match(tag, /\brel="noopener noreferrer"/);
+  }
+  assert.doesNotMatch(html, /OFFICIAL DISCORD INVITE COMING SOON/);
+  assert.doesNotMatch(html, /the420lobbybur/i);
 });
 
 test("JavaScript parses and includes interactive behavior", () => {
