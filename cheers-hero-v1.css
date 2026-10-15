@@ -4,6 +4,8 @@
   font-size:clamp(85px,10.6vw,167px);
   line-height:.81;
 }
+.hero-heading-cheers > span:first-child{font-weight:500;letter-spacing:-.046em;color:#f1f5e6}
+.hero-heading-cheers .headline-highlight{font-weight:700;letter-spacing:-.056em}
 .hero-heading-cheers .headline-cheers{
   position:relative;
   display:block;
@@ -18,7 +20,7 @@
   line-height:.85;
   letter-spacing:-.092em;
   color:#e4efdb;
-  -webkit-text-stroke:.55px rgba(243,255,236,.52);
+  -webkit-text-stroke:.24px rgba(243,255,236,.35);
   text-shadow:
     0 0 8px rgba(218,250,200,.52),
     0 0 24px rgba(195,242,162,.27),
@@ -33,8 +35,9 @@
   background-clip:text;
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 0 4px rgba(178,239,154,.48));
+  filter:url(#cheers-letter-waver) drop-shadow(0 0 6px rgba(178,239,154,.33));
 }
+.hero-heading-cheers .cheers-filter-defs{position:absolute;inline-size:0;block-size:0;overflow:hidden}
 .hero-heading-cheers .headline-cheers::before{
   content:"CHEERS,";
   position:absolute;
@@ -73,7 +76,7 @@
   bottom:-.18em;
   height:.52em;
   pointer-events:none;
-  transform:rotate(-1.2deg);
+  transform:rotate(-1.2deg) scaleY(1.32);
   filter:drop-shadow(0 4px 7px rgba(0,0,0,.68));
 }
 .hero-heading-cheers .cheers-roll img{
@@ -93,7 +96,7 @@
   pointer-events:none;
   overflow:visible;
   opacity:.8;
-  filter:blur(2.2px) drop-shadow(0 0 6px rgba(207,251,180,.25));
+  filter:blur(3.1px) drop-shadow(0 0 8px rgba(207,251,180,.28));
   animation:cheers-rise 9s ease-in-out infinite alternate;
 }
 .hero-heading-cheers .cheers-vapor path{
