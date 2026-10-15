@@ -202,6 +202,8 @@ test("Sesh accessories are custom illustrated rather than emoji placeholders", (
   assert.match(html,/<details class="arcade-help">/);
   assert.match(html,/class="arcade-play"/);
   assert.match(html,/class="arcade-rules-strip"/);
+  for(const name of ["lighter","grinder","papers"])assert.match(html,new RegExp('data-kit="'+name+'"'));
+  assert.match(game,/querySelectorAll\("\.sesh-kit-tracker \[data-kit\]"\)/);
 });
 
 test("kit synergy, intact bonus and broken glass penalty are gameplay rules", () => {
