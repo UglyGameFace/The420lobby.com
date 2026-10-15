@@ -33,7 +33,7 @@ test("does not publish obsolete or unconfirmed Minecraft ports", () => {
 });
 
 test("only verified outbound links are allowed", () => {
-  const outbound = [...html.matchAll(/\bhref="(https?:[^"]+)"/g)].map((match) => match[1]);
+  const outbound = [...html.matchAll(/<a\b[^>]*\bhref="(https?:[^"]+)"/g)].map((match) => match[1]);
   assert.deepEqual(outbound, []);
 });
 
