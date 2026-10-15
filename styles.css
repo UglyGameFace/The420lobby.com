@@ -18,3 +18,8 @@
 @media(hover:none){.world-card{transform:none!important}.world-card:hover::before{opacity:0}.button.primary:hover,.button.secondary:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.portal-scene{transform:translateY(-50%)}}
 html.fx-off{scroll-behavior:auto}html.fx-off .reveal{opacity:1;transform:none;transition:none}html.fx-off *,html.fx-off *::before,html.fx-off *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}html.fx-off .portal-scene{transform:translateY(-50%)}html.fx-off .pip{box-shadow:none}html.fx-off .fx-toggle .pip{background:#7a7a7a}
+/* Progressive enhancement: content remains readable when scripting is disabled. */
+.reveal{opacity:1;transform:none}
+html.motion-ready:not(.fx-off) .reveal:not(.visible){opacity:0;transform:translateY(33px)}
+html.motion-ready:not(.fx-off) .reveal.visible{opacity:1;transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){html.motion-ready .reveal,html.motion-ready .reveal:not(.visible){opacity:1;transform:none}}
