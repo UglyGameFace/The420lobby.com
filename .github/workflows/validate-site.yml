@@ -24,14 +24,17 @@ jobs:
         run: |
           node --check script.js
           node --check visual-engine.js
+          node --check sesh-signal.js
       - name: Static site regression tests
         run: node --test tests/site.test.mjs
       - name: Install browser smoke-test tooling
         run: |
           npm install --no-save playwright@1.56.1
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium firefox webkit
       - name: Browser smoke tests
         run: node tests/browser-smoke.mjs
+      - name: Cross-browser compatibility (Chromium, Firefox, WebKit)
+        run: node tests/cross-browser.mjs
       - name: Save browser previews
         if: always()
         uses: actions/upload-artifact@v4

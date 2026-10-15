@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="/styles.css">
 <script defer src="/visual-engine.js"></script>
 <script defer src="/script.js"></script>
+<script defer src="/sesh-signal.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -28,7 +29,7 @@
   <div class="header-shell shell">
     <a class="logo" href="#top" aria-label="The 420 Lobby home"><img class="logo-smoke" src="/assets/smoke-420.svg" alt="" width="420" height="156" fetchpriority="high"><span class="logo-type">THE 420<br><strong>LOBBY.</strong><small>GAME · SESH · REPEAT</small></span></a>
     <nav class="desktop-nav" id="primary-nav" aria-label="Main navigation">
-      <a href="#vibe">THE VIBE</a><a href="#experiences">WHAT WE DO</a><a href="#after-dark">AFTER DARK</a>
+      <a href="#vibe">THE VIBE</a><a href="#experiences">WHAT WE DO</a><a href="#sesh-signal">PLAY THE ARCADE</a><a href="#after-dark">AFTER DARK</a>
       <a class="nav-join" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer">JOIN THE SERVER <span aria-hidden="true">↗</span></a>
     </nav>
     <div class="header-actions">
@@ -70,7 +71,7 @@
         </div>
       </div>
     </div>
-    <div class="hero-scroll-hint"><span>SCROLL TO EXPLORE</span><div></div><small>01 / 04</small></div>
+    <div class="hero-scroll-hint"><span>SCROLL TO EXPLORE</span><div></div><small>01 / 05</small></div>
   </section>
 
   <div class="ticker" aria-label="Smoke, game, chill. A 420-friendly gaming and movie-night community">
@@ -121,6 +122,69 @@
     </div>
   </section>
 
+  <section class="sesh-arcade section-space" id="sesh-signal" aria-labelledby="sesh-heading">
+    <div class="shell arcade-shell">
+      <div class="section-kicker reveal"><span>03 / THE LOBBY ARCADE</span><span>42 SECONDS. YOUR BEST VIBE.</span></div>
+      <div class="arcade-layout">
+        <div class="arcade-copy">
+          <div class="arcade-side-label reveal"><span class="arcade-pulse" aria-hidden="true"></span> NEW IN THE LOBBY <span>✳</span> NO SIGN-IN NEEDED</div>
+          <h2 id="sesh-heading" class="arcade-heading reveal">SESH<br><em>SIGNAL.</em></h2>
+          <p class="arcade-subhead reveal">Catch the good clouds. Dodge the interference. Chain your combos and chase a new personal best in this original little 420 arcade.</p>
+          <div class="arcade-legend reveal" aria-label="How to play">
+            <div><span class="arcade-legend-icon legend-smoke" aria-hidden="true">〰</span><span><b>GREEN SMOKE</b><small>Tap to collect</small></span></div>
+            <div><span class="arcade-legend-icon legend-gold" aria-hidden="true">✦</span><span><b>GOLDEN CLOUD</b><small>Big point bonus</small></span></div>
+            <div><span class="arcade-legend-icon legend-static" aria-hidden="true">✕</span><span><b>VIOLET STATIC</b><small>Don't tap it</small></span></div>
+          </div>
+          <div class="arcade-controls reveal">
+            <button type="button" class="arcade-btn arcade-btn-primary" id="sesh-start">START NEW ROUND <span aria-hidden="true">↗</span></button>
+            <button type="button" class="arcade-btn" id="sesh-pause" disabled>PAUSE</button>
+            <button type="button" class="arcade-btn" id="sesh-sound" aria-pressed="false">SOUND OFF</button>
+          </div>
+          <p class="arcade-keyboard-hint">Tap clouds or use Tab + Enter. When your charge is ready, press <kbd>B</kbd> while focused in the playfield to activate Chill Mode.</p>
+          <div class="arcade-result-row">
+            <div class="arcade-personal-best"><small>PERSONAL BEST · THIS DEVICE</small><strong id="sesh-best">0000</strong></div>
+            <button type="button" class="arcade-btn arcade-share" id="sesh-share" disabled>SHARE YOUR SCORE <span aria-hidden="true">↗</span></button>
+          </div>
+          <p id="sesh-result" class="arcade-result-note" aria-live="polite"></p>
+          <p class="arcade-disclaimer">Just for fun. No real-world prizes or Discord roles. Your best score stays on your device, not our servers.</p>
+        </div>
+
+        <div class="arcade-machine" aria-label="Sesh Signal mini-game">
+          <div class="machine-label"><span><span class="machine-live-dot" aria-hidden="true"></span> THE 420 LOBBY <b>/ SESHLAB_01</b></span><span>NO. 0420</span></div>
+          <div class="machine-screen">
+            <div class="machine-scoreboard" aria-label="Round status">
+              <div><small>SCORE</small><strong id="sesh-score">0000</strong></div>
+              <div><small>COMBO</small><strong id="sesh-combo">x0</strong></div>
+              <div><small>TIME</small><strong id="sesh-time">42</strong></div>
+            </div>
+            <div id="sesh-stage" class="sesh-stage" role="group" aria-label="Sesh Signal playing field. Tap green and golden clouds. Avoid violet static." tabindex="0" data-mode="idle">
+              <div class="sesh-board-mark" aria-hidden="true">420</div>
+              <div class="sesh-board-grid" aria-hidden="true"></div>
+              <div class="sesh-smoke-halo halo-a" aria-hidden="true"></div>
+              <div class="sesh-smoke-halo halo-b" aria-hidden="true"></div>
+              <div class="sesh-target-layer" id="sesh-target-layer"></div>
+              <div class="sesh-burst-layer" id="sesh-burst-layer" aria-hidden="true"></div>
+              <div class="sesh-overlay" id="sesh-overlay">
+                <span class="sesh-overlay-emblem" aria-hidden="true">✳</span>
+                <strong class="sesh-overlay-title">YOUR SIGNAL AWAITS.</strong>
+                <p class="sesh-overlay-copy">42 seconds to catch the good clouds. Press Start to play.</p>
+              </div>
+            </div>
+            <div class="sesh-round-track" aria-hidden="true"><span id="sesh-round-progress"></span></div>
+            <div class="sesh-power">
+              <div class="sesh-power-copy"><span>CHILL MODE // DOUBLE POINTS</span><small id="sesh-charge-text">CHARGE 0%</small></div>
+              <div class="sesh-power-track" aria-hidden="true"><span id="sesh-charge-fill"></span></div>
+              <button type="button" class="sesh-boost-button" id="sesh-boost" disabled>ACTIVATE CHILL MODE</button>
+            </div>
+          </div>
+          <div class="machine-footer"><span>★ HANDCRAFTED FOR THE COMMUNITY</span><span>GAME • SESH • REPEAT</span></div>
+        </div>
+      </div>
+      <p id="sesh-announcement" class="arcade-screenreader" role="status" aria-live="polite">Game ready.</p>
+      <noscript><p class="arcade-nojs">This mini-game requires JavaScript. The rest of the website works without it.</p></noscript>
+    </div>
+  </section>
+
   <section class="reality-section" id="after-dark" aria-labelledby="dark-heading">
     <div class="reality-stage" aria-hidden="true">
       <div class="reality-prism"></div><div class="reality-slit"></div>
@@ -130,7 +194,7 @@
       <div class="reality-echo echo-one">420</div><div class="reality-echo echo-two">420</div>
     </div>
     <div class="reality-content shell">
-      <span class="section-number reveal">03 / KEEP THE NIGHT GOING</span>
+      <span class="section-number reveal">04 / KEEP THE NIGHT GOING</span>
       <h2 id="dark-heading" class="reality-title reveal">LATE NIGHTS.<br>GOOD GAMES.<br><span>REAL PEOPLE.</span><br><em>NO FAKE HYPE.</em></h2>
       <p class="reveal">Community is what makes the night interesting. Whether you're gaming, laughing, watching, or simply lurking, there's room to settle in.</p>
       <a class="reality-link reveal" href="#join">FIND YOUR WAY IN <span aria-hidden="true">↗</span></a>
@@ -138,7 +202,7 @@
   </section>
 
   <section class="community-proof section-space shell" aria-labelledby="proof-heading">
-    <div class="section-kicker reveal"><span>04 / WHY WE’RE HERE</span><span>NO MADE-UP MEMBER COUNTERS</span></div>
+    <div class="section-kicker reveal"><span>05 / WHY WE’RE HERE</span><span>NO MADE-UP MEMBER COUNTERS</span></div>
     <div class="proof-grid">
       <div><h2 class="big-type reveal" id="proof-heading">BUILT FOR<br><em>HUMANS.</em><br>NOT HYPE.</h2></div>
       <div class="proof-panel reveal">

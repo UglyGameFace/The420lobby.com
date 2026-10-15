@@ -3,20 +3,28 @@
 **Discord:** https://discord.gg/the420lobby  
 **Cloudflare Pages project:** `the420lobby-com`
 
-## Active task: Custom smoke identity & cinematic community redesign v4
+## Active task: Sesh Signal community arcade
 
-The site's visual effects should be moody and eerie, but its brand voice must advertise a welcoming 420-friendly Discord gaming community, not a haunted house. This follow-up repairs the paper-like header mark with a procedural cloud-formed smoke `420`, replaces haunted-house copy, reshapes the repetitive feature grid into an asymmetric composition and extends the existing optical scroll scene. The original botanical leaf and WebGL fog system stay in place.
+PR #3's custom smoke branding is already in production `main`. This feature adds a fully playable, standalone 42-second 420-themed arcade game as the next single active task, without modifying Dank Shield or claiming any live Discord integration.
+
+**Rules:** Collect drifting green smoke (+10 plus combo), grab rare gold clouds (+40), avoid violet static (-15 and combo reset). After charging the meter, activate five seconds of double-point Chill Mode. Tap on Android or navigate targets with keyboard Tab/Enter. Press B with focus inside the playfield to activate the boost.
+
+**Results:** Show round score, combo, elapsed time, personal best, player tier, and optional share/copy to Discord. The best score is stored only in this browser's localStorage and may disappear if storage is cleared. No account, analytics SDK, leaderboard backend, prize, or permission to affect Discord roles is involved.
+
+**Reliability:** One requestAnimationFrame loop runs only while a round is active. The round automatically pauses if the tab/app goes to the background. Personal best reads/writes are guarded for privacy modes that block storage. Optional sound is disabled by default, gameplay works without WebGL, targets are native buttons and moving targets slow down when reduced-motion or Save-Data is enabled.
 
 ### Architecture / ownership
 - `index.html`: semantic content, internal links, verified Discord invite, no invented stats or Minecraft ports.
 - `styles.css`: sole authoritative theme and layout stylesheet. Responsive and reduced-motion designs included.
-- `script.js`: sole DOM interaction and scroll/parallax coordinator.
+- `script.js`: the marketing site's DOM interaction and scroll/parallax coordinator.
+- `sesh-signal.js`: independent mini-game state, local scoring, one animation loop, share/copy and optional sound. No server calls.
 - `visual-engine.js`: GPU WebGL shader, owned behind `window.LobbyAtmosphere`. No Three.js download, CDNs, or build step. Shader falls back to CSS if WebGL is unavailable.
 - `assets/haunted-lounge.svg`: existing atmospheric CRT gaming illustration, retained as visual background only. Its filename is legacy; no haunted-house copy is promoted.
 - `assets/smoke-420.svg`: procedural vapor lettering formed by turbulence, displacement, feathered clouds, and translucent density, deliberately replacing the clipping-paper CSS brand mark.
 - `assets/botanical-leaf.svg`: seven individual serrated leaflets, veins, tapering and a stem, not generic blade shapes.
 - `favicon.svg`: existing icon, unchanged in this scope.
 - `tests/site.test.mjs`: static regression checks.
+- `tests/browser-smoke.mjs`: Chromium acceptance tests, including real arcade taps, score changes, pause/resume and restart on mobile sizes.
 
 ### Performance safeguards
 - WebGL only while the hero is onscreen and tab visible; animation loop pauses on tab visibility change.
@@ -40,6 +48,7 @@ With Node.js 20 or newer:
 ```sh
 node --check script.js
 node --check visual-engine.js
+node --check sesh-signal.js
 node --test tests/site.test.mjs
 ```
 
@@ -47,7 +56,7 @@ Runtime visual checks in multiple browsers are still necessary. WebGL shader com
 
 ## Website ↔ Discord/Minecraft integration backlog (not implemented in this redesign)
 
-The user wants actual server integration and a fun smoking-themed mini-game, but neither is implemented during the active visual redesign. The **mini-game is first in the backlog**: an original lighthearted, mobile-friendly 420 community activity or game, ideally playable without sign-in. Mechanics, anti-spam limits, accessibility, and any Discord integration must be designed and validated in that separate task, without inventing member rewards or server data. Do not modify Dank Shield while this PR is in progress.
+Sesh Signal is now implemented as a **local-only mini-game**. Direct Discord/Minecraft integration remains the next task, not part of the arcade PR. Never invent member rewards, public counts or cross-service authentication. Changes to Dank Shield need separate authorization and integration tests.
 
 Suggested delivery order:
 
