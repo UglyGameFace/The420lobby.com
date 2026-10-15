@@ -34,6 +34,24 @@ try{
         assert.equal(await page.locator(".logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed smoke logo load");
         assert.equal(await page.locator(".sesh-wisp").count(),0,"No targets before start");
         const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+        if(overflow>2) {
+          const details=await page.evaluate(()=>{
+            const candidates=[...document.body.querySelectorAll("*")].map(el=>{
+              const r=el.getBoundingClientRect(),style=getComputedStyle(el);
+              return {node:el.tagName.toLowerCase()+(el.id?"#"+el.id:"")+
+                (typeof el.className==="string"?"."+el.className.trim().split(/\s+/).slice(0,2).join("."):""),
+                left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),
+                overflow:style.overflowX,display:style.display};
+            }).filter(x=>x.right>innerWidth+2||x.left< -2)
+              .sort((a,b)=>b.right-a.right).slice(0,35);
+            const gameLink=document.querySelector('link[href="/sesh-signal-v2.css"]');
+            return {viewport:innerWidth,doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,
+              loaded:!!gameLink?.sheet,arcadeDisplay:getComputedStyle(document.querySelector(".arcade-layout")).display,
+              stageHeight:document.querySelector("#sesh-stage").getBoundingClientRect().height,
+              candidates};
+          });
+          console.error("OVERFLOW DEBUG "+name+"/"+width+": "+JSON.stringify(details));
+        }
         assert.ok(overflow<=2,name+"/"+width+" overflow: "+overflow+"px");
         assert.equal(await page.locator("#hero-heading").evaluate(el=>getComputedStyle(el).opacity),"1");
         if(mobile){
