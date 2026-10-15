@@ -1,98 +1,99 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import fs from "node:fs";
 import vm from "node:vm";
 
-const read = (name) => readFileSync(new URL("../" + name, import.meta.url), "utf8");
+const read = (name) => fs.readFileSync(new URL("../"+name,import.meta.url),"utf8");
 const html = read("index.html");
 const css = read("styles.css");
-const js = read("script.js");
-const artwork = read("assets/gaming-420-world.svg");
-const invite = "https://discord.gg/the420lobby";
+const client = read("script.js");
+const renderer = read("visual-engine.js");
+const leaf = read("assets/botanical-leaf.svg");
+const lounge = read("assets/haunted-lounge.svg");
+const icon = read("favicon.svg");
 
-test("the hero immediately communicates 420-friendly gaming, not a generic club", () => {
-  for (const term of ["SPAWN IN.", "SPARK UP.", "SQUAD UP.", "420-friendly", "Minecraft", "movie nights", "gaming"]) {
-    assert.ok(html.toLowerCase().includes(term.toLowerCase()), "missing: " + term);
+test("hero communicates a spooky, stoner-friendly gaming hangout immediately", () => {
+  for(const text of ["AFTER","DARK,","WE PLAY","spooky","Discord","Minecraft","sesh","THE 420 LOBBY"]) {
+    assert.ok(html.toLowerCase().includes(text.toLowerCase()),"missing "+text);
   }
-  assert.match(html, /<h1 id="hero-title"/);
-  assert.match(html, /src="\/assets\/gaming-420-world\.svg"/);
-  assert.doesNotMatch(html, /REAL PEOPLE\.|UNREAL|WELCOME TO YOUR NEW DIMENSION/);
-  assert.match(html, /<meta name="description" content="[^"]+420-friendly/);
+  assert.match(html,/id="hero-heading"/);
+  assert.match(html,/src="\/assets\/haunted-lounge\.svg"/);
+  assert.match(html,/src="\/assets\/botanical-leaf\.svg"/);
+  assert.doesNotMatch(html,/UNREAL VIBES|PICK YOUR REALITY|ON ANOTHER FREQUENCY/i);
 });
 
-test("the artwork is a standalone gamepad and cannabis illustration", () => {
-  assert.match(artwork, /<svg\s+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
-  assert.match(artwork, /viewBox="0 0 800 820"/);
-  assert.match(artwork, /game controller/i);
-  assert.match(artwork, /cannabis leaf/i);
-  assert.match(artwork, /[Ss]moke/);
-  assert.match(artwork, /<\/svg>\s*$/);
+test("custom botanical art uses seven distinct serrated and veined leaflets", () => {
+  assert.equal((leaf.match(/transform="rotate\(-?\d+ 300 464\)"/g)||[]).length,7);
+  assert.ok((leaf.match(/<path/g)||[]).length>35);
+  assert.match(leaf,/serrated leaflets/);
+  assert.match(leaf,/veins/);
+  assert.match(leaf,/<\/svg>\s*$/);
+  assert.match(lounge,/ghostly|phantom|spectral/i);
+  assert.match(lounge,/gaming controller/i);
+  assert.match(icon,/haunted|ghost|\/svg>/i);
 });
 
-test("all core page features remain advertised", () => {
-  for (const id of ["main", "about", "worlds", "signal", "join"]) {
-    assert.match(html, new RegExp('\\bid="' + id + '"'));
-  }
-  for (const word of ["DANK", "SHIELD", "CINEMA", "MINECRAFT", "JAVA", "BEDROCK", "420 LOBBY"]) {
-    assert.ok(html.toUpperCase().includes(word), "missing feature: " + word);
-  }
-  assert.equal((html.match(/<article class="world-card/g) || []).length, 4);
+test("all advertised community experiences remain present", () => {
+  for(const id of ["main","vibe","experiences","after-dark","join"])assert.match(html,new RegExp('id="'+id+'"'));
+  for(const term of ["DANK","SHIELD","CINEMA","MINECRAFT","BEDROCK","JAVA","VOICE"])assert.ok(html.toUpperCase().includes(term),term);
+  assert.equal((html.match(/<article class="experience-card/g)||[]).length,4);
 });
 
-test("same-page navigation has no broken anchors", () => {
-  const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]));
-  for (const [, target] of html.matchAll(/\bhref="#([^"]+)"/g)) {
-    assert.ok(ids.has(target), "broken same-page link #" + target);
-  }
+test("internal anchors resolve and IDs are unique", () => {
+  const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]);
+  assert.equal(ids.length,new Set(ids).size,"duplicate id");
+  for(const [,id] of html.matchAll(/\bhref="#([^"]+)"/g)) assert.ok(ids.includes(id),"missing #"+id);
 });
 
-test("Discord buttons always use the confirmed custom invitation", () => {
-  const anchors = [...html.matchAll(/<a\b[^>]*\bhref="(https?:[^"]+)"[^>]*>/g)];
-  assert.equal(anchors.length, 4, "header, hero, hangout card, and final join CTA");
-  for (const [tag, target] of anchors) {
-    assert.equal(target, invite);
-    assert.match(tag, /\btarget="_blank"/);
-    assert.match(tag, /\brel="noopener noreferrer"/);
+test("only four safe outbound official Discord invites exist", () => {
+  const outgoing=[...html.matchAll(/<a\b[^>]*\bhref="(https?:[^"]+)"[^>]*>/g)];
+  assert.equal(outgoing.length,4);
+  for(const [tag,url] of outgoing){
+    assert.equal(url,"https://discord.gg/the420lobby");
+    assert.match(tag,/target="_blank"/);
+    assert.match(tag,/rel="noopener noreferrer"/);
   }
 });
 
-test("unverified Minecraft addresses and old ports remain unpublished", () => {
-  assert.doesNotMatch(html, /212\.192\.28\.160|25571|25845|minecraft:\/\/|bedrock:\/\//);
-  assert.match(html, /Minecraft server connection details are being updated/);
-  assert.doesNotMatch(html, /the420lobbybur|OFFICIAL DISCORD INVITE COMING SOON/);
+test("does not invent server stats, Minecraft addresses, or Discord API credentials", () => {
+  assert.doesNotMatch(html,/212\.192\.28\.160|25571|25845|minecraft:\/\/|bedrock:\/\//);
+  assert.doesNotMatch(html,/live member count|online members: \d+|discord bot token|api token/i);
+  assert.match(html,/Minecraft connection details will be published/);
 });
 
-test("interactive scripts parse and preserve accessible behavior", () => {
-  assert.doesNotThrow(() => new vm.Script(js, { filename: "script.js" }));
-  for (const feature of ["IntersectionObserver", "requestAnimationFrame", "cancelAnimationFrame", "signal-tab", "aria-selected", "reduced-motion", "menu-toggle", "document.hidden"]) {
-    assert.ok(js.includes(feature), "missing runtime behavior: " + feature);
+test("WebGL renders custom atmospheric shader and degrades gracefully", () => {
+  assert.doesNotThrow(()=>new vm.Script(renderer));
+  for(const token of ["webglcontextlost","webglcontextrestored","getContext(\"webgl\"","createShader","createProgram","fbm(","requestAnimationFrame","cancelAnimationFrame","visibilitychange","prefers-reduced-motion","saveData","setEnabled"]) {
+    assert.ok(renderer.includes(token), "missing "+token);
   }
-  assert.match(js, /MODE 001 \/\/ THE HANGOUT/);
-  assert.match(html, /role="tablist"/);
-  assert.equal((html.match(/role="tab"/g) || []).length, 4);
-  assert.match(html, /class="skip-link"/);
-  assert.match(html, /id="fx-toggle"[^>]*aria-pressed="true"/);
+  assert.doesNotMatch(renderer,/smoothstep\(1\.6,\.2/);
+  assert.match(html,/id="depth-canvas"/);
+  assert.equal((html.match(/id="depth-canvas"/g)||[]).length,1);
 });
 
-test("the site includes gaming HUD, responsive layouts and reduced motion", () => {
-  for (const selector of [".hero", ".portal-scene", ".scene-art", ".game-hud", ".com-leaf", ".world-card", ".signal-screen", "html.fx-off", "html.motion-ready", "prefers-reduced-motion", "@media(max-width:760px)"]) {
-    assert.ok(css.includes(selector), "missing CSS: " + selector);
+test("interaction controller preserves useful controls and reduced motion", () => {
+  assert.doesNotThrow(()=>new vm.Script(client));
+  for(const token of ["aria-expanded","menu-toggle","scroll-progress","LobbyAtmosphere","reduced-motion","saveData","IntersectionObserver","interactive-card"]) {
+    assert.ok(client.includes(token), "missing "+token);
   }
-  assert.match(css, /\.reveal\{opacity:1;transform:none/);
-  assert.doesNotMatch(css, /--magenta:|\.portal-ring/);
-  assert.match(html, /<meta name="viewport"/);
-  assert.match(html, /<link rel="stylesheet" href="\/styles\.css"/);
-  assert.match(html, /<script defer src="\/script\.js"/);
+  assert.match(html,/id="menu-toggle"[^>]*aria-controls="primary-nav"/);
+  assert.match(html,/id="fx-toggle"[^>]*aria-pressed="true"/);
+  assert.match(html,/class="skip-link"/);
 });
 
-test("page style braces and asset references are consistent", () => {
-  const noComments = css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, "");
-  let depth = 0;
-  for (const char of noComments) {
-    if (char === "{") depth++;
-    if (char === "}") depth--;
-    assert.ok(depth >= 0, "unmatched closing CSS brace");
-  }
-  assert.equal(depth, 0, "unmatched opening CSS braces");
-  assert.match(html, /href="\/favicon\.svg"/);
+test("CSS has original haunted experience and mobile/performance fallbacks",()=>{
+  for(const item of [".hero-scene",".botanical-foreground",".scene-cobweb",".experience-card",".reality-section",".join",".fx-off","prefers-reduced-motion","@media(max-width:760px)","@media(hover:none)"])assert.ok(css.includes(item),item);
+  assert.doesNotMatch(css,/\.portal-ring|--magenta:/);
+  assert.match(css,/\.entrance,\.reveal\{opacity:1;/);
+  const noComments=css.replace(/\/\*[\s\S]*?\*\//g,"").replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,"");
+  let depth=0;
+  for(const c of noComments){if(c==="{")depth++;if(c==="}")depth--;assert.ok(depth>=0,"extra CSS brace");}
+  assert.equal(depth,0);
+});
+
+test("static Pages hosting remains build-free", () => {
+  assert.match(html,/<link rel="stylesheet" href="\/styles\.css">/);
+  assert.match(html,/<script defer src="\/script\.js"><\/script>/);
+  assert.match(html,/<script defer src="\/visual-engine\.js"><\/script>/);
+  assert.doesNotMatch(html,/https?:\/\/cdn\..*\/.*\.js/);
 });

@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1050" role="img" aria-labelledby="title desc">
+<title id="title">The haunted 420 gaming lounge</title>
+<desc id="desc">An old enchanted gaming room with a glowing green CRT, a friendly phantom, twisted branches, a controller, and spooky teal smoke.</desc>
+<defs>
+<radialGradient id="moon"><stop stop-color="#efffcc"/><stop offset=".4" stop-color="#b2e2ba"/><stop offset="1" stop-color="#81e8ac" stop-opacity="0"/></radialGradient>
+<radialGradient id="fog"><stop stop-color="#6decbd" stop-opacity=".55"/><stop offset=".5" stop-color="#3c9f7e" stop-opacity=".28"/><stop offset="1" stop-color="#24573f" stop-opacity="0"/></radialGradient>
+<linearGradient id="wall" x1=".1" y1=".1" x2=".8" y2="1"><stop stop-color="#234b42"/><stop offset=".5" stop-color="#0d2926"/><stop offset="1" stop-color="#061715"/></linearGradient>
+<linearGradient id="window" x1=".1" y1="0" x2=".9" y2="1"><stop stop-color="#406b62"/><stop offset=".6" stop-color="#122c2c"/><stop offset="1" stop-color="#071b1b"/></linearGradient>
+<linearGradient id="tv" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#50745a"/><stop offset=".25" stop-color="#253d37"/><stop offset=".8" stop-color="#0d1c1d"/><stop offset="1" stop-color="#4f6949"/></linearGradient>
+<radialGradient id="crt"><stop stop-color="#7bffa5" stop-opacity=".48"/><stop offset=".65" stop-color="#176455" stop-opacity=".64"/><stop offset="1" stop-color="#071b22"/></radialGradient>
+<linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c2e3a0"/><stop offset=".5" stop-color="#618c73"/><stop offset="1" stop-color="#183f3a"/></linearGradient>
+<linearGradient id="ghost" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#f1ffe0"/><stop offset=".48" stop-color="#a9f4c6"/><stop offset="1" stop-color="#1ba18c" stop-opacity=".35"/></linearGradient>
+<radialGradient id="eye"><stop stop-color="#f3ffbb"/><stop offset="1" stop-color="#c4ff73"/></radialGradient>
+<filter id="aura" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="24"/></filter>
+<filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="shadow"><feDropShadow dx="0" dy="24" stdDeviation="18" flood-color="#020e0d" flood-opacity=".75"/></filter>
+<pattern id="scan" width="4" height="8" patternUnits="userSpaceOnUse"><rect width="4" height="1" fill="#d3ffe7" opacity=".06"/></pattern>
+<pattern id="grain" width="93" height="81" patternUnits="userSpaceOnUse"><path d="M5 11h1M52 31h2M25 70h1M82 76h1M43 6h1" stroke="#d7ffbc" stroke-opacity=".22"/></pattern>
+</defs>
+<!-- Moonlit arched window and ancient trees -->
+<path d="M188 610V316C188 159 310 70 495 70S807 162 807 316V610Z" fill="#071517" stroke="#83e4bd" stroke-opacity=".25" stroke-width="15"/>
+<path d="M215 597V314C215 177 329 95 495 95S779 177 779 314V597Z" fill="url(#window)"/>
+<ellipse cx="499" cy="285" rx="210" ry="210" fill="url(#moon)" opacity=".55"/>
+<circle cx="508" cy="249" r="90" fill="#cde9c2" opacity=".71"/>
+<circle cx="508" cy="249" r="108" fill="none" stroke="#d9ffc8" stroke-opacity=".17" stroke-width="8"/>
+<path d="M221 458q65-61 115-39t95-38q83-59 159-18t175-44V599H221Z" fill="#14342f" opacity=".84"/>
+<path d="M220 515q87-58 146-19t110-8q95-54 161 1t143-18v130H221Z" fill="#0b2428"/>
+<path d="M225 593q-30-210 57-289q-17 72 10 93l-9 198Zm548 0q-4-212-58-282q7 82-18 103l4 180Z" fill="#061918" opacity=".95"/>
+<path d="M282 308q76 84 123 60M720 329q-80 85-115 56M304 440q83-26 122 26" fill="none" stroke="#061917" stroke-width="20" stroke-linecap="round"/>
+<path d="M496 101v498M225 354h553" stroke="#5eaa93" stroke-opacity=".28" stroke-width="16"/>
+<path d="M496 101v498M225 354h553" stroke="#051c1b" stroke-width="7"/>
+<rect x="199" y="586" width="595" height="26" rx="7" fill="#35554b" stroke="#a2e4b2" stroke-opacity=".3" stroke-width="2"/>
+<!-- Cobwebs and small ghosts -->
+<g fill="none" stroke="#d3faca" stroke-opacity=".36" stroke-width="1.8">
+<path d="M793 109q-103 42-119 140M800 124q-91 25-128 145M805 144q-74 7-128 134"/>
+<path d="M782 144Q765 183 729 201M767 181Q743 214 707 219M753 216Q728 237 688 237"/>
+<path d="M209 199q93 15 138 92M207 217q82 7 123 93M213 238q59 5 97 91"/>
+<path d="M236 216q16 42 49 53M256 238q11 36 41 49"/>
+</g>
+<g opacity=".65" fill="#dafcd1">
+<circle cx="300" cy="210" r="4"/><circle cx="691" cy="291" r="3"/><circle cx="657" cy="178" r="2"/><circle cx="400" cy="129" r="3"/><circle cx="620" cy="135" r="4"/>
+</g>
+<!-- Looming friendly spectral character behind desk -->
+<path d="M382 469c-7-116 40-179 113-179 78 0 119 72 121 179 0 31 27 47 3 74-18 20-23 5-49-7-24-10-32 32-65 19-23-10-37 22-65 10-29-11-48-16-62-2-35 34-20-24-25-47-4-18 26-19 29-47Z" fill="url(#ghost)" opacity=".67" filter="url(#glow)"/>
+<path d="M383 478c-6-114 39-182 113-182 77 0 119 70 118 184 0 26 16 43 4 58-22 23-45-36-71 0-17 24-35 23-50 4-13-17-34 33-54 15-23-20-34-26-59-7-22 17-12-44-1-72Z" fill="url(#ghost)" opacity=".89"/>
+<path d="M439 392q23-20 43 7M519 402q25-19 45 1" fill="none" stroke="#15483e" stroke-width="14" stroke-linecap="round"/>
+<ellipse cx="459" cy="420" rx="13" ry="22" fill="#082521"/><ellipse cx="546" cy="425" rx="13" ry="23" fill="#082521"/>
+<ellipse cx="457" cy="413" rx="4" ry="7" fill="url(#eye)" filter="url(#glow)"/><ellipse cx="544" cy="418" rx="4" ry="7" fill="url(#eye)" filter="url(#glow)"/>
+<path d="M467 476Q502 498 539 478" stroke="#113d32" stroke-width="8" stroke-linecap="round" fill="none"/>
+<path d="M471 480Q503 509 534 482" stroke="#f1ffca" stroke-opacity=".48" stroke-width="2.5" fill="none"/>
+<!-- Illuminated desk and large vintage gaming monitor -->
+<ellipse cx="499" cy="749" rx="400" ry="146" fill="#61e2ad" opacity=".2" filter="url(#aura)"/>
+<path d="M88 741Q499 686 906 744l19 82q-414 77-842-2Z" fill="#172721" stroke="#81b88b" stroke-opacity=".5" stroke-width="5" filter="url(#shadow)"/>
+<path d="M111 747Q500 709 881 746" stroke="#9fcda1" stroke-opacity=".55" stroke-width="7" fill="none"/>
+<g filter="url(#shadow)">
+<path d="M249 415q-6-19 19-28l453-18q26 0 32 24l22 289q4 29-24 36l-481 23q-31 2-36-25Z" fill="url(#tv)" stroke="#8bbb91" stroke-width="6"/>
+<path d="M282 440q1-23 21-27l377-16q31-2 34 25l19 226q1 27-23 28l-402 16q-26 1-29-22Z" fill="#061b1b" stroke="#d1f8b9" stroke-opacity=".34" stroke-width="5"/>
+<path d="M303 448q0-18 19-20l344-14q22-2 26 19l17 204q2 22-21 23l-359 15q-19 2-21-21Z" fill="url(#crt)"/>
+<path d="M303 448q0-18 19-20l344-14q22-2 26 19l17 204q2 22-21 23l-359 15q-19 2-21-21Z" fill="url(#scan)"/>
+<path d="M325 464q50-39 144-22" stroke="#c4ffc7" stroke-opacity=".19" stroke-width="17" fill="none" stroke-linecap="round"/>
+<path d="M657 650q-99 19-297 16" stroke="#d8ffbc" stroke-opacity=".15" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M355 523q50-61 133-64 85-3 148 47" stroke="#d5ff9c" stroke-opacity=".25" stroke-width="3" fill="none"/>
+<text x="508" y="514" transform="rotate(-2 508 514)" text-anchor="middle" fill="#dfffb3" font-family="Arial Black,Arial,sans-serif" font-size="47" font-weight="900" letter-spacing="-2">THE 420</text>
+<text x="508" y="571" transform="rotate(-2 508 571)" text-anchor="middle" fill="#afff92" font-family="Arial Black,Arial,sans-serif" font-size="76" font-weight="900" letter-spacing="-6" filter="url(#glow)">LOBBY</text>
+<text x="509" y="605" transform="rotate(-2 509 605)" text-anchor="middle" fill="#c1efbc" font-family="monospace" font-size="14" font-weight="bold" letter-spacing="3">GAME • SESH • REPEAT</text>
+<rect x="292" y="702" width="449" height="17" fill="#172822"/>
+<circle cx="731" cy="685" r="8" fill="#c5ff77" filter="url(#glow)"/>
+<circle cx="756" cy="685" r="6" fill="#588c62"/>
+<path d="M435 732h134l17 44H414Z" fill="#203a32"/>
+<path d="M388 777h223" stroke="#6a9572" stroke-width="18" stroke-linecap="round"/>
+</g>
+<!-- 3D inspired gaming controller foreground -->
+<g filter="url(#shadow)" transform="translate(0 3)">
+<path d="M340 758c25-11 46-8 70-2 30 7 139 4 160-4 24-9 52-3 72 19 17 20 28 69 18 94-5 16-19 23-31 16-11-6-20-25-31-36l-32-28H408l-31 31c-13 14-23 30-37 28-19-3-23-16-24-34-3-38 2-67 24-84Z" fill="#192b28" stroke="#a4d194" stroke-width="4"/>
+<path d="M344 774q20-16 59-4 27 9 157 3 53-15 72 9" stroke="#d3ffb5" stroke-opacity=".48" stroke-width="4" fill="none"/>
+<path d="M381 782h16v19h20v16h-20v18h-16v-18h-20v-16h20Z" fill="#98cb84"/>
+<g fill="#315d45" stroke="#c7ecad" stroke-width="3"><circle cx="578" cy="789" r="11"/><circle cx="608" cy="815" r="11"/><circle cx="549" cy="815" r="11"/><circle cx="577" cy="838" r="11"/></g>
+<circle cx="452" cy="829" r="19" fill="#0a1b1a" stroke="#739b77" stroke-width="3"/><circle cx="528" cy="829" r="19" fill="#0a1b1a" stroke="#739b77" stroke-width="3"/>
+<rect x="473" y="783" width="30" height="8" rx="4" fill="#a5d993" opacity=".55"/>
+</g>
+<!-- Graveyard silhouettes and hanging tendrils for spookiness -->
+<path d="M89 757V596l38-61 30 61v153M875 747V604l-39-65-29 65v143" stroke="#152a21" stroke-width="26" fill="none"/>
+<path d="M97 577q-13-79 8-132M882 584q5-69-28-136" stroke="#3a5d49" stroke-opacity=".7" stroke-width="7" fill="none"/>
+<path d="M100 457q-35-14-46-61M873 470q34-20 45-67" stroke="#3a5d49" stroke-opacity=".6" stroke-width="5" fill="none"/>
+<g fill="#baff91" opacity=".55"><circle cx="185" cy="673" r="4"/><circle cx="785" cy="622" r="4"/><circle cx="796" cy="690" r="2"/><circle cx="216" cy="612" r="3"/></g>
+<rect x="0" y="0" width="1000" height="1050" fill="url(#grain)" opacity=".28"/>
+</svg>

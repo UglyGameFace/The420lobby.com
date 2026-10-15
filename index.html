@@ -1,71 +1,170 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090912"><meta name="description" content="The 420 Lobby. A 420-friendly community universe for gaming, movie nights, Minecraft, and custom Discord experiences.">
-<meta property="og:type" content="website"><meta property="og:title" content="The 420 Lobby | Game. Sesh. Repeat."><meta property="og:description" content="Spawn in. Spark up. Squad up. A 420-friendly Discord gaming community with Minecraft, Dank Cinema, Dank Shield, and good company.">
-<title>The 420 Lobby | Game. Sesh. Repeat.</title>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css"><script defer src="/script.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080e0d">
+<meta name="description" content="The 420 Lobby: a spooky, 420-friendly gaming community with Discord hangouts, Minecraft Java and Bedrock, Dank Cinema, and Dank Shield.">
+<meta property="og:type" content="website"><meta property="og:title" content="The 420 Lobby | After Dark, We Play">
+<meta property="og:description" content="Game. Sesh. Haunt. Repeat. Join a 420-friendly Discord gaming community.">
+<meta property="og:url" content="https://the420lobby.com/">
+<title>The 420 Lobby | After Dark, We Play</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=Unbounded:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="/assets/haunted-lounge.svg" as="image" type="image/svg+xml">
+<link rel="stylesheet" href="/styles.css">
+<script defer src="/visual-engine.js"></script>
+<script defer src="/script.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-<div id="scroll-progress" aria-hidden="true"></div><div class="grain" aria-hidden="true"></div><canvas id="starfield" aria-hidden="true"></canvas>
-<header class="site-header" id="top"><nav class="nav shell" aria-label="Primary navigation">
-<a class="brand" href="#top" aria-label="The 420 Lobby, back to top"><span class="brand-mark">420</span><span class="brand-title">THE <b>420 LOBBY</b><small>GAMING • SESHS • COMMUNITY</small></span></a>
-<div class="nav-links" id="nav-links"><a href="#about">THE HANGOUT</a><a href="#worlds">WHAT WE DO</a><a href="#signal">LOBBY MODES</a><a class="nav-enter" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer" aria-label="Join The 420 Lobby Discord server (opens in a new tab)">JOIN DISCORD ↗</a></div>
-<div class="nav-actions"><button type="button" id="fx-toggle" class="fx-toggle" aria-pressed="true" title="Toggle visual effects"><i class="pip"></i><span id="fx-label">FX ON</span></button><button type="button" id="menu-toggle" class="menu-toggle" aria-controls="nav-links" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button></div>
-</nav></header>
+<div class="ambient-noise" aria-hidden="true"></div>
+<div id="scroll-progress" aria-hidden="true"></div>
+
+<header class="site-header" id="top">
+  <div class="header-shell shell">
+    <a class="logo" href="#top" aria-label="The 420 Lobby home"><span class="logo-glyph" aria-hidden="true">4<span>2</span>0</span><span class="logo-type">THE 420<br><strong>LOBBY.</strong></span></a>
+    <nav class="desktop-nav" id="primary-nav" aria-label="Main navigation">
+      <a href="#vibe">THE VIBE</a><a href="#experiences">THE GOOD STUFF</a><a href="#after-dark">AFTER DARK</a>
+      <a class="nav-join" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer">JOIN THE SERVER <span aria-hidden="true">↗</span></a>
+    </nav>
+    <div class="header-actions">
+      <button id="fx-toggle" class="fx-toggle" type="button" aria-pressed="true"><span aria-hidden="true">✦</span><span id="fx-label">EFFECTS ON</span></button>
+      <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open navigation" aria-controls="primary-nav" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </div>
+</header>
 
 <main id="main">
-<section class="hero" aria-labelledby="hero-title">
-<div class="hero-grid" aria-hidden="true"></div><div class="hero-glow" aria-hidden="true"></div>
-<div class="portal-scene" id="portal-scene" aria-hidden="true">
-  <div class="game-halo"></div>
-  <div class="scene-smoke smoke-left"></div><div class="scene-smoke smoke-right"></div>
-  <img class="scene-art" src="/assets/gaming-420-world.svg" alt="" width="800" height="820" decoding="async" fetchpriority="high">
-  <span class="game-hud hud-top">[ GAME MODE: CHILL ]</span>
-  <span class="game-hud hud-right">420<br>FRIENDLY</span>
-  <span class="game-hud hud-bottom">◆ READY TO SQUAD UP</span>
-</div>
-<div class="hero-content shell">
-<p class="micro-heading reveal"><span class="pip"></span> THE 420 LOBBY // 420-FRIENDLY GAMING COMMUNITY <span class="tiny-line"></span></p>
-<h1 id="hero-title" class="hero-title"><span class="hero-line reveal">SPAWN IN.</span><span class="hero-line outline reveal delay1">SPARK UP.</span><span class="hero-line acid glitch reveal delay2" data-text="SQUAD UP.">SQUAD UP.</span></h1>
-<p class="hero-copy reveal delay3">Grab your controller, bring your favorite strain of humor, and find your people. <b>The 420 Lobby</b> is a 420-friendly Discord home for late-night gaming, chill seshes, Minecraft, and movie nights.</p>
-<div class="hero-buttons reveal delay3"><a class="button primary" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer">JOIN THE LOBBY <span aria-hidden="true">↗</span></a><a class="button secondary" href="#worlds">SEE WHAT WE PLAY <span aria-hidden="true">↓</span></a></div>
-<div class="hero-tags reveal delay3"><span class="tag-chip">✦ 420 FRIENDLY</span><span class="tag-chip">✦ GAMING SQUADS</span><span class="tag-chip">✦ MOVIE NIGHTS</span><span class="tag-chip">✦ MINECRAFT CROSS-PLAY</span></div>
-</div>
-<span class="hero-coordinates">[ THE 420 LOBBY ]<br>YOUR NEXT FAVORITE GAME NIGHT</span>
-<a class="scroll-cue" href="#about">SCROLL TO EXPLORE THE LOBBY <span></span></a><span class="hero-angle" aria-hidden="true">GG ✦ 420</span>
-</section>
-<div class="ticker" aria-label="Game, sesh, repeat. Dank Cinema, Minecraft, and a 420-friendly Discord community."><div class="ticker-track" aria-hidden="true"><span>GAME. SESH. REPEAT.</span><i>✳</i><span>420 FRIENDLY</span><i>✳</i><span>DANK CINEMA</span><i>✳</i><span>MINECRAFT CROSS-PLAY</span><i>✳</i><span>GAME. SESH. REPEAT.</span><i>✳</i><span>420 FRIENDLY</span><i>✳</i><span>DANK CINEMA</span><i>✳</i><span>MINECRAFT CROSS-PLAY</span><i>✳</i></div></div>
+  <section class="hero" id="home" aria-labelledby="hero-heading">
+    <canvas id="depth-canvas" aria-hidden="true"></canvas>
+    <div class="hero-vignette" aria-hidden="true"></div>
+    <div class="hero-background-rune rune-a" aria-hidden="true">✦</div>
+    <div class="hero-background-rune rune-b" aria-hidden="true">✧</div>
+    <div class="hero-background-rune rune-c" aria-hidden="true">✦</div>
 
-<section class="manifesto shell section-space" id="about" aria-labelledby="about-title">
-<div class="section-label reveal"><span>01 / THE HANGOUT</span><span>GOOD PEOPLE. BETTER GAME NIGHTS.</span></div>
-<div class="manifesto-grid"><h2 id="about-title" class="manifesto-title reveal">YOUR GAMES.<br>YOUR CREW.<br><span>YOUR KIND OF</span><br><strong>SESH.</strong></h2>
-<div class="manifesto-side reveal delay1"><div class="micro-orbit"><span>✳</span><small>STAY WEIRD<br>STAY REAL</small></div><p>Whether you're passing time in voice chat, sharing a laugh during a sesh, running Minecraft adventures, or queuing up another game, this is a place to hang without the awkward try-hard energy.</p><a class="under-link" href="#worlds">CHECK OUT THE LOBBY <span>↗</span></a></div></div>
-<div class="traits reveal"><span>✦ 420-FRIENDLY CHATS</span><span>✦ GAMING SQUADS</span><span>✦ MOVIE NIGHTS</span><span>✦ JAVA + BEDROCK</span></div>
-</section>
+    <div class="hero-scene" id="hero-scene" aria-hidden="true">
+      <div class="scene-arch scene-layer" data-depth=".18"></div>
+      <img src="/assets/haunted-lounge.svg" class="lounge-illustration scene-layer" data-depth=".43" alt="" width="1000" height="1050" fetchpriority="high">
+      <img src="/assets/botanical-leaf.svg" class="botanical-foreground scene-layer" data-depth=".9" alt="" width="600" height="640" decoding="async">
+      <div class="scene-cobweb scene-layer" data-depth=".22"></div>
+      <div class="scene-spectral-glow"></div>
+      <span class="scene-label label-one">[ THE HAUNTED HANGOUT ]</span>
+      <span class="scene-label label-two">SES​​H MODE: ON <span>●</span></span>
+    </div>
 
-<section class="worlds section-space" id="worlds" aria-labelledby="worlds-title"><div class="shell">
-<div class="section-label reveal"><span>02 / WHAT WE DO</span><span>MORE THAN A DISCORD INVITE.</span></div>
-<div class="section-intro"><h2 class="display reveal" id="worlds-title">CHOOSE YOUR<br><em>HANGOUT.</em></h2><p class="reveal delay1">Some nights you game. Some nights you sesh and watch a movie. Some nights you end up building for hours. We have a spot for all of it.</p></div>
-<div class="card-grid">
-<article class="world-card card-community tilt reveal"><div class="card-art community-art" aria-hidden="true"><div class="com-orbit orbit-one"></div><div class="com-orbit orbit-two"></div><div class="com-orbit orbit-three"></div><svg class="com-leaf" viewBox="0 0 200 210" fill="none" aria-hidden="true"><path d="M100 164C83 123 83 64 100 24c17 40 17 99 0 140ZM89 155C47 135 28 95 30 68c27 8 52 37 59 87ZM111 155c42-20 61-60 59-87-27 8-52 37-59 87ZM87 162c-32 1-62-20-76-44 35-8 66 13 76 44ZM113 162c32 1 62-20 76-44-35-8-66 13-76 44ZM96 161c-23 14-45 13-64 5 25-20 48-21 64-5ZM104 161c23 14 45 13 64 5-25-20-48-21-64-5ZM96 161l1 36h7l1-36" fill="#a9f476" stroke="#d5ffb4" stroke-width="1.5"/></svg><small class="art-tag tag-one">YOUR PEOPLE</small><small class="art-tag tag-two">GAME + SESH</small></div><div class="card-layer"><div class="card-top"><span>WORLD / 001</span><b>↗</b></div><div class="card-bottom"><small>VOICE CHAT • SESHS • GAMING CREWS</small><h3>THE<br>HANGOUT<span>.</span></h3><p>Chill in voice, meet your next squad, joke around, and enjoy a 420-friendly space where you can actually be yourself.</p><a href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer" class="card-action">FIND YOUR PEOPLE <span aria-hidden="true">↗</span></a></div></div></article>
-<article class="world-card card-shield tilt reveal delay1"><div class="card-art shield-art" aria-hidden="true"><div class="radar"></div><svg class="shield-svg" viewBox="0 0 200 220" fill="none"><path d="M100 8 183 47v62c0 48-29 78-83 103C46 187 17 157 17 109V47L100 8Z" stroke="currentColor" stroke-width="3"/><path d="M100 32 160 61v47c0 34-18 57-60 80-42-23-60-46-60-80V61l60-29Z" stroke="currentColor" opacity=".5"/><path d="m62 109 24 24 52-53" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="scan-line"></div></div><div class="card-layer"><div class="card-top"><span>WORLD / 002</span><b>↗</b></div><div class="card-bottom"><small>BUILT-IN DISCORD COMMUNITY TOOLS</small><h3>DANK<br>SHIELD<span>.</span></h3><p>Our custom Discord toolkit for protection, verification, roles, sharing, and a more personal community experience.</p><a href="#signal" class="card-action">DISCOVER THE TECH <span>↗</span></a></div></div></article>
-<article class="world-card card-cinema tilt reveal"><div class="card-art cinema-art" aria-hidden="true"><div class="cinema-halo"></div><div class="cinema-screen"><span class="play-icon"></span></div><small class="film-code">00:04:20:00</small></div><div class="card-layer"><div class="card-top"><span>WORLD / 003</span><b>↗</b></div><div class="card-bottom"><small>STAY IN. LIGHTS LOW. MOVIE ON.</small><h3>DANK<br>CINEMA<span>.</span></h3><p>A home for movie nights, shared screens, and the timeless tradition of everyone talking through the best scene.</p><a href="#join" class="card-action">CATCH THE VIBE <span>↗</span></a></div></div></article>
-<article class="world-card card-minecraft tilt reveal delay1"><div class="card-art minecraft-art" aria-hidden="true"><div class="voxel-stage"><span class="voxel v1"></span><span class="voxel v2"></span><span class="voxel v3"></span><span class="voxel v4"></span></div><small class="voxel-code">JAVA × BEDROCK</small></div><div class="card-layer"><div class="card-top"><span>WORLD / 004</span><b>↗</b></div><div class="card-bottom"><small>JAVA + BEDROCK • BUILD TOGETHER</small><h3>THE 420<br>SERVER<span>.</span></h3><p>One Minecraft community for Java and Bedrock players. Explore, build, survive, and create your own story.</p><a href="#join" class="card-action">MINECRAFT UPDATES <span>↗</span></a></div></div></article>
-</div></div></section>
+    <div class="hero-content shell">
+      <div class="hero-copy-block">
+        <p class="eyebrow entrance"><span class="indicator" aria-hidden="true"></span> THE 420 LOBBY <span class="eyebrow-divider" aria-hidden="true"></span> SPOOKY. STONEY. SOCIAL.</p>
+        <h1 id="hero-heading" class="hero-heading entrance" data-delay="1"><span>AFTER</span><span class="headline-hollow">DARK,</span><span class="headline-highlight">WE PLAY<span class="final-dot">.</span></span></h1>
+        <p class="hero-subtitle entrance" data-delay="2">Your haunted little corner of Discord. <strong>Game with the crew, share a sesh, binge a movie, or disappear into Minecraft.</strong> Come for the smoke. Stay for the people.</p>
+        <div class="hero-cta entrance" data-delay="3">
+          <a class="cta-primary magnetic" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer"><span>ENTER THE 420 LOBBY</span><span class="cta-icon" aria-hidden="true">↗</span></a>
+          <a class="cta-secondary" href="#experiences">EXPLORE THE HAUNT <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="hero-details entrance" data-delay="3">
+          <span>✦ 420 FRIENDLY</span><span>✦ GAMING SQUADS</span><span>✦ MOVIE NIGHTS</span><span>✦ JAVA + BEDROCK</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint"><span>SCROLL IF YOU DARE</span><div></div><small>01 / 04</small></div>
+  </section>
 
-<section class="interlude" aria-label="The rules of reality don't apply"><div class="interlude-grid" aria-hidden="true"></div><div class="inter-ring ring-one" aria-hidden="true"></div><div class="inter-ring ring-two" aria-hidden="true"></div><div class="inter-ring ring-three" aria-hidden="true"></div><div class="shell interlude-body"><span class="section-number reveal">[ REALITY CHECK // 04:20 ]</span><h2 class="reveal">ONE LOBBY.<br>ENDLESS<br><em>SIDE QUESTS.</em></h2><p class="reveal">From a chill smoke break to one more game at 3 AM, the best moments are the ones you didn't plan.</p></div><span class="infinity-mark" aria-hidden="true">420</span></section>
+  <div class="ticker" aria-label="Game, sesh, haunt, repeat. A spooky 420-friendly gaming community">
+    <div class="ticker-inner" aria-hidden="true">
+      <span>GAME. SESH. HAUNT. REPEAT.</span><i>✦</i><span>WELCOME TO THE AFTER HOURS</span><i>✦</i><span>THE 420 LOBBY</span><i>✦</i>
+      <span>GAME. SESH. HAUNT. REPEAT.</span><i>✦</i><span>WELCOME TO THE AFTER HOURS</span><i>✦</i><span>THE 420 LOBBY</span><i>✦</i>
+    </div>
+  </div>
 
-<section id="signal" class="signal section-space shell" aria-labelledby="signal-title"><div class="section-label reveal"><span>03 / LOBBY MODES</span><span>EVERYONE HAS THEIR WAY TO PLAY.</span></div><div class="section-intro"><h2 class="display reveal" id="signal-title">PICK YOUR<br><em>GAME MODE.</em></h2><p class="reveal delay1">Chill in the lobby, build in Minecraft, catch a movie, or see how Dank Shield helps keep the community running.</p></div>
-<div class="signal-console reveal"><div class="signal-tabs" role="tablist" aria-label="Explore The 420 Lobby experiences"><button class="signal-tab active" type="button" role="tab" id="tab-community" aria-controls="signal-panel" aria-selected="true" data-signal="community"><span>01</span> SESH + SOCIAL</button><button class="signal-tab" type="button" role="tab" id="tab-shield" aria-controls="signal-panel" aria-selected="false" data-signal="shield"><span>02</span> DANK SHIELD</button><button class="signal-tab" type="button" role="tab" id="tab-cinema" aria-controls="signal-panel" aria-selected="false" data-signal="cinema"><span>03</span> DANK CINEMA</button><button class="signal-tab" type="button" role="tab" id="tab-minecraft" aria-controls="signal-panel" aria-selected="false" data-signal="minecraft"><span>04</span> MINECRAFT</button></div>
-<div class="signal-screen" role="tabpanel" id="signal-panel" aria-labelledby="tab-community" tabindex="0"><div class="signal-meta"><span><i class="pip"></i> LOBBY CHANNEL ACTIVE</span><span>TL-0420 / <span id="signal-code">001</span></span></div><div class="spectrum" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="signal-copy"><small id="signal-kicker">MODE 001 // THE HANGOUT</small><h3 id="signal-headline">SESH. GAME.<br>REPEAT.</h3><p id="signal-description">Pop into voice chat, share a laugh, find people to game with, and unwind in a 420-friendly Discord community.</p></div><div class="signal-bottom"><span>THE 420 LOBBY // GAME HUB</span><span>VIBE CHECK <i class="pip"></i></span></div></div></div>
-</section>
+  <section class="vibe section-space shell" id="vibe" aria-labelledby="vibe-heading">
+    <div class="section-kicker reveal"><span>01 / THE VIBE</span><span>NO SWEATY TRY-HARD ENERGY REQUIRED</span></div>
+    <div class="vibe-grid">
+      <div>
+        <h2 class="big-type reveal" id="vibe-heading">FIND YOUR<br><span>PEOPLE.</span><br>GET A LITTLE<br><em>HAUNTED.</em></h2>
+        <p class="vibe-callout reveal">The best lobbies never have a closing time.</p>
+      </div>
+      <div class="vibe-aside reveal">
+        <div class="leaf-seal"><img src="/assets/botanical-leaf.svg" alt="" loading="lazy" width="600" height="640"><span>GOOD VIBES<br>ONLY*</span></div>
+        <p>We made a space for late-night gamers, chill smokers, night owls, and anyone tired of servers that feel like job interviews. Pull up to voice chat, find a squad, or just hang out.</p>
+        <small>*GOOD VIBES, NOT A FREE PASS TO BE A JERK.</small>
+      </div>
+    </div>
+    <div class="traits reveal"><span>✳ STONER FRIENDLY</span><span>⌘ CROSS-PLAY GAMING</span><span>☾ LATE-NIGHT LOUNGE</span><span>✦ BUILT FOR THE CREW</span></div>
+  </section>
 
-<section class="join section-space" id="join" aria-labelledby="join-title"><div class="join-glow" aria-hidden="true"></div><div class="join-orbit" aria-hidden="true"></div><div class="shell join-content"><span class="section-number reveal">04 / YOUR INVITE</span><h2 id="join-title" class="reveal">YOUR NEXT<br><em>GAME NIGHT</em><br>STARTS HERE.</h2><p class="reveal">Pull up, bring your crew, or find a new one. The Lobby is ready whenever you are.</p><div class="join-buttons reveal"><a class="button primary join-discord" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer">JOIN THE DISCORD <span aria-hidden="true">↗</span></a><a href="#worlds" class="button secondary">BROWSE THE LOBBY <span>↑</span></a></div><p class="link-note">Minecraft server connection details are being updated. Join the Discord for news while we confirm the new address.</p></div></section>
+  <section class="experiences section-space" id="experiences" aria-labelledby="experiences-heading">
+    <div class="shell">
+      <div class="section-kicker reveal"><span>02 / ENTER THE LOBBY</span><span>FOUR WAYS TO LOSE TRACK OF TIME</span></div>
+      <div class="experiences-heading"><h2 id="experiences-heading" class="big-type reveal">CHOOSE YOUR<br><em>SIDE QUEST.</em></h2><p class="reveal">This is more than an invite link. It's where the games, seshes, movie nights, and community tools come together.</p></div>
+      <div class="experience-grid">
+        <article class="experience-card hangout-card interactive-card reveal">
+          <div class="card-glow"></div><div class="card-visual" aria-hidden="true"><img class="card-leaf" src="/assets/botanical-leaf.svg" alt="" loading="lazy" width="600" height="640"><span class="card-visual-stamp">✦ SESHS & SQUADS ✦</span></div>
+          <div class="card-info"><div class="card-topline"><span>01 // YOUR PEOPLE</span><span>↗</span></div><h3>THE<br>HANGOUT.</h3><p>Find your crew, hang out in VC, share the laughs, and let the conversation go wherever the night takes it.</p><a href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer" class="card-link">JOIN THE CONVERSATION <span aria-hidden="true">↗</span></a></div>
+        </article>
+        <article class="experience-card shield-card interactive-card reveal">
+          <div class="card-glow"></div><div class="card-visual shield-visual" aria-hidden="true"><svg viewBox="0 0 300 320" fill="none" class="shield-mark"><path d="M150 15 266 68v92c0 72-40 116-116 149C74 276 34 232 34 160V68L150 15Z" stroke="currentColor" stroke-width="6"/><path d="M150 52 231 91v68c0 47-26 80-81 109-55-29-81-62-81-109V91l81-39Z" stroke="currentColor" stroke-opacity=".5" stroke-width="3"/><path d="m103 159 32 29 64-76" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="card-info"><div class="card-topline"><span>02 // BUILT DIFFERENT</span><span>↗</span></div><h3>DANK<br>SHIELD.</h3><p>Our custom Discord toolkit brings moderation, protection, verification, roles, sharing, and personalized member experiences together.</p><a href="#after-dark" class="card-link">MEET THE TECH <span aria-hidden="true">↗</span></a></div>
+        </article>
+        <article class="experience-card cinema-card interactive-card reveal">
+          <div class="card-glow"></div><div class="card-visual cinema-visual" aria-hidden="true"><div class="film-reel"><span>▶</span></div><div class="cinema-beam"></div><div class="cinema-stars">✦ ✧ ✦</div></div>
+          <div class="card-info"><div class="card-topline"><span>03 // LIGHTS OUT</span><span>↗</span></div><h3>DANK<br>CINEMA.</h3><p>Movie nights and shared watch-party experiences. Bring snacks, get comfortable, and make it a group thing.</p><a href="#after-dark" class="card-link">THE MOVIE-NIGHT VIBE <span aria-hidden="true">↗</span></a></div>
+        </article>
+        <article class="experience-card minecraft-card interactive-card reveal">
+          <div class="card-glow"></div><div class="card-visual minecraft-visual" aria-hidden="true"><div class="voxel-scape"><span></span><span></span><span></span><span></span><span></span></div><div class="minecraft-tag">JAVA <b>✳</b> BEDROCK</div></div>
+          <div class="card-info"><div class="card-topline"><span>04 // BUILD YOUR WORLD</span><span>↗</span></div><h3>THE 420<br>SERVER.</h3><p>A Minecraft cross-play adventure for Java and Bedrock players. Build, explore, and make the world your own.</p><a href="#join" class="card-link">SERVER ADDRESS COMING SOON <span aria-hidden="true">↗</span></a></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="reality-section" id="after-dark" aria-labelledby="dark-heading">
+    <div class="reality-stage" aria-hidden="true">
+      <div class="reality-tunnel" data-depth=".33"></div>
+      <div class="reality-window" data-depth=".52"><div class="reality-window-inner"></div></div>
+      <img class="reality-leaf" src="/assets/botanical-leaf.svg" alt="" loading="lazy" width="600" height="640" data-depth=".7">
+      <div class="reality-echo echo-one">420</div><div class="reality-echo echo-two">420</div>
+    </div>
+    <div class="reality-content shell">
+      <span class="section-number reveal">03 / THE AFTER HOURS</span>
+      <h2 id="dark-heading" class="reality-title reveal">THE INTERNET<br>IS FULL OF<br><span>GHOST TOWNS.</span><br><em>DON'T LIVE IN ONE.</em></h2>
+      <p class="reveal">Community is what makes the night interesting. Whether you're gaming, laughing, watching, or simply lurking, there's room to settle in.</p>
+      <a class="reality-link reveal" href="#join">FIND YOUR WAY IN <span aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+
+  <section class="community-proof section-space shell" aria-labelledby="proof-heading">
+    <div class="section-kicker reveal"><span>04 / REAL COMMUNITY</span><span>NO MADE-UP MEMBER COUNTERS</span></div>
+    <div class="proof-grid">
+      <div><h2 class="big-type reveal" id="proof-heading">BUILT FOR<br><em>HUMANS.</em><br>NOT HYPE.</h2></div>
+      <div class="proof-panel reveal">
+        <p class="proof-label">THE LOBBY MANIFESTO</p>
+        <p>Come as you are. Play what you love. Respect other people. Help make the server feel like somewhere worth returning to.</p>
+        <div class="proof-rows"><span>01 <b>FIND THE CREW</b></span><span>02 <b>MAKE YOUR NIGHT</b></span><span>03 <b>COME BACK TOMORROW</b></span></div>
+        <p class="proof-footnote">Live Discord activity and verified game-server status can be connected later. No invented counts or fake activity.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="join section-space" id="join" aria-labelledby="join-heading">
+    <div class="join-fog" aria-hidden="true"></div>
+    <div class="join-moon" aria-hidden="true"></div>
+    <div class="shell join-content">
+      <div class="join-ornament reveal" aria-hidden="true">✦ &nbsp; ☾ &nbsp; ✦</div>
+      <span class="section-number reveal">THE DOOR IS OPEN</span>
+      <h2 id="join-heading" class="reveal">STAY A WHILE.<br><em>GET HAUNTED.</em></h2>
+      <p class="reveal">The 420 Lobby is waiting on the other side. Bring your controller, your weirdest stories, and your favorite people.</p>
+      <a class="cta-primary large-cta reveal" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer">JOIN THE 420 LOBBY <span aria-hidden="true">↗</span></a>
+      <p class="join-note">Minecraft connection details will be published when the new server address is confirmed.</p>
+    </div>
+  </section>
 </main>
-<footer class="footer shell"><div><a href="#top" class="footer-logo">420<span>✳</span>LOBBY</a><p>Game together. Chill together. Stay for the vibes.</p></div><div class="footer-nav"><a href="#about">THE VIBE</a><a href="#worlds">OUR WORLDS</a><a href="#top">BACK TO TOP ↑</a><small>© <span id="year">2026</span> THE 420 LOBBY.</small></div></footer>
-</body></html>
+
+<footer class="footer shell">
+  <div><a class="footer-logo" href="#top">THE 420 <strong>LOBBY.</strong></a><p>Game. Sesh. Haunt. Repeat.</p></div>
+  <div class="footer-links"><a href="#vibe">THE VIBE</a><a href="#experiences">WHAT WE DO</a><a href="#top">BACK TO TOP ↑</a><small>© <span id="year">2026</span> THE 420 LOBBY.</small></div>
+</footer>
+</body>
+</html>

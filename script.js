@@ -1,281 +1,162 @@
+/* The 420 Lobby v3: scroll story, UI, parallax and safe animation controls. */
 (function () {
   "use strict";
+  const root = document.documentElement;
+  const fxButton = document.getElementById("fx-toggle");
+  const fxLabel = document.getElementById("fx-label");
+  const menuButton = document.getElementById("menu-toggle");
+  const menu = document.getElementById("primary-nav");
+  const progress = document.getElementById("scroll-progress");
+  const hero = document.getElementById("hero-scene");
+  const reality = document.getElementById("after-dark");
+  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+  const saveData = !!(navigator.connection && navigator.connection.saveData);
+  const elements = document.querySelectorAll(".entrance, .reveal");
+  const atmosphere = window.LobbyAtmosphere;
+  let effects = !motionPreference.matches && !saveData;
+  let scheduledScroll = false;
+  let pointer = [0,0];
+  let observer = null;
 
-  var root = document.documentElement;
-  var progress = document.getElementById("scroll-progress");
-  var menuButton = document.getElementById("menu-toggle");
-  var menu = document.getElementById("nav-links");
-  var fxButton = document.getElementById("fx-toggle");
-  var fxLabel = document.getElementById("fx-label");
-  var canvas = document.getElementById("starfield");
-  var ctx = canvas && canvas.getContext ? canvas.getContext("2d", { alpha: true }) : null;
-  var motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
-  var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-  var saveData = !!(navigator.connection && navigator.connection.saveData);
-  var motionOn = !motionPreference.matches && !saveData;
-  var frame = 0;
-  var lastFrame = 0;
-  var stars = [];
-  var width = 0;
-  var height = 0;
-  var heroVisible = true;
-  var scrollPending = false;
-  var pointerX = 0;
-  var pointerY = 0;
-  var revealElements = document.querySelectorAll(".reveal");
-  var revealObserver = null;
-
-  function showAllReveals() {
+  function unhide() {
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
     root.classList.remove("motion-ready");
-    revealElements.forEach(function (el) { el.classList.add("visible"); });
+    elements.forEach(function(element) { element.classList.add("visible"); });
   }
 
-  if ("IntersectionObserver" in window && motionOn) {
-    root.classList.add("motion-ready");
-    revealObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.04, rootMargin: "0px 0px -4% 0px" });
-    revealElements.forEach(function (el) { revealObserver.observe(el); });
-  } else {
-    showAllReveals();
-  }
-
-  function stopStars() {
-    if (frame) cancelAnimationFrame(frame);
-    frame = 0;
-    if (ctx) ctx.clearRect(0, 0, width, height);
-  }
-
-  function prepareStars() {
-    if (!ctx) return;
-    width = Math.max(1, window.innerWidth);
-    height = Math.max(1, window.innerHeight);
-    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var count = saveData ? 22 : width < 760 ? 55 : 125;
-    stars = Array.from({ length: count }, function () {
-      return {
-        angle: Math.random() * Math.PI * 2,
-        radius: Math.sqrt(Math.random()),
-        depth: 0.22 + Math.random() * 0.75,
-        size: 0.4 + Math.random() * 1.55,
-        phase: Math.random() * Math.PI * 2
-      };
-    });
-  }
-
-  function drawStars(time) {
-    frame = 0;
-    if (!motionOn || !ctx || !heroVisible || document.hidden) return;
-    var targetFrameInterval = width < 760 ? 34 : 24;
-    if (time - lastFrame < targetFrameInterval) {
-      frame = requestAnimationFrame(drawStars);
+  function installReveal() {
+    if (!effects || !("IntersectionObserver" in window)) {
+      unhide();
       return;
     }
-    lastFrame = time;
-    ctx.clearRect(0, 0, width, height);
-    var centerX = width * (width < 760 ? 0.67 : 0.78) - pointerX * 18;
-    var centerY = height * 0.44 - pointerY * 16;
-    var radius = Math.max(width, height) * 0.83;
-    for (var i = 0; i < stars.length; i++) {
-      var s = stars[i];
-      var advance = (time * 0.000014 * (s.depth + 0.3)) % 1;
-      var distance = ((s.radius + advance) % 1) * radius;
-      var x = centerX + Math.cos(s.angle) * distance;
-      var y = centerY + Math.sin(s.angle) * distance * 0.69;
-      if (x < 0 || x > width || y < 0 || y > height) continue;
-      var opacity = Math.max(0.11, Math.min(0.76, (0.48 + 0.3 * Math.sin(time * 0.0007 + s.phase)) * (distance / radius + 0.15)));
-      ctx.globalAlpha = opacity;
-      ctx.fillStyle = i % 10 === 0 ? "#baff6b" : i % 4 === 0 ? "#f7c679" : "#e4f4dc";
-      ctx.beginPath();
-      ctx.arc(x, y, s.size * (0.6 + distance / radius), 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-    frame = requestAnimationFrame(drawStars);
+    if (observer) observer.disconnect();
+    elements.forEach(function(element) { element.classList.remove("visible"); });
+    observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.04,rootMargin:"0px 0px -3% 0px"});
+    root.classList.add("motion-ready");
+    elements.forEach(function(element) { observer.observe(element); });
   }
 
-  function startStars() {
-    if (ctx && motionOn && heroVisible && !document.hidden && !frame) frame = requestAnimationFrame(drawStars);
+  function setEffects(value) {
+    effects = !!value && !motionPreference.matches && !saveData;
+    root.classList.toggle("fx-off", !effects);
+    if (fxButton) {
+      fxButton.setAttribute("aria-pressed", String(effects));
+      fxButton.disabled = motionPreference.matches || saveData;
+      fxButton.title = fxButton.disabled ? "Effects disabled by reduced-motion or data-saving preference" : "Toggle animations";
+    }
+    if (fxLabel) fxLabel.textContent = effects ? "EFFECTS ON" : (motionPreference.matches || saveData ? "LOW MOTION" : "EFFECTS OFF");
+    if (atmosphere) atmosphere.setEnabled(effects);
+    if (effects) installReveal();
+    else unhide();
+    updateScroll();
   }
 
-  function setMotion(enabled) {
-    motionOn = !!enabled && !motionPreference.matches && !saveData;
-    root.classList.toggle("fx-off", !motionOn);
-    if (fxButton) fxButton.setAttribute("aria-pressed", String(motionOn));
-    if (fxLabel) fxLabel.textContent = motionOn ? "FX ON" : "FX OFF";
-    if (motionOn) startStars();
-    else {
-      stopStars();
-      root.style.setProperty("--hero-shift", "0px");
-      root.style.setProperty("--interlude-shift", "0px");
-      root.style.setProperty("--mouse-x", "0px");
-      root.style.setProperty("--mouse-y", "0px");
-      showAllReveals();
-    }
-  }
-
-  if (fxButton) {
-    fxButton.addEventListener("click", function () {
-      if (saveData || motionPreference.matches) return;
-      setMotion(!motionOn);
-    });
-    if (saveData || motionPreference.matches) {
-      fxButton.title = "Visual effects disabled by your motion or data-saving preferences";
-    }
-  }
-  function handleMotionPreference() { setMotion(!motionPreference.matches); }
-  if (motionPreference.addEventListener) motionPreference.addEventListener("change", handleMotionPreference);
-  else if (motionPreference.addListener) motionPreference.addListener(handleMotionPreference);
+  if (fxButton) fxButton.addEventListener("click", function(){ setEffects(!effects); });
+  function onMotionChange() { setEffects(!motionPreference.matches); }
+  if (motionPreference.addEventListener) motionPreference.addEventListener("change", onMotionChange);
+  else if (motionPreference.addListener) motionPreference.addListener(onMotionChange);
 
   if (menu && menuButton) {
     function closeMenu() {
       menu.classList.remove("open");
-      menuButton.setAttribute("aria-expanded", "false");
-      menuButton.setAttribute("aria-label", "Open menu");
+      menuButton.setAttribute("aria-expanded","false");
+      menuButton.setAttribute("aria-label","Open navigation");
     }
-    menuButton.addEventListener("click", function () {
-      var opened = menu.classList.toggle("open");
-      menuButton.setAttribute("aria-expanded", String(opened));
-      menuButton.setAttribute("aria-label", opened ? "Close menu" : "Open menu");
+    menuButton.addEventListener("click", function() {
+      const open = menu.classList.toggle("open");
+      menuButton.setAttribute("aria-expanded", String(open));
+      menuButton.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
     });
-    menu.querySelectorAll("a").forEach(function (link) {
-      link.addEventListener("click", closeMenu);
-    });
-    window.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") closeMenu();
-    });
-    window.addEventListener("resize", function () {
-      if (window.innerWidth > 760) closeMenu();
-    }, { passive: true });
+    menu.querySelectorAll("a").forEach(function(link) { link.addEventListener("click",closeMenu); });
+    document.addEventListener("keydown", function(event) { if (event.key === "Escape") closeMenu(); });
+    window.addEventListener("resize", function() { if (window.innerWidth > 760) closeMenu(); }, {passive:true});
   }
 
   function updateScroll() {
-    scrollPending = false;
-    var y = window.scrollY || window.pageYOffset || 0;
-    var scrollRange = Math.max(1, root.scrollHeight - window.innerHeight);
-    if (progress) progress.style.transform = "scaleX(" + Math.min(1, y / scrollRange) + ")";
-    if (motionOn) {
-      root.style.setProperty("--hero-shift", Math.min(300, y * 0.23).toFixed(1) + "px");
-      var section = document.querySelector(".interlude");
-      if (section) {
-        var bounds = section.getBoundingClientRect();
-        var midpoint = bounds.top + bounds.height / 2;
-        var offset = (window.innerHeight / 2 - midpoint) * 0.06;
-        root.style.setProperty("--interlude-shift", Math.max(-45, Math.min(45, offset)).toFixed(1) + "px");
-      }
+    scheduledScroll = false;
+    const scrollTop = Math.max(0,window.scrollY || window.pageYOffset || 0);
+    const maxScroll = Math.max(1,root.scrollHeight-window.innerHeight);
+    if (progress) progress.style.transform = "scaleX("+Math.min(1,scrollTop/maxScroll)+")";
+    if (!effects) {
+      root.style.setProperty("--hero-shift","0px");
+      root.style.setProperty("--rotation","0deg");
+      root.style.setProperty("--twist","0deg");
+      root.style.setProperty("--reality-y","0px");
+      root.style.setProperty("--leaf-x","0px");
+      root.style.setProperty("--leaf-y","0px");
+      if (atmosphere) atmosphere.setScroll(0);
+      return;
+    }
+    const position = Math.min(1.5,scrollTop/Math.max(window.innerHeight,1));
+    root.style.setProperty("--hero-shift",(position*105).toFixed(1)+"px");
+    if (atmosphere) atmosphere.setScroll(Math.min(1,position));
+    if (reality) {
+      const rect = reality.getBoundingClientRect();
+      const progress = Math.max(-1,Math.min(1,(window.innerHeight*.5-(rect.top+rect.height*.5))/(Math.max(window.innerHeight,1))));
+      root.style.setProperty("--rotation",(progress*22).toFixed(2)+"deg");
+      root.style.setProperty("--twist",(progress*17).toFixed(2)+"deg");
+      root.style.setProperty("--reality-y",(progress*55).toFixed(1)+"px");
+      root.style.setProperty("--leaf-y",(progress*125).toFixed(1)+"px");
+      root.style.setProperty("--leaf-x",(progress*-55).toFixed(1)+"px");
     }
   }
-  window.addEventListener("scroll", function () {
-    if (!scrollPending) {
-      scrollPending = true;
+
+  window.addEventListener("scroll", function() {
+    if (!scheduledScroll) {
+      scheduledScroll = true;
       requestAnimationFrame(updateScroll);
     }
-  }, { passive: true });
+  }, {passive:true});
 
   if (finePointer.matches) {
-    window.addEventListener("pointermove", function (event) {
-      if (!motionOn) return;
-      pointerX = (event.clientX / Math.max(1, window.innerWidth) - 0.5) * 2;
-      pointerY = (event.clientY / Math.max(1, window.innerHeight) - 0.5) * 2;
-      root.style.setProperty("--mouse-x", (pointerX * 13).toFixed(2) + "px");
-      root.style.setProperty("--mouse-y", (pointerY * 11).toFixed(2) + "px");
-    }, { passive: true });
-
-    document.querySelectorAll(".tilt").forEach(function (card) {
-      card.addEventListener("pointermove", function (event) {
-        if (!motionOn) return;
-        var box = card.getBoundingClientRect();
-        var x = (event.clientX - box.left) / box.width;
-        var y = (event.clientY - box.top) / box.height;
-        card.style.setProperty("--card-ry", ((x - 0.5) * 7).toFixed(2) + "deg");
-        card.style.setProperty("--card-rx", ((0.5 - y) * 7).toFixed(2) + "deg");
-        card.style.setProperty("--pointer-x", (x * 100).toFixed(1) + "%");
-        card.style.setProperty("--pointer-y", (y * 100).toFixed(1) + "%");
-      }, { passive: true });
-      card.addEventListener("pointerleave", function () {
-        card.style.setProperty("--card-rx", "0deg");
-        card.style.setProperty("--card-ry", "0deg");
+    window.addEventListener("pointermove", function(event) {
+      if (!effects) return;
+      pointer = [
+        event.clientX/Math.max(1,window.innerWidth)*2-1,
+        event.clientY/Math.max(1,window.innerHeight)*2-1
+      ];
+      if (hero) {
+        root.style.setProperty("--x",(pointer[0]*9).toFixed(1)+"px");
+        root.style.setProperty("--y",(pointer[1]*9).toFixed(1)+"px");
+        hero.querySelectorAll(".scene-layer[data-depth]").forEach(function(layer) {
+          const amount = Number(layer.getAttribute("data-depth")) || 0;
+          layer.style.setProperty("--px",(pointer[0]*amount*24).toFixed(1)+"px");
+          layer.style.setProperty("--py",(pointer[1]*amount*20).toFixed(1)+"px");
+        });
+      }
+    }, {passive:true});
+    document.querySelectorAll(".interactive-card").forEach(function(card) {
+      card.addEventListener("pointermove",function(event) {
+        if (!effects) return;
+        const b = card.getBoundingClientRect();
+        const x = (event.clientX-b.left)/Math.max(1,b.width);
+        const y = (event.clientY-b.top)/Math.max(1,b.height);
+        card.style.setProperty("--ry",((x-.5)*7).toFixed(2)+"deg");
+        card.style.setProperty("--rx",((.5-y)*7).toFixed(2)+"deg");
+        card.style.setProperty("--gx",(x*100).toFixed(1)+"%");
+        card.style.setProperty("--gy",(y*100).toFixed(1)+"%");
+      }, {passive:true});
+      card.addEventListener("pointerleave",function() {
+        card.style.setProperty("--ry","0deg");
+        card.style.setProperty("--rx","0deg");
       });
     });
   }
 
-  var signalData = {
-    community: ["001", "MODE 001 // THE HANGOUT", "SESH. GAME. REPEAT.", "Pop into voice chat, share a laugh, find people to game with, and unwind in a 420-friendly Discord community."],
-    shield: ["002", "MODE 002 // DANK SHIELD", "KEEP THE GOOD VIBES SAFE.", "Dank Shield helps with Discord moderation, verification, role selection, profiles, sharing, and community management."],
-    cinema: ["003", "MODE 003 // DANK CINEMA", "ROLL CREDITS. PASS SNACKS.", "Grab your friends for movie nights and a shared watch-party experience inside the 420 community."],
-    minecraft: ["004", "MODE 004 // THE 420 SERVER", "BUILD. EXPLORE. CHILL.", "The 420 Server brings Java and Bedrock players together. The new connection address will be posted once confirmed."]
-  };
-  var tabs = Array.from(document.querySelectorAll(".signal-tab"));
-  var panel = document.getElementById("signal-panel");
-
-  function selectSignal(name, focusTab) {
-    if (!Object.prototype.hasOwnProperty.call(signalData, name)) return;
-    var data = signalData[name];
-    var ids = ["signal-code", "signal-kicker", "signal-headline", "signal-description"];
-    for (var i = 0; i < ids.length; i++) {
-      var element = document.getElementById(ids[i]);
-      if (element) element.textContent = data[i];
-    }
-    tabs.forEach(function (tab) {
-      var selected = tab.getAttribute("data-signal") === name;
-      tab.setAttribute("aria-selected", String(selected));
-      tab.tabIndex = selected ? 0 : -1;
-      tab.classList.toggle("active", selected);
-      if (selected && focusTab) tab.focus();
-    });
-    if (panel) panel.setAttribute("aria-labelledby", "tab-" + name);
-  }
-  tabs.forEach(function (tab, index) {
-    tab.addEventListener("click", function () {
-      selectSignal(tab.getAttribute("data-signal"), false);
-    });
-    tab.addEventListener("keydown", function (event) {
-      if (["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"].indexOf(event.key) === -1) return;
-      event.preventDefault();
-      var next = index;
-      if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (index + 1) % tabs.length;
-      if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (index - 1 + tabs.length) % tabs.length;
-      if (event.key === "Home") next = 0;
-      if (event.key === "End") next = tabs.length - 1;
-      selectSignal(tabs[next].getAttribute("data-signal"), true);
-    });
-  });
-
-  var year = document.getElementById("year");
+  const year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());
 
-  if (ctx) {
-    prepareStars();
-    window.addEventListener("resize", function () {
-      prepareStars();
-      startStars();
-    }, { passive: true });
-    document.addEventListener("visibilitychange", function () {
-      if (document.hidden) stopStars();
-      else startStars();
-    });
-    if ("IntersectionObserver" in window) {
-      var hero = document.querySelector(".hero");
-      if (hero) {
-        var heroObserver = new IntersectionObserver(function (entries) {
-          heroVisible = entries[0].isIntersecting;
-          if (heroVisible) startStars();
-          else stopStars();
-        }, { threshold: 0 });
-        heroObserver.observe(hero);
-      }
-    }
-  }
-
-  selectSignal("community", false);
-  setMotion(motionOn);
+  setEffects(effects);
   updateScroll();
 })();
