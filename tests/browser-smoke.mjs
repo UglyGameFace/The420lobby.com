@@ -112,11 +112,21 @@ try {
       await page.locator("#sesh-start").click();
       await page.locator(".sesh-wisp--smoke").first().waitFor({state:"visible",timeout:6500});
       const firstWisp=page.locator(".sesh-wisp--smoke").first();
-      const hitbox1=await firstWisp.boundingBox();
+      const relativeHitbox = () => firstWisp.evaluate(button => {
+        const b=button.getBoundingClientRect();
+        const board=document.querySelector("#sesh-stage").getBoundingClientRect();
+        return {x:b.x-board.x,y:b.y-board.y,width:b.width,height:b.height,scrollY:window.scrollY};
+      });
+      const hitbox1=await relativeHitbox();
       await page.waitForTimeout(120);
-      const hitbox2=await firstWisp.boundingBox();
-      assert.ok(hitbox1 && hitbox2 && Math.abs(hitbox1.width-hitbox2.width)<0.5 && Math.abs(hitbox1.x-hitbox2.x)<0.5 && Math.abs(hitbox1.y-hitbox2.y)<0.5,"smoke tap target must stay physically stable");
-      await firstWisp.click({timeout:4000});
+      const hitbox2=await relativeHitbox();
+      const stable=Math.abs(hitbox1.width-hitbox2.width)<0.5 &&
+        Math.abs(hitbox1.height-hitbox2.height)<0.5 &&
+        Math.abs(hitbox1.x-hitbox2.x)<0.5 &&
+        Math.abs(hitbox1.y-hitbox2.y)<0.5;
+      assert.ok(stable,"Smoke hitbox moves relative to game board: "+JSON.stringify({hitbox1,hitbox2}));
+      // A real click must work, even if the browser needs to scroll the page to the board.
+      await firstWisp.click({timeout:5000});
       const points=Number(await page.locator("#sesh-score").textContent());
       assert.ok(points>0,"tapping a green wisp should award points");
       await page.locator("#sesh-pause").click();
