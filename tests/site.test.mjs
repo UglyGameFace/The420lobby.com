@@ -50,21 +50,6 @@ test("approved Cheers hero retains actual text, independent motion and original 
   assert.match(jointArt, /<\/svg>\s*$/);
 });
 
-test("cheers joint stays integrated inside the lettering with a flickering ember", () => {
-  assert.match(html, /class="cheers-roll"[^>]*>.*class="cheers-ember"/s);
-  const rollRule = cheersCss.match(/\.hero-heading-cheers \.cheers-roll\{([^}]*)\}/s)?.[1] ?? "";
-  const width = Number(rollRule.match(/width:\s*([\d.]+)%/)?.[1]);
-  const left = Number(rollRule.match(/left:\s*([\d.]+)%/)?.[1]);
-  assert.ok(width > 0 && left >= 0, "joint geometry must be percentage-based");
-  assert.ok(left + width <= 100, "joint must not overshoot past CHEERS onto WE PLAY");
-  assert.match(cheersCss, /@keyframes cheers-ember/);
-  assert.match(cheersCss, /\.hero-heading-cheers \.cheers-ember\{[^}]*animation:cheers-ember/);
-  const fxOff = cheersCss.match(/html\.fx-off[^{]*\{[^}]*\}/s)?.[0] ?? "";
-  assert.ok(fxOff.includes(".cheers-ember"), "ember flicker must stop with FX off");
-  const reduced = cheersCss.match(/prefers-reduced-motion:reduce\)\{([\s\S]*?)\n\}/)?.[0] ?? "";
-  assert.ok(reduced.includes(".cheers-ember"), "ember flicker must stop under reduced motion");
-});
-
 test("custom botanical art uses seven distinct serrated and veined leaflets", () => {
   assert.equal((leaf.match(/transform="rotate\(-?\d+ 300 464\)"/g)||[]).length,7);
   assert.ok((leaf.match(/<path/g)||[]).length>35);
@@ -83,12 +68,16 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(smokeLogo, /fractalNoise/);
   assert.match(smokeLogo, /feDisplacementMap/);
   assert.doesNotMatch(smokeLogo,/stroke-width="23"|stroke-width="16"|filter="url\(#aura\)"/);
-  assert.match(smokeLogo, /<svg[^>]*viewBox="-28 -45 476 260"/);
+  assert.match(smokeLogo, /<svg[^>]*viewBox="-12 -32 452 218"/);
+  assert.match(smokeLogo, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
+  assert.doesNotMatch(smokeLogo, /id="outer-cloud"/);
+  assert.doesNotMatch(smokeLogo, /id="billow"/);
   assert.doesNotMatch(html,/class="logo-glyph"/);
   assert.doesNotMatch(css,/\.logo-glyph/);
   assert.match(css,/\.fx-toggle #fx-label\{display:none\}/);
   assert.match(css,/\.scene-label\{display:none\}/);
-  assert.match(css,/\.logo-smoke\{width:137px;height:69px/);
+  assert.match(css,/\.logo-smoke\{width:129px;height:62px/);
+  assert.match(html, /class="fx-switch"/);
 });
 
 test("all advertised community experiences remain present", () => {

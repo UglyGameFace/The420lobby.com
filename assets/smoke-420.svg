@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-28 -45 476 260" role="img" aria-labelledby="title desc">
-<title id="title">420 formed from clouds of smoke</title>
-<desc id="desc">The digits 420 are formed from translucent curling vapor and feathery smoke, with a generous transparent safety margin so the swirls are never clipped on mobile.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -32 452 218" role="img" aria-labelledby="title desc">
+<title id="title">420 formed from curling smoke</title>
+<desc id="desc">The digits 420 are formed from translucent curling vapor and feathery smoke, tightly cropped with no background cloud so the mark aligns flush in the site header.</desc>
 <defs>
  <linearGradient id="vapor" x1="0" y1=".9" x2=".8" y2=".1">
   <stop stop-color="#648479" stop-opacity=".34"/>
@@ -15,23 +15,15 @@
   <stop offset=".7" stop-color="#f6faf2" stop-opacity=".9"/>
   <stop offset="1" stop-color="#9fb7ad" stop-opacity=".37"/>
  </linearGradient>
- <filter id="outer-cloud" x="-32%" y="-70%" width="164%" height="240%">
-  <feTurbulence type="fractalNoise" baseFrequency=".018 .055" numOctaves="5" seed="11" result="drift"/>
-  <feDisplacementMap in="SourceGraphic" in2="drift" scale="23" xChannelSelector="R" yChannelSelector="G" result="twisted"/>
-  <feGaussianBlur in="twisted" stdDeviation="8"/>
- </filter>
  <filter id="smoke-form" x="-30%" y="-65%" width="160%" height="230%">
   <feTurbulence type="fractalNoise" baseFrequency=".033 .075" numOctaves="4" seed="24" result="whorls"/>
-  <feDisplacementMap in="SourceGraphic" in2="whorls" scale="19" xChannelSelector="R" yChannelSelector="G" result="ripped"/>
+  <feDisplacementMap in="SourceGraphic" in2="whorls" scale="22" xChannelSelector="R" yChannelSelector="G" result="ripped"/>
   <feGaussianBlur in="ripped" stdDeviation="2.3"/>
  </filter>
  <filter id="filaments" x="-30%" y="-100%" width="160%" height="300%">
   <feTurbulence type="fractalNoise" baseFrequency=".04 .12" numOctaves="3" seed="7" result="wind"/>
   <feDisplacementMap in="SourceGraphic" in2="wind" scale="15" xChannelSelector="R" yChannelSelector="G"/>
   <feGaussianBlur stdDeviation="2.9"/>
- </filter>
- <filter id="billow" x="-70%" y="-110%" width="240%" height="320%">
-  <feGaussianBlur stdDeviation="10"/>
  </filter>
  <mask id="digit-window">
   <rect width="420" height="168" fill="black"/>
@@ -47,25 +39,17 @@
   <feGaussianBlur stdDeviation=".7"/>
  </filter>
 </defs>
-<!-- Smoke is volume, not a glowing font outline. Shapes fray, curl and vary in density. -->
+<!-- Smoke is volume, not a glowing font outline. Shapes fray, curl and vary in density. No background cloud: the digits stand on their own. -->
 <g font-family="Arial Black,Impact,sans-serif" font-size="148" font-weight="900" letter-spacing="-10">
- <text x="23" y="129" fill="#e9f1e9" opacity=".48" filter="url(#outer-cloud)">420</text>
- <text x="23" y="129" fill="url(#vapor)" opacity=".8" filter="url(#smoke-form)">420</text>
+ <text x="23" y="129" fill="url(#vapor)" opacity=".92" filter="url(#smoke-form)">420</text>
  <text x="23" y="129" fill="url(#shade)" opacity=".33" filter="url(#filaments)">420</text>
 </g>
 <!-- Fractal-density pockets and thin translucent streamers shape the interiors. -->
-<rect x="19" y="2" width="386" height="150" fill="#e4f2e9" filter="url(#cloud-density)" mask="url(#digit-window)" opacity=".38"/>
+<rect x="19" y="2" width="386" height="150" fill="#e4f2e9" filter="url(#cloud-density)" mask="url(#digit-window)" opacity=".45"/>
 <g fill="none" stroke="#dce9dc" stroke-linecap="round" filter="url(#filaments)">
  <path d="M56 23C37 8 56-7 40-16M76 18C91-5 65-7 77-24M126 31C148 7 126 1 142-17" stroke-width="8" opacity=".35"/>
  <path d="M174 22C165 3 178-4 164-18M207 24C224 1 200-6 226-27M263 29C249 9 266-10 258-25" stroke-width="7" opacity=".3"/>
  <path d="M310 25C330 5 309-1 324-18M365 43C388 21 375 8 401-7M392 92C418 94 394 118 436 118" stroke-width="8" opacity=".34"/>
  <path d="M16 93C-15 78 23 53-8 41M36 128C16 141 28 156 8 174M284 131C273 152 300 156 288 181" stroke-width="6" opacity=".3"/>
-</g>
-<g fill="#d9e7dc" filter="url(#billow)" opacity=".35">
- <ellipse cx="56" cy="49" rx="26" ry="17"/>
- <ellipse cx="143" cy="77" rx="31" ry="15"/>
- <ellipse cx="224" cy="48" rx="20" ry="23"/>
- <ellipse cx="352" cy="65" rx="25" ry="24"/>
- <ellipse cx="292" cy="128" rx="23" ry="16"/>
 </g>
 </svg>
