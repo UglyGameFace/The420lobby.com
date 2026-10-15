@@ -11,14 +11,18 @@ const renderer = read("visual-engine.js");
 const leaf = read("assets/botanical-leaf.svg");
 const lounge = read("assets/haunted-lounge.svg");
 const icon = read("favicon.svg");
+const smokeLogo = read("assets/smoke-420.svg");
 
-test("hero communicates a spooky, stoner-friendly gaming hangout immediately", () => {
-  for(const text of ["AFTER","DARK,","WE PLAY","spooky","Discord","Minecraft","sesh","THE 420 LOBBY"]) {
+test("hero communicates a 420-friendly gaming community, not haunted house branding", () => {
+  for(const text of ["AFTER","DARK,","WE PLAY","420 FRIENDLY","Discord","Minecraft","sesh","THE 420 LOBBY"]) {
     assert.ok(html.toLowerCase().includes(text.toLowerCase()),"missing "+text);
   }
   assert.match(html,/id="hero-heading"/);
   assert.match(html,/src="\/assets\/haunted-lounge\.svg"/);
   assert.match(html,/src="\/assets\/botanical-leaf\.svg"/);
+  assert.match(html,/src="\/assets\/smoke-420\.svg"/);
+  const textOnly=html.replace(/<(?:img|meta|link)[^>]*>/g,"");
+  assert.doesNotMatch(textOnly,/haunted|haunt|ghost towns|spooky/i);
   assert.doesNotMatch(html,/UNREAL VIBES|PICK YOUR REALITY|ON ANOTHER FREQUENCY/i);
 });
 
@@ -33,10 +37,23 @@ test("custom botanical art uses seven distinct serrated and veined leaflets", ()
   assert.match(icon,/haunted|ghost|\/svg>/i);
 });
 
+test("custom smoke 420 brand has accessible branding without the old clipped square", () => {
+  assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/smoke-420\.svg"/);
+  assert.match(html, /class="logo"[^>]+aria-label="The 420 Lobby home"/);
+  assert.match(smokeLogo, /digits 420 take shape as swirling, feathery, translucent white vapor/i);
+  assert.match(smokeLogo, /fractalNoise/);
+  assert.match(smokeLogo, /feDisplacementMap/);
+  assert.doesNotMatch(smokeLogo,/stroke-width="23"|stroke-width="16"|filter="url\(#aura\)"/);
+  assert.match(smokeLogo, /<svg[^>]*viewBox="0 0 420 168"/);
+  assert.doesNotMatch(html,/class="logo-glyph"/);
+  assert.doesNotMatch(css,/\.logo-glyph/);
+});
+
 test("all advertised community experiences remain present", () => {
   for(const id of ["main","vibe","experiences","after-dark","join"])assert.match(html,new RegExp('id="'+id+'"'));
   for(const term of ["DANK","SHIELD","CINEMA","MINECRAFT","BEDROCK","JAVA","VOICE"])assert.ok(html.toUpperCase().includes(term),term);
   assert.equal((html.match(/<article class="experience-card/g)||[]).length,4);
+  assert.equal((html.match(/class="card-body"/g)||[]).length,4);
 });
 
 test("internal anchors resolve and IDs are unique", () => {
@@ -82,8 +99,11 @@ test("interaction controller preserves useful controls and reduced motion", () =
 });
 
 test("CSS has original haunted experience and mobile/performance fallbacks",()=>{
-  for(const item of [".hero-scene",".botanical-foreground",".scene-cobweb",".experience-card",".reality-section",".join",".fx-off","prefers-reduced-motion","@media(max-width:760px)","@media(hover:none)"])assert.ok(css.includes(item),item);
+  for(const item of [".hero-scene",".botanical-foreground",".scene-cobweb",".experience-card",".reality-section",".reality-prism",".reality-slit",".logo-smoke",".join",".fx-off","prefers-reduced-motion","@media(max-width:760px)","@media(hover:none)"])assert.ok(css.includes(item),item);
   assert.doesNotMatch(css,/\.portal-ring|--magenta:/);
+  assert.match(css,/grid-template-columns:repeat\(12,minmax\(0,1fr\)\)/);
+  assert.match(css,/experience-card:nth-child\(4n\+1\)/);
+  assert.match(css,/experience-card:nth-child\(n\)\{grid-column:1/);
   assert.match(css,/\.entrance,\.reveal\{opacity:1;/);
   const noComments=css.replace(/\/\*[\s\S]*?\*\//g,"").replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g,"");
   let depth=0;

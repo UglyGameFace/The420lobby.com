@@ -28,7 +28,9 @@ try {
   await mkdir("artifacts",{recursive:true});
   for (const scenario of [
     {name:"desktop",size:{width:1440,height:900},mobile:false},
-    {name:"mobile",size:{width:390,height:844},mobile:true}
+    {name:"tablet",size:{width:820,height:1024},mobile:false},
+    {name:"mobile",size:{width:390,height:844},mobile:true},
+    {name:"narrow-mobile",size:{width:320,height:700},mobile:true}
   ]) {
     const page=await browser.newPage({viewport:scenario.size,deviceScaleFactor:scenario.mobile?2:1});
     const errors=[];
@@ -40,9 +42,13 @@ try {
     assert.equal(initialHeroOpacity,"1","hero text must be readable immediately, not hidden behind scroll observer");
     assert.equal(await page.title(),"The 420 Lobby | After Dark, We Play");
     assert.equal(await page.locator(".experience-card").count(),4);
+    assert.equal(await page.locator(".card-body").count(),4,"custom feature card content needs to be present");
     assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),4);
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
+    assert.equal(await page.locator("img.logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");
+    assert.equal(await page.locator(".logo-glyph").count(),0,"outdated sticky-note mark still present");
+    assert.equal(await page.locator(".reality-prism").count(),1,"optical prism missing");
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
     assert.ok(overflow<=2,scenario.name+" horizontal overflow "+overflow+"px");
     if (scenario.mobile) {

@@ -3,18 +3,19 @@
 **Discord:** https://discord.gg/the420lobby  
 **Cloudflare Pages project:** `the420lobby-com`
 
-## Active task: Haunted Lobby v3 redesign
+## Active task: Custom smoke identity & cinematic community redesign v4
 
-The previous live site looked like a nightclub/generic gaming template. This branch changes the authoritative static site into an original haunted gaming lounge with a proper seven-blade serrated cannabis emblem, an illustrated spectral gaming room, scroll-linked reality distortion, 3D hover depth, and a WebGL spectral fog engine.
+The site's visual effects should be moody and eerie, but its brand voice must advertise a welcoming 420-friendly Discord gaming community, not a haunted house. This follow-up repairs the paper-like header mark with a procedural cloud-formed smoke `420`, replaces haunted-house copy, reshapes the repetitive feature grid into an asymmetric composition and extends the existing optical scroll scene. The original botanical leaf and WebGL fog system stay in place.
 
 ### Architecture / ownership
 - `index.html`: semantic content, internal links, verified Discord invite, no invented stats or Minecraft ports.
 - `styles.css`: sole authoritative theme and layout stylesheet. Responsive and reduced-motion designs included.
 - `script.js`: sole DOM interaction and scroll/parallax coordinator.
 - `visual-engine.js`: GPU WebGL shader, owned behind `window.LobbyAtmosphere`. No Three.js download, CDNs, or build step. Shader falls back to CSS if WebGL is unavailable.
-- `assets/haunted-lounge.svg`: original bespoke creepy CRT + gaming controller artwork.
+- `assets/haunted-lounge.svg`: existing atmospheric CRT gaming illustration, retained as visual background only. Its filename is legacy; no haunted-house copy is promoted.
+- `assets/smoke-420.svg`: procedural vapor lettering formed by turbulence, displacement, feathered clouds, and translucent density, deliberately replacing the clipping-paper CSS brand mark.
 - `assets/botanical-leaf.svg`: seven individual serrated leaflets, veins, tapering and a stem, not generic blade shapes.
-- `favicon.svg`: original glowing ghost.
+- `favicon.svg`: existing icon, unchanged in this scope.
 - `tests/site.test.mjs`: static regression checks.
 
 ### Performance safeguards
@@ -46,7 +47,7 @@ Runtime visual checks in multiple browsers are still necessary. WebGL shader com
 
 ## Website ↔ Discord/Minecraft integration backlog (not implemented in this redesign)
 
-The user wants actual server integration after this visual redesign is validated. Treat it as the *next* implementation task, not an excuse to modify Dank Shield while the redesign is in progress.
+The user wants actual server integration and a fun smoking-themed mini-game, but neither is implemented during the active visual redesign. The **mini-game is first in the backlog**: an original lighthearted, mobile-friendly 420 community activity or game, ideally playable without sign-in. Mechanics, anti-spam limits, accessibility, and any Discord integration must be designed and validated in that separate task, without inventing member rewards or server data. Do not modify Dank Shield while this PR is in progress.
 
 Suggested delivery order:
 
