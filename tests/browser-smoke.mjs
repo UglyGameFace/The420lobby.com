@@ -30,6 +30,8 @@ try {
     {name:"desktop",size:{width:1440,height:900},mobile:false},
     {name:"tablet",size:{width:820,height:1024},mobile:false},
     {name:"mobile",size:{width:390,height:844},mobile:true},
+    {name:"samsung-mobile",size:{width:412,height:915},mobile:true},
+    {name:"compact-mobile",size:{width:360,height:740},mobile:true},
     {name:"narrow-mobile",size:{width:320,height:700},mobile:true}
   ]) {
     const page=await browser.newPage({viewport:scenario.size,deviceScaleFactor:scenario.mobile?2:1});
@@ -48,6 +50,44 @@ try {
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
     assert.equal(await page.locator("img.logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");
     assert.equal(await page.locator(".logo-glyph").count(),0,"outdated sticky-note mark still present");
+    const layout = await page.evaluate(() => {
+      const get = selector => {
+        const rect=document.querySelector(selector).getBoundingClientRect();
+        return {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom,width:rect.width,height:rect.height};
+      };
+      return {viewport:window.innerWidth,header:get(".header-shell"),logo:get(".logo"),
+        mark:get(".logo-smoke"),fx:get("#fx-toggle"),menu:get("#menu-toggle"),
+        heading:get("#hero-heading"),smokeLabel:get(".scene-label")};
+    });
+    if(scenario.mobile){
+      assert.ok(layout.mark.top >= 0,"smoke 420 image must not crop above the viewport");
+      assert.ok(layout.mark.bottom <= layout.header.bottom+2,"smoke 420 image must fit inside the header");
+      assert.ok(layout.logo.right+3 <= layout.fx.left, "brand and FX controls overlap");
+      assert.ok(layout.fx.right+3 <= layout.menu.left, "effects and menu buttons overlap");
+      assert.ok(layout.menu.right <= layout.viewport+1,"menu is offscreen");
+      assert.ok(layout.heading.left >= 0 && layout.heading.right <= layout.viewport+2,
+        "hero headline exceeds mobile viewport");
+      assert.equal(await page.locator(".scene-label").evaluate(el=>getComputedStyle(el).display),"none",
+        "decorative scene label should not cover the mobile header");
+      assert.equal(await page.locator("#fx-label").evaluate(el=>getComputedStyle(el).display),"none",
+        "wide effects label must collapse on mobile");
+    }
+    const smokeMargins = await page.locator(".logo-smoke").evaluate(image => {
+      const canvas=document.createElement("canvas");
+      canvas.width=476;canvas.height=260;
+      const context=canvas.getContext("2d",{willReadFrequently:true});
+      context.drawImage(image,0,0,476,260);
+      const pixels=context.getImageData(0,0,476,260).data;
+      let total=0,edge=0;
+      for(let y=0;y<260;y++)for(let x=0;x<476;x++){
+        const a=pixels[(y*476+x)*4+3];
+        if(a>60){ total++; if(x<2||x>473||y<2||y>257)edge++; }
+      }
+      return {total,edge};
+    });
+    assert.ok(smokeMargins.total>250,"420 smoke logo is absent or invisible");
+    assert.ok(smokeMargins.edge < Math.max(4,smokeMargins.total*.005),
+      "smoke numerals bleed past their artwork boundaries");
     assert.equal(await page.locator(".reality-prism").count(),1,"optical prism missing");
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
     assert.ok(overflow<=2,scenario.name+" horizontal overflow "+overflow+"px");
