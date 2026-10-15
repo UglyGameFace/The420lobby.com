@@ -54,6 +54,10 @@ try{
         await page.locator("#hero-heading").waitFor({state:"visible"});
         assert.equal(await page.locator(".logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed smoke logo load");
         assert.equal(await page.locator(".sesh-item").count(),0,"No targets before start");
+        const logoBounds=await page.locator(".logo-smoke").boundingBox();
+        if(mobile){
+          assert.ok(logoBounds && logoBounds.width<=150,"WebKit must honor mobile smoke logo width: "+JSON.stringify(logoBounds));
+        }
         const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
         if(overflow>2) {
           const details=await page.evaluate(()=>{
