@@ -65,8 +65,15 @@ try{
                 overflow:style.overflowX,display:style.display};
             }).filter(x=>x.right>innerWidth+2||x.left< -2)
               .sort((a,b)=>b.right-a.right).slice(0,35);
+            const headerElements=["html","body",".header-shell",".logo",".logo-smoke",".logo-type",".header-actions","#fx-toggle","#menu-toggle",".desktop-nav"].map(selector=>{
+              const node=document.querySelector(selector);
+              if(!node)return {selector,missing:true};
+              const r=node.getBoundingClientRect(),computed=getComputedStyle(node);
+              return {selector,left:r.left,right:r.right,width:r.width,display:computed.display,
+                font:computed.font,whiteSpace:computed.whiteSpace,overflowX:computed.overflowX};
+            });
             const gameLink=document.querySelector('link[href="/sesh-signal-v3.css"]');
-            return {viewport:innerWidth,doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,
+            return {viewport:innerWidth,doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,headerElements,
               loaded:!!gameLink?.sheet,arcadeDisplay:getComputedStyle(document.querySelector(".arcade-layout")).display,
               stageHeight:document.querySelector("#sesh-stage").getBoundingClientRect().height,
               candidates};
