@@ -170,3 +170,10 @@ html.fx-off .sesh-smoke-halo,html.fx-off .arcade-pulse,html.fx-off .sesh-item::b
  .sesh-stage{height:275px}
  .sesh-item{width:60px;height:60px}
 }
+
+.sesh-kit-tracker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;padding:3px 8px 7px;background:rgba(11,37,26,.78);border-bottom:1px solid rgba(170,247,157,.14)}
+.sesh-kit-tracker span{display:flex;align-items:center;justify-content:center;gap:5px;min-height:28px;color:#9fb5a0;font-size:9px;letter-spacing:.07em;font-weight:900;border:1px solid rgba(160,218,149,.14)}
+.sesh-kit-tracker b{font:900 14px system-ui;color:#768e78}
+.sesh-kit-tracker .is-collected{background:rgba(150,250,134,.16);border-color:rgba(178,250,140,.52);color:#e4ffca}
+.sesh-kit-tracker .is-collected b{color:#baff96}
+@media(max-width:420px){.sesh-kit-tracker{padding-inline:5px}.sesh-kit-tracker span{font-size:8px;gap:3px;min-height:26px}}
