@@ -45,6 +45,8 @@ try {
     assert.equal(await page.title(),"The 420 Lobby | After Dark, We Play");
     assert.equal(await page.locator(".experience-card").count(),4);
     assert.equal(await page.locator(".card-body").count(),4,"custom feature card content needs to be present");
+    assert.equal(await page.locator("#sesh-stage").count(),1,"arcade field is missing");
+    assert.equal(await page.locator("#sesh-start").count(),1,"arcade start is missing");
     assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),4);
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
@@ -104,8 +106,38 @@ try {
       await page.locator("#fx-toggle").click();
       assert.equal(await page.locator("#fx-toggle").getAttribute("aria-pressed"),"true");
     }
+    if (scenario.name === "mobile" || scenario.name === "narrow-mobile") {
+      await page.locator("#sesh-signal").scrollIntoViewIfNeeded();
+      await page.evaluate(()=>{Math.random=()=>0.5;});
+      await page.locator("#sesh-start").click();
+      await page.locator(".sesh-wisp--smoke").first().waitFor({state:"visible",timeout:6500});
+      const firstWisp=page.locator(".sesh-wisp--smoke").first();
+      const hitbox1=await firstWisp.boundingBox();
+      await page.waitForTimeout(120);
+      const hitbox2=await firstWisp.boundingBox();
+      assert.ok(hitbox1 && hitbox2 && Math.abs(hitbox1.width-hitbox2.width)<0.5 && Math.abs(hitbox1.x-hitbox2.x)<0.5 && Math.abs(hitbox1.y-hitbox2.y)<0.5,"smoke tap target must stay physically stable");
+      await firstWisp.click({timeout:4000});
+      const points=Number(await page.locator("#sesh-score").textContent());
+      assert.ok(points>0,"tapping a green wisp should award points");
+      await page.locator("#sesh-pause").click();
+      assert.equal(await page.locator("#sesh-stage").getAttribute("data-mode"),"paused");
+      const frozen=await page.locator("#sesh-time").textContent();
+      await page.waitForTimeout(250);
+      assert.equal(await page.locator("#sesh-time").textContent(),frozen,"pausing must stop the clock");
+      await page.locator("#sesh-pause").click();
+      assert.equal(await page.locator("#sesh-stage").getAttribute("data-mode"),"playing");
+      await page.locator("#sesh-sound").click();
+      assert.equal(await page.locator("#sesh-sound").getAttribute("aria-pressed"),"true");
+      await page.locator("#sesh-sound").click();
+      assert.equal(await page.locator("#sesh-sound").getAttribute("aria-pressed"),"false");
+      await page.locator("#sesh-start").click();
+      assert.equal(await page.locator("#sesh-score").textContent(),"0000","restarting resets the score");
+      await page.locator("#sesh-pause").click();
+      await page.locator(".arcade-machine").screenshot({path:"artifacts/"+scenario.name+"-arcade.png",animations:"disabled"});
+      console.log("PASS "+scenario.name+" arcade: spawn, score, pause, resume, audio toggle, restart");
+    }
     await page.screenshot({path:"artifacts/"+scenario.name+".png",animations:"disabled",timeout:10000});
-    for (const selector of ["#vibe","#experiences",".hangout-card",".shield-card",".cinema-card",".minecraft-card","#after-dark",".community-proof","#join"]) {
+    for (const selector of ["#vibe","#experiences","#sesh-signal",".hangout-card",".shield-card",".cinema-card",".minecraft-card","#after-dark",".community-proof","#join"]) {
       await page.locator(selector).scrollIntoViewIfNeeded();
       await page.waitForTimeout(90);
     }
