@@ -59,6 +59,12 @@ try {
       assert.equal(await page.locator("#fx-toggle").getAttribute("aria-pressed"),"true");
     }
     await page.screenshot({path:"artifacts/"+scenario.name+".png",animations:"disabled",timeout:10000});
+    for (const selector of ["#vibe","#experiences",".hangout-card",".shield-card",".cinema-card",".minecraft-card","#after-dark",".community-proof","#join"]) {
+      await page.locator(selector).scrollIntoViewIfNeeded();
+      await page.waitForTimeout(90);
+    }
+    await page.evaluate(()=>window.scrollTo(0,0));
+    await page.screenshot({path:"artifacts/"+scenario.name+"-full.png",fullPage:true,animations:"disabled",timeout:30000});
     assert.deepEqual(errors,[],"uncaught browser errors");
     await page.close();
     console.log("PASS "+scenario.name+" "+scenario.size.width+"x"+scenario.size.height+": links, artwork, navigation, effects toggle, no overflow");
