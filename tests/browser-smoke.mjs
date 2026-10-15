@@ -207,7 +207,22 @@ try {
       await rare.click({timeout:5000});
       assert.ok(Number(await page.locator("#sesh-score").textContent())>=45,"intact glass must award bonus");
       await page.locator("#sesh-pause").click();
-            console.log("PASS "+scenario.name+" arcade: accessories, glass hazards, score, pause, resume, audio toggle, restart");
+            if (scenario.name === "mobile") {
+        await page.evaluate(()=>{Math.random=()=>0.35;});
+        await page.locator("#sesh-start").click();
+        await page.locator(".sesh-item--lighter").first().click({timeout:6000});
+        await page.evaluate(()=>{Math.random=()=>0.55;});
+        await page.locator(".sesh-item--grinder").first().click({timeout:6000});
+        await page.evaluate(()=>{Math.random=()=>0.80;});
+        await page.locator(".sesh-item--papers").first().click({timeout:6000});
+        assert.ok(Number(await page.locator("#sesh-score").textContent())>=117,
+          "one of each kit item must yield +75 set bonus");
+        assert.equal(await page.locator(".sesh-kit-tracker .is-collected").count(),0,
+          "three-piece kit should reset after completion");
+        assert.match(await page.locator("#sesh-announcement").textContent(),/Full sesh kit complete/);
+        await page.locator("#sesh-pause").click();
+      }
+      console.log("PASS "+scenario.name+" arcade: accessories, glass hazards, completed kit, score, pause, resume, audio toggle, restart");
     }
     if(scenario.name==="desktop" || scenario.name==="mobile" || scenario.name==="narrow-mobile") {
       await page.locator("#sesh-signal").scrollIntoViewIfNeeded();
