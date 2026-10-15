@@ -12,6 +12,7 @@ const leaf = read("assets/botanical-leaf.svg");
 const lounge = read("assets/haunted-lounge.svg");
 const icon = read("favicon.svg");
 const smokeLogo = read("assets/smoke-420.svg");
+const game = read("sesh-signal.js");
 
 test("hero communicates a 420-friendly gaming community, not haunted house branding", () => {
   for(const text of ["AFTER","DARK,","WE PLAY","420 FRIENDLY","Discord","Minecraft","sesh","THE 420 LOBBY"]) {
@@ -119,4 +120,48 @@ test("static Pages hosting remains build-free", () => {
   assert.match(html,/<script defer src="\/script\.js"><\/script>/);
   assert.match(html,/<script defer src="\/visual-engine\.js"><\/script>/);
   assert.doesNotMatch(html,/https?:\/\/cdn\..*\/.*\.js/);
+});
+test("Sesh Signal is an actual arcade game section, not a placeholder", () => {
+  assert.match(html,/id="sesh-signal"/);
+  assert.match(html,/id="sesh-stage"/);
+  assert.match(html,/id="sesh-start"/);
+  assert.match(html,/id="sesh-pause"[^>]*disabled/);
+  assert.match(html,/id="sesh-boost"[^>]*disabled/);
+  assert.match(html,/id="sesh-share"[^>]*disabled/);
+  assert.match(html,/id="sesh-sound"/);
+  assert.match(html,/id="sesh-target-layer"/);
+  assert.match(html,/id="sesh-overlay"/);
+  assert.match(html,/id="sesh-best"/);
+  assert.match(html,/id="sesh-score"/);
+  assert.match(html,/id="sesh-announcement"[^>]*role="status"/);
+  assert.match(html,/href="#sesh-signal"/);
+  assert.match(html,/src="\/sesh-signal.js"/);
+  assert.match(html,/No real-world prizes or Discord roles/);
+  assert.match(html,/Your best score stays on your device/);
+  assert.doesNotMatch(html,/online members:\s*\d+|discord bot token|25571|25845/i);
+});
+
+test("Sesh Signal uses timed real interaction with pause, focus, and safe local scores", () => {
+  assert.doesNotThrow(()=>new vm.Script(game, {filename:"sesh-signal.js"}));
+  for(const feature of [
+    "DURATION = 42000","requestAnimationFrame(frame)","cancelAnimationFrame",
+    "localStorage.getItem","localStorage.setItem","document.hidden",
+    "visibilitychange","pagehide","document.activeElement","prefers-reduced-motion",
+    "saveData","catchTarget","boost()","pause(","resume()","finish()",
+    "navigator.share","navigator.clipboard","aria-label","soundOn"
+  ]) assert.ok(game.includes(feature),"missing game feature: "+feature);
+  assert.doesNotMatch(game,/discord\.com\/api\/|discord\.gg\/.*token|fetch\s*\(/);
+  assert.match(game,/state\.mode\s*!==\s*"playing"/);
+  assert.match(game,/try\s*\{\s*window\.localStorage/);
+});
+
+test("custom arcade styling supports touch, keyboard, and phones", () => {
+  for(const selector of [
+    ".sesh-arcade", ".arcade-layout", ".arcade-machine",
+    ".sesh-target-layer", ".sesh-overlay[hidden]", ".sesh-wisp",
+    ".sesh-wisp--rare", ".sesh-wisp--static", ".sesh-stage.chill-mode",
+    "@media(max-width:350px)", "prefers-reduced-motion"
+  ]) assert.ok(css.includes(selector), "missing arcade style "+selector);
+  assert.match(css,/touch-action:manipulation/);
+  assert.match(css,/\.arcade-screenreader/);
 });
