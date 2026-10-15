@@ -44,9 +44,12 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(smokeLogo, /fractalNoise/);
   assert.match(smokeLogo, /feDisplacementMap/);
   assert.doesNotMatch(smokeLogo,/stroke-width="23"|stroke-width="16"|filter="url\(#aura\)"/);
-  assert.match(smokeLogo, /<svg[^>]*viewBox="0 0 420 168"/);
+  assert.match(smokeLogo, /<svg[^>]*viewBox="-28 -45 476 260"/);
   assert.doesNotMatch(html,/class="logo-glyph"/);
   assert.doesNotMatch(css,/\.logo-glyph/);
+  assert.match(css,/\.fx-toggle #fx-label\{display:none\}/);
+  assert.match(css,/\.scene-label\{display:none\}/);
+  assert.match(css,/\.logo-smoke\{width:137px;height:69px/);
 });
 
 test("all advertised community experiences remain present", () => {
