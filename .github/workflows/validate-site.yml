@@ -12,7 +12,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,6 +21,22 @@ jobs:
         with:
           node-version: "22"
       - name: JavaScript syntax
-        run: node --check script.js
+        run: |
+          node --check script.js
+          node --check visual-engine.js
       - name: Static site regression tests
         run: node --test tests/site.test.mjs
+      - name: Install browser smoke-test tooling
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Browser smoke tests
+        run: node tests/browser-smoke.mjs
+      - name: Save browser previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: haunted-lobby-previews
+          path: artifacts/*.png
+          if-no-files-found: ignore
+          retention-days: 7
