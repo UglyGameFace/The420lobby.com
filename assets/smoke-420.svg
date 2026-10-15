@@ -1,55 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -32 452 218" role="img" aria-labelledby="title desc">
-<title id="title">420 formed from curling smoke</title>
-<desc id="desc">The digits 420 are formed from translucent curling vapor and feathery smoke, tightly cropped with no background cloud so the mark aligns flush in the site header.</desc>
+<title id="title">420 in smoky lettering</title>
+<desc id="desc">The digits 420 rendered as smoky lettering. No background haze or cloud.</desc>
 <defs>
- <linearGradient id="vapor" x1="0" y1=".9" x2=".8" y2=".1">
-  <stop stop-color="#648479" stop-opacity=".34"/>
-  <stop offset=".3" stop-color="#c8d6c5" stop-opacity=".8"/>
-  <stop offset=".56" stop-color="#f4f7ef" stop-opacity=".92"/>
-  <stop offset=".82" stop-color="#cfddd1" stop-opacity=".67"/>
-  <stop offset="1" stop-color="#f6f7f2" stop-opacity=".95"/>
+ <linearGradient id="vapor" x1="0" y1="1" x2="0" y2="0">
+  <stop stop-color="#d7e2d4" stop-opacity="1"/>
+  <stop offset=".5" stop-color="#f2f6ee" stop-opacity="1"/>
+  <stop offset="1" stop-color="#ffffff" stop-opacity="1"/>
  </linearGradient>
- <linearGradient id="shade" x1=".12" y1="1" x2=".7" y2="0">
-  <stop stop-color="#748d83" stop-opacity=".19"/>
-  <stop offset=".43" stop-color="#dce9df" stop-opacity=".63"/>
-  <stop offset=".7" stop-color="#f6faf2" stop-opacity=".9"/>
-  <stop offset="1" stop-color="#9fb7ad" stop-opacity=".37"/>
- </linearGradient>
- <filter id="smoke-form" x="-30%" y="-65%" width="160%" height="230%">
-  <feTurbulence type="fractalNoise" baseFrequency=".033 .075" numOctaves="4" seed="24" result="whorls"/>
-  <feDisplacementMap in="SourceGraphic" in2="whorls" scale="22" xChannelSelector="R" yChannelSelector="G" result="ripped"/>
-  <feGaussianBlur in="ripped" stdDeviation="2.3"/>
- </filter>
- <filter id="filaments" x="-30%" y="-100%" width="160%" height="300%">
-  <feTurbulence type="fractalNoise" baseFrequency=".04 .12" numOctaves="3" seed="7" result="wind"/>
-  <feDisplacementMap in="SourceGraphic" in2="wind" scale="15" xChannelSelector="R" yChannelSelector="G"/>
-  <feGaussianBlur stdDeviation="2.9"/>
- </filter>
- <mask id="digit-window">
-  <rect width="420" height="168" fill="black"/>
-  <text x="23" y="129" font-family="Arial Black,Impact,sans-serif" font-size="148" font-weight="900" letter-spacing="-10" fill="white">420</text>
- </mask>
- <filter id="cloud-density" x="-25%" y="-25%" width="150%" height="150%">
-  <feTurbulence type="fractalNoise" baseFrequency=".06 .11" numOctaves="4" seed="39" result="grain"/>
-  <feColorMatrix in="grain" type="matrix" values="
-     0 0 0 0 .91
-     0 0 0 0 .96
-     0 0 0 0 .93
-     .25 .4 .3 0 -.08"/>
-  <feGaussianBlur stdDeviation=".7"/>
+ <filter id="smoke-edge" x="-20%" y="-20%" width="140%" height="140%">
+  <feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="3" seed="24" result="grain"/>
+  <feDisplacementMap in="SourceGraphic" in2="grain" scale="10" xChannelSelector="R" yChannelSelector="G" result="smoked"/>
+  <feGaussianBlur in="smoked" stdDeviation="1.1"/>
  </filter>
 </defs>
-<!-- Smoke is volume, not a glowing font outline. Shapes fray, curl and vary in density. No background cloud: the digits stand on their own. -->
+<!-- Smoky lettering only: crisp digit forms with smoke-textured edges. No haze, no cloud, no background. -->
 <g font-family="Arial Black,Impact,sans-serif" font-size="148" font-weight="900" letter-spacing="-10">
- <text x="23" y="129" fill="url(#vapor)" opacity=".92" filter="url(#smoke-form)">420</text>
- <text x="23" y="129" fill="url(#shade)" opacity=".33" filter="url(#filaments)">420</text>
-</g>
-<!-- Fractal-density pockets and thin translucent streamers shape the interiors. -->
-<rect x="19" y="2" width="386" height="150" fill="#e4f2e9" filter="url(#cloud-density)" mask="url(#digit-window)" opacity=".45"/>
-<g fill="none" stroke="#dce9dc" stroke-linecap="round" filter="url(#filaments)">
- <path d="M56 23C37 8 56-7 40-16M76 18C91-5 65-7 77-24M126 31C148 7 126 1 142-17" stroke-width="8" opacity=".35"/>
- <path d="M174 22C165 3 178-4 164-18M207 24C224 1 200-6 226-27M263 29C249 9 266-10 258-25" stroke-width="7" opacity=".3"/>
- <path d="M310 25C330 5 309-1 324-18M365 43C388 21 375 8 401-7M392 92C418 94 394 118 436 118" stroke-width="8" opacity=".34"/>
- <path d="M16 93C-15 78 23 53-8 41M36 128C16 141 28 156 8 174M284 131C273 152 300 156 288 181" stroke-width="6" opacity=".3"/>
+ <text x="23" y="129" fill="url(#vapor)" filter="url(#smoke-edge)">420</text>
 </g>
 </svg>
