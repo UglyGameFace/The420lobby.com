@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 168" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-28 -45 476 260" role="img" aria-labelledby="title desc">
 <title id="title">420 formed from clouds of smoke</title>
-<desc id="desc">The digits 420 take shape as swirling, feathery, translucent white vapor with curling wisps and cloudy density variations, not solid neon strokes.</desc>
+<desc id="desc">The digits 420 are formed from translucent curling vapor and feathery smoke, with a generous transparent safety margin so the swirls are never clipped on mobile.</desc>
 <defs>
  <linearGradient id="vapor" x1="0" y1=".9" x2=".8" y2=".1">
   <stop stop-color="#648479" stop-opacity=".34"/>
