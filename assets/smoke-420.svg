@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 156" role="img" aria-labelledby="title desc">
+<title id="title">420 in custom smoke lettering</title>
+<desc id="desc">The numbers 420 are formed from flowing luminous smoke, with wisps of vapor extending beyond the lettering.</desc>
+<defs>
+ <linearGradient id="smoke" x1=".1" y1=".8" x2=".8" y2=".05"><stop stop-color="#4caa83"/><stop offset=".28" stop-color="#baff91"/><stop offset=".53" stop-color="#e8ffe5"/><stop offset=".78" stop-color="#a7eccb"/><stop offset="1" stop-color="#f6fff2"/></linearGradient>
+ <linearGradient id="inner" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#befa9d"/><stop offset=".45" stop-color="#edffe7"/><stop offset="1" stop-color="#8decc8"/></linearGradient>
+ <filter id="aura" x="-25%" y="-80%" width="150%" height="260%"><feGaussianBlur stdDeviation="6"/></filter>
+</defs>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <g stroke="url(#smoke)" stroke-width="23" opacity=".53" filter="url(#aura)">
+   <path d="M80 18C71 29 58 49 48 69L27 101C47 97 75 97 110 98M87 22C84 54 84 85 86 135"/>
+   <path d="M152 52C153 12 212 12 222 40C233 66 194 83 167 104C158 113 150 123 147 135C167 129 193 131 224 131"/>
+   <path d="M305 18C268 14 255 45 256 77C256 116 277 139 308 136C339 134 358 111 357 72C355 36 338 19 305 18Z"/>
+  </g>
+  <g stroke="url(#smoke)" stroke-width="16">
+   <path d="M80 18C71 29 58 49 48 69L27 101C47 97 75 97 110 98M87 22C84 54 84 85 86 135"/>
+   <path d="M152 52C153 12 212 12 222 40C233 66 194 83 167 104C158 113 150 123 147 135C167 129 193 131 224 131"/>
+   <path d="M305 18C268 14 255 45 256 77C256 116 277 139 308 136C339 134 358 111 357 72C355 36 338 19 305 18Z"/>
+  </g>
+  <g stroke="url(#inner)" stroke-width="5.7" opacity=".7">
+   <path d="M81 17C70 36 45 77 30 98L108 98M86 25L86 130"/>
+   <path d="M153 51C151 16 207 14 219 42C230 68 190 87 163 109L149 133H223"/>
+   <path d="M303 18C270 16 258 46 258 76C258 111 277 135 309 134C342 132 356 105 354 73C352 41 334 20 303 18Z"/>
+  </g>
+ </g>
+ <g class="smoke-wisps" fill="none" stroke="#d6ffda" stroke-width="2.7" stroke-linecap="round" opacity=".47">
+  <path d="M70 20C64 4 45 13 48 0M98 24C105 2 125 10 121 0M180 17C179 0 164 1 161 -9"/>
+  <path d="M270 26C258 3 276 5 271 -7M324 18C347 -2 361 8 357 -8"/>
+  <path d="M40 85C12 78 26 61 3 60M349 119C374 120 373 98 391 109C403 116 398 131 411 133"/>
+ </g>
+ <g fill="#d7ffb7" opacity=".56"><circle cx="135" cy="8" r="2.5"/><circle cx="241" cy="38" r="2"/><circle cx="386" cy="93" r="2"/></g>
+</svg>
