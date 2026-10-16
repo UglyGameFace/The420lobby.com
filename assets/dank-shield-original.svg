@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 660" role="img" aria-labelledby="title desc">
+<title id="title">Dank Shield original cyber-defense crest</title><desc id="desc">Emerald and brushed-gold shield with a geometric DS monogram, protected core and circuit traces.</desc>
+<defs><linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0b0"/><stop offset=".22" stop-color="#b18a43"/><stop offset=".48" stop-color="#f7e0a0"/><stop offset=".72" stop-color="#80602a"/><stop offset="1" stop-color="#f4d68b"/></linearGradient><linearGradient id="inner" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#183e30"/><stop offset=".48" stop-color="#081b18"/><stop offset="1" stop-color="#102a24"/></linearGradient><radialGradient id="glow"><stop stop-color="#55ffae" stop-opacity=".52"/><stop offset="1" stop-color="#55ffae" stop-opacity="0"/></radialGradient><filter id="light" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="13"/></filter></defs>
+<ellipse cx="300" cy="300" rx="275" ry="295" fill="url(#glow)" opacity=".6"/>
+<path d="M300 29 511 107 494 359Q474 505 300 611 126 505 106 359L89 107Z" fill="#051310" stroke="#153c2a" stroke-width="14"/>
+<path d="M300 42 500 116 484 353Q465 493 300 595 135 493 116 353L100 116Z" fill="url(#metal)" stroke="#3c2910" stroke-width="5"/>
+<path d="M300 67 474 131 460 350Q440 473 300 566 160 473 140 350L126 131Z" fill="url(#inner)" stroke="#d4ba70" stroke-width="3"/>
+<path d="M300 84 451 141 438 342Q421 453 300 539 179 453 162 342L149 141Z" fill="none" stroke="#5ee6a0" stroke-opacity=".4" stroke-width="2"/>
+<g fill="none" stroke="#5ce6a1" stroke-opacity=".55" stroke-width="3"><path d="M165 214h70l28 28"/><path d="M435 214h-70l-28 28"/><path d="M174 382h62l36-38"/><path d="M426 382h-62l-36-38"/></g><g fill="#a3ffca"><circle cx="165" cy="214" r="6"/><circle cx="435" cy="214" r="6"/><circle cx="174" cy="382" r="6"/><circle cx="426" cy="382" r="6"/></g>
+<circle cx="300" cy="288" r="132" fill="#3dff9a" opacity=".18" filter="url(#light)"/><circle cx="300" cy="288" r="111" fill="#091d18" stroke="url(#metal)" stroke-width="6"/><circle cx="300" cy="288" r="96" fill="none" stroke="#4de7a0" stroke-opacity=".6" stroke-dasharray="3 12" stroke-width="3"/>
+<path d="M232 240h42q51 0 51 48t-51 48h-42zm22 21v54h18q28 0 28-27t-28-27z" fill="#d8f9db" fill-rule="evenodd"/>
+<path d="M368 245q-16-10-36-8-30 2-30 27 0 21 29 27 24 5 24 15 0 15-25 14-16 0-30-10v25q17 9 35 9 47 0 47-39 0-27-32-35-21-5-21-13 0-10 18-10 10 0 21 5z" fill="#7af5b0"/>
+<path d="M237 405h126l-10 32H247z" fill="#09251b" stroke="url(#metal)" stroke-width="4"/><path d="M278 405v-14a22 22 0 0 1 44 0v14" fill="none" stroke="#d8be78" stroke-width="9"/><circle cx="300" cy="420" r="5" fill="#6df6b0"/>
+<path d="M80 473q220 52 440 0l-17 68q-203 57-406 0z" fill="#091c17" stroke="url(#metal)" stroke-width="8"/><text x="300" y="519" text-anchor="middle" font-family="Arial,sans-serif" font-size="46" font-weight="900" letter-spacing="4" fill="#f6e1a1">DANK SHIELD</text>
+</svg>
