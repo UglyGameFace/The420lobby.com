@@ -104,7 +104,11 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   .logo-smoke{width:clamp(75px,22vw,116px);height:60px}
   .logo-type{font-size:clamp(10px,2.9vw,14px)}
   .menu-toggle{width:42px;height:42px}
-  .header-actions{gap:6px}
+  .header-actions{gap:6px;position:relative;z-index:12}
+  .header-shell{position:relative;isolation:isolate}
+  .header-shell .logo{max-width:calc(100% - 64px);position:relative;z-index:2;overflow:hidden}
+  .header-shell .logo-smoke{flex-shrink:1;min-width:66px}
+  .header-shell .menu-toggle{position:relative;z-index:15;flex:0 0 42px;pointer-events:auto}
   .desktop-nav{display:none}
   .desktop-nav.open{display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;padding:12px var(--gutter) 23px;background:#0b1b14;border-bottom:1px solid var(--stroke)}
   .desktop-nav.open a{font-size:13px;padding:12px 6px}
