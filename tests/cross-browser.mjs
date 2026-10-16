@@ -67,6 +67,16 @@ try{
           return painted;
         });
         assert.ok(await countPaintedPixels(page.locator(".logo-smoke"))>200,name+" smoke logo paints no pixels");
+        const zeroPixels=await page.locator(".logo-smoke").evaluate(img=>{
+          const c=document.createElement("canvas");c.width=245;c.height=116;
+          const context=c.getContext("2d");context.drawImage(img,0,0,245,116);
+          const bytes=context.getImageData(0,0,245,116).data;
+          let lit=0;
+          for(let y=14;y<105;y++)for(let x=180;x<236;x++)
+            if(bytes[(y*245+x)*4+3]>90)lit++;
+          return lit;
+        });
+        assert.ok(zeroPixels>350,name+" right-hand zero is missing from painted SVG: "+zeroPixels);
         assert.ok(await countPaintedPixels(page.locator(".cheers-art"))>200,name+" photographic Cheers art paints no pixels");
         const composition=await page.evaluate(()=>{
           const rect=s=>document.querySelector(s).getBoundingClientRect();
@@ -108,6 +118,22 @@ try{
         assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed joint art load");
         assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,");
         assert.equal(await page.locator(".sesh-item").count(),0,"No targets before start");
+        const completeLogo=await page.evaluate(()=>{
+          const rect=q=>{const r=document.querySelector(q).getBoundingClientRect();return {left:r.left,right:r.right,width:r.width}};
+          return {prefix:rect(".logo-prefix"),image:rect(".logo-smoke"),suffix:rect(".logo-suffix")};
+        });
+        assert.ok(completeLogo.prefix.right<=completeLogo.image.left+.5,
+          name+" THE overlaps smoky 4: "+JSON.stringify(completeLogo));
+        assert.ok(completeLogo.image.right<=completeLogo.suffix.left+.5,
+          name+" smoky zero overlaps LOBBY: "+JSON.stringify(completeLogo));
+        if(width>760&&width<=1050){
+          assert.ok(await page.locator("#menu-toggle").isVisible(),name+" tablet menu toggle hidden");
+          assert.equal(await page.locator("#primary-nav").isVisible(),false,name+" desktop links should collapse on tablet");
+          await page.locator("#menu-toggle").click();
+          assert.equal(await page.locator("#primary-nav").isVisible(),true,name+" tablet menu failed to open");
+          await page.locator("#menu-toggle").click();
+          assert.equal(await page.locator("#primary-nav").isVisible(),false,name+" tablet menu failed to close");
+        }
         const logoBounds=await page.locator(".logo-smoke").boundingBox();
         if(mobile){
           assert.ok(logoBounds && logoBounds.width<=Math.min(165,width*.45),"Mobile smoke logo width exceeds available space: "+JSON.stringify(logoBounds));
