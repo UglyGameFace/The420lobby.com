@@ -85,3 +85,12 @@ html.fx-off{scroll-behavior:auto}html.fx-off *,html.fx-off *::before,html.fx-off
 .shield-card .dank-shield-brand-art{top:64px;width:min(43%,180px);max-height:190px}
 .shield-card .card-info h3{font-size:clamp(48px,5.8vw,86px);line-height:.94}
 @media(max-width:760px){.shield-card .card-info{min-height:670px}.shield-card .dank-shield-brand-art{top:66px;width:min(40%,154px);max-height:168px}.shield-card .card-info h3{font-size:clamp(48px,11vw,70px);line-height:.96}.shield-card .card-body{margin-top:auto}}
+
+/* Exact approved Dank Shield card art (33451.png), without cropping or recreated text. */
+.shield-card{aspect-ratio:2/3;min-height:0;transform:none;transform-style:flat}
+.shield-card .shield-visual{position:absolute;inset:0;display:block;padding:0;overflow:hidden}
+.shield-card .shield-visual::before,.shield-card .shield-visual::after{content:none}
+.shield-card .dank-shield-brand-art{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;max-height:none;aspect-ratio:2/3;object-fit:fill;transform:none;animation:none;filter:none;mask-image:none;clip-path:none;border-radius:0}
+.shield-card .shield-card-hitarea{position:absolute;inset:0;z-index:5;display:block;cursor:pointer}
+.shield-card .shield-card-hitarea:focus-visible{outline:3px solid #b8ff88;outline-offset:-5px;border-radius:6px}
+@media(max-width:760px){.shield-card{min-height:0;aspect-ratio:2/3}.shield-card .dank-shield-brand-art{inset:0;width:100%;height:100%;max-width:none;max-height:none;transform:none}}
