@@ -99,6 +99,20 @@ try {
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
     assert.equal(await page.locator("img.logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");
+    const countPaintedPixels = async locator => locator.evaluate(img => {
+          const c=document.createElement("canvas");
+          c.width=img.naturalWidth;
+          c.height=img.naturalHeight;
+          const ctx=c.getContext("2d");
+          ctx.drawImage(img,0,0);
+          const px=ctx.getImageData(0,0,c.width,c.height).data;
+          let painted=0;
+          for(let i=3;i<px.length;i+=4) if(px[i]>24) painted++;
+          return painted;
+        });
+    assert.ok(await countPaintedPixels(page.locator("img.logo-smoke"))>200,"smoke logo SVG loaded but is invisible");
+    assert.ok(await countPaintedPixels(page.locator("img.cheers-art"))>200,"CHEERS smoke art loaded but is invisible");
+    assert.ok(await countPaintedPixels(page.locator("img.botanical-foreground"))>100,"new leaf asset loaded but is invisible");
     assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,"approved joint art failed to load");
     assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,","hero slogan regressed");
     assert.equal(await page.locator(".logo-glyph").count(),0,"outdated sticky-note mark still present");
