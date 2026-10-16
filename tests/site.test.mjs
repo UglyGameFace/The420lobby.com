@@ -118,14 +118,18 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(html, /class="fx-switch"/);
 });
 
-test("Dank Shield card uses uploaded official brand artwork, not fabricated shield glyph", () => {
-  const image=fs.readFileSync(new URL("../assets/dank-shield-logo.avif",import.meta.url));
-  assert.ok(image.length>4000 && image.length<30000,"logo must be optimized and present");
-  assert.equal(image.subarray(4,12).toString("ascii"),"ftypavif");
-  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-logo\.avif"/);
+test("Dank Shield card uses purpose-built crest integrated into card, without generic shield placeholder", () => {
+  const crest=read("assets/dank-shield-card-crest.svg");
+  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-card-crest\.svg"/);
   assert.doesNotMatch(html,/class="shield-mark"/);
   assert.match(css,/\.dank-shield-brand-art\{position:relative;/);
   assert.doesNotMatch(css,/\.shield-mark\{/);
+  assert.match(crest,/<svg[^>]+viewBox="0 0 640 610"/);
+  assert.match(crest,/id="smoke-zero"|id="complete-numerals"|id="blade"/);
+  assert.match(crest,/DANK<\/text>/);
+  assert.match(crest,/SHIELD<\/text>/);
+  assert.match(crest,/id="inner"/);
+  assert.doesNotMatch(crest,/<image\b|data:image\/|href="https?:/,"brand crest should be locally drawn, not pasted photo");
 });
 
 test("all advertised community experiences remain present", () => {
