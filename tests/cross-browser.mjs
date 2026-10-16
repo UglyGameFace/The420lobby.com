@@ -126,6 +126,14 @@ try{
           name+" THE overlaps smoky 4: "+JSON.stringify(completeLogo));
         assert.ok(completeLogo.image.right<=completeLogo.suffix.left+.5,
           name+" smoky zero overlaps LOBBY: "+JSON.stringify(completeLogo));
+        if(width>760&&width<=1050){
+          assert.ok(await page.locator("#menu-toggle").isVisible(),name+" tablet menu toggle hidden");
+          assert.equal(await page.locator("#primary-nav").isVisible(),false,name+" desktop links should collapse on tablet");
+          await page.locator("#menu-toggle").click();
+          assert.equal(await page.locator("#primary-nav").isVisible(),true,name+" tablet menu failed to open");
+          await page.locator("#menu-toggle").click();
+          assert.equal(await page.locator("#primary-nav").isVisible(),false,name+" tablet menu failed to close");
+        }
         const logoBounds=await page.locator(".logo-smoke").boundingBox();
         if(mobile){
           assert.ok(logoBounds && logoBounds.width<=Math.min(165,width*.45),"Mobile smoke logo width exceeds available space: "+JSON.stringify(logoBounds));
