@@ -102,6 +102,9 @@ try {
 
     assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),4);
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
+    await page.locator("img.lounge-xbox-controller").evaluate(el => el.decode());
+    assert.equal(await page.locator("img.lounge-xbox-controller").evaluate(el=>el.complete && el.naturalWidth>0),true,
+      "actual Xbox controller photograph failed to load");
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
     assert.equal(await page.locator("img.logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");
     const countPaintedPixels = async locator => locator.evaluate(img => {
