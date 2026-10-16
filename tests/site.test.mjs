@@ -91,11 +91,14 @@ test("approved natural leaf art replaces the old geometric foreground", () => {
 });
 
 test("custom smoke 420 brand has accessible branding without the old clipped square", () => {
-  assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/approved-smoke-420\.svg\?v=20261016-fullzero");
+  assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/approved-smoke-420\.svg\?v=20261016-fullzero"/);
   assert.match(html, /class="logo"[^>]+aria-label="The 420 Lobby home"/);
   assert.match(smokeLogo, /Smoke-formed 420 lettering/);
   assert.match(smokeLogo, /data:image\/png;base64,/);
-  assert.match(smokeLogo, /viewBox="0 0 120 85"/);
+  assert.match(smokeLogo, /viewBox="0 0 245 116"/);
+  assert.match(smokeLogo, /id="smoke-zero"/);
+  assert.match(smokeLogo, /fill-rule="evenodd"/);
+  assert.match(smokeLogo, /id="complete-numerals"/);
   assert.match(smokeLogo, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
   assert.doesNotMatch(html,/class="logo-glyph"/);
   assert.doesNotMatch(css,/\.logo-glyph/);
