@@ -112,12 +112,12 @@ try {
     const placement=await brand.evaluate(img=>{
       const card=img.closest(".shield-card").getBoundingClientRect();
       const art=img.getBoundingClientRect();
-      return {loaded:img.complete&&img.naturalWidth===224,
+      return {loaded:img.complete&&img.naturalWidth>0&&img.naturalHeight>0,
         visible:art.width>=110&&art.height>=110,
         inside:art.left>=card.left-1&&art.right<=card.right+1 && art.top>=card.top-1};
     });
     assert.ok(placement.loaded&&placement.visible&&placement.inside,
-      "uploaded Dank Shield logo must load and fit within card: "+JSON.stringify(placement));
+      "original Dank Shield SVG must decode and fit within card: "+JSON.stringify(placement));
     await page.locator(".hangout-card").scrollIntoViewIfNeeded();
     await page.locator("img.card-foliage-photo").evaluate(img=>img.decode());
     assert.ok(await page.locator("img.card-foliage-photo").evaluate(img=>img.naturalWidth>0),
@@ -131,8 +131,8 @@ try {
         const r=el.getBoundingClientRect();
         return {left:r.left,right:r.right,width:r.width,viewport:innerWidth};
       });
-      assert.ok(controller.width>=100 && controller.left>=-3 && controller.right<=controller.viewport+3,
-        "real Xbox controller is clipped outside the mobile viewport: "+JSON.stringify(controller));
+      assert.equal(controller.width,0,
+        "unretouched controller photo must remain hidden until a clean licensed cutout is integrated: "+JSON.stringify(controller));
     }
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
     assert.equal(await page.locator("img.logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");

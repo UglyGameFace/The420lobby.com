@@ -83,7 +83,8 @@ test("approved natural leaf art replaces the old geometric foreground", () => {
   assert.match(css, /\.card-foliage-photo\{position:absolute;/);
   assert.match(lounge, /controller is rendered by the image in the hero scene/i);
   assert.doesNotMatch(lounge, /id="lounge-controller"/, "do not keep the fake drawn gamepad");
-  assert.match(html, /class="lounge-xbox-controller scene-layer" src="https:\/\/thumb\.wikimedia\.org\/wikipedia\/commons\/thumb\/6\/60\/Xbox-360-Controller-Black\.png\/960px-Xbox-360-Controller-Black\.png"/);
+  assert.match(html, /class="lounge-xbox-controller scene-layer" src="https:\/\/commons\.wikimedia\.org\/wiki\/Special:Redirect\/file\/Xbox_Series_Controller_Carbon_Black\.jpg"/);
+  assert.match(css, /\.lounge-xbox-controller\{display:none\}/, "do not display a rectangular controller photograph behind the hero");
   assert.match(css, /\.lounge-xbox-controller\{position:absolute;/);
   assert.doesNotMatch(lounge, /d="M388 777h223"/);
   assert.doesNotMatch(lounge, /d="M435 732h134l17 44H414Z"/);
@@ -118,14 +119,14 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(html, /class="fx-switch"/);
 });
 
-test("Dank Shield card uses the owner's uploaded logo, not a hand-drawn cannabis crest", () => {
-  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-logo\.avif"/);
+test("Dank Shield card uses an original crest, not the owner's uploaded logo", () => {
+  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-original\.svg"/);
   assert.doesNotMatch(html,/dank-shield-card-crest\.svg/);
   assert.doesNotMatch(html,/class="shield-mark"/);
   assert.match(css,/\.dank-shield-brand-art\{position:relative;/);
   assert.match(css,/aspect-ratio:1;object-fit:contain/);
-  assert.match(css,/mask-image:radial-gradient\(ellipse 70% 70% at 50% 33%,#000 40%,transparent 86%\)/);
-  assert.match(css,/clip-path:circle\(49% at 50% 50%\)/);
+  assert.doesNotMatch(css.match(/\.dank-shield-brand-art\{[^}]+\}/)?.[0] ?? "",/mask-image|clip-path/);
+  assert.doesNotMatch(html,/dank-shield-logo\.avif/);
   assert.match(html, /<h3>DANK<br>SHIELD\.<\/h3>/);
 });
 
