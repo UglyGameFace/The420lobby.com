@@ -26,7 +26,11 @@ test("hero communicates a 420-friendly gaming community, not haunted house brand
   assert.match(html,/id="hero-heading"/);
   assert.match(html,/src="\/assets\/haunted-lounge\.svg"/);
   assert.match(html,/src="\/assets\/approved-leaf\.svg"/);
-  assert.match(html,/src="\/assets\/approved-smoke-420\.svg"/);
+  assert.match(html,/src="\/assets\/approved-smoke-420\.svg\?v=20261016-fullzero"/);
+  assert.match(smokeLogo,/viewBox="0 0 245 116"/);
+  assert.match(smokeLogo,/id="smoke-zero"/);
+  assert.match(smokeLogo,/id="complete-numerals"/);
+  assert.match(smokeLogo,/filter="url\(#complete-420-haze\)"/);
   const textOnly=html.replace(/<(?:img|meta|link)[^>]*>/g,"");
   assert.doesNotMatch(textOnly,/haunted|haunt|ghost towns|spooky/i);
   assert.doesNotMatch(html,/UNREAL VIBES|PICK YOUR REALITY|ON ANOTHER FREQUENCY/i);
@@ -87,7 +91,7 @@ test("approved natural leaf art replaces the old geometric foreground", () => {
 });
 
 test("custom smoke 420 brand has accessible branding without the old clipped square", () => {
-  assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/approved-smoke-420\.svg"/);
+  assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/approved-smoke-420\.svg\?v=20261016-fullzero");
   assert.match(html, /class="logo"[^>]+aria-label="The 420 Lobby home"/);
   assert.match(smokeLogo, /Smoke-formed 420 lettering/);
   assert.match(smokeLogo, /data:image\/png;base64,/);
