@@ -102,6 +102,9 @@ try {
     assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,"approved joint art failed to load");
     assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,","hero slogan regressed");
     assert.equal(await page.locator(".logo-glyph").count(),0,"outdated sticky-note mark still present");
+    assert.equal(await page.locator(".logo-prefix").textContent(),"THE");
+    assert.equal(await page.locator(".logo-suffix").textContent(),"LOBBY.");
+    assert.equal(await page.locator(".logo").innerText(),"THELOBBY.","smoky 420 must be an image between words, not duplicated text");
     const layout = await page.evaluate(() => {
       const get = selector => {
         const rect=document.querySelector(selector).getBoundingClientRect();
@@ -118,12 +121,12 @@ try {
         "full brand must fit inside the header");
       assert.ok(layout.menu.left >= layout.header.left-2 && layout.fx.right <= layout.header.right+2,
         "header controls must fit inside the header");
-      assert.ok(layout.header.height <= 102, "mobile header grew too tall");
+      assert.ok(layout.header.height <= 96, "mobile header grew too tall");
       assert.ok(Math.abs((layout.logo.left+layout.logo.right)/2-(layout.header.left+layout.header.right)/2)<=2,
         "full THE LOBBY 420 logo is not centered");
       assert.ok(layout.menu.right+3 <= layout.logo.left, "menu and brand overlap");
       assert.ok(layout.logo.right+3 <= layout.fx.left, "brand and FX controls overlap");
-      assert.ok(layout.eyebrow.top-layout.header.bottom>=55 && layout.eyebrow.top-layout.header.bottom<=260,
+      assert.ok(layout.eyebrow.top-layout.header.bottom>=135 && layout.eyebrow.top-layout.header.bottom<=240,
         "gap between header and After Cheers is too small or too big");
       assert.ok(layout.heading.left >= 0 && layout.heading.right <= layout.viewport+2,
         "hero headline exceeds mobile viewport");
