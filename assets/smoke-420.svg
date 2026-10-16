@@ -1,20 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -32 452 218" role="img" aria-labelledby="title desc">
-<title id="title">420 in smoky lettering</title>
-<desc id="desc">The digits 420 rendered as smoky lettering. No background haze or cloud.</desc>
+<title id="title">420 in drifting smoke</title>
+<desc id="desc">The digits 420 rendered as smoky lettering, with soft translucent haze and wispy edges.</desc>
 <defs>
  <linearGradient id="vapor" x1="0" y1="1" x2="0" y2="0">
-  <stop stop-color="#d7e2d4" stop-opacity="1"/>
-  <stop offset=".5" stop-color="#f2f6ee" stop-opacity="1"/>
-  <stop offset="1" stop-color="#ffffff" stop-opacity="1"/>
+  <stop stop-color="#c8dbcc" stop-opacity=".82"/>
+  <stop offset=".45" stop-color="#ecf4eb" stop-opacity=".93"/>
+  <stop offset="1" stop-color="#f8fff9" stop-opacity=".71"/>
  </linearGradient>
- <filter id="smoke-edge" x="-20%" y="-20%" width="140%" height="140%">
-  <feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="3" seed="24" result="grain"/>
-  <feDisplacementMap in="SourceGraphic" in2="grain" scale="10" xChannelSelector="R" yChannelSelector="G" result="smoked"/>
-  <feGaussianBlur in="smoked" stdDeviation="1.1"/>
+ <filter id="smoke-edge" x="-35%" y="-60%" width="170%" height="220%">
+  <feTurbulence type="fractalNoise" baseFrequency=".045 .092" numOctaves="3" seed="24" result="grain"/>
+  <feDisplacementMap in="SourceGraphic" in2="grain" scale="16" xChannelSelector="R" yChannelSelector="G" result="smoked"/>
+  <feGaussianBlur in="smoked" stdDeviation="1.7"/>
+ </filter>
+ <filter id="smoke-haze" x="-40%" y="-70%" width="180%" height="240%">
+  <feGaussianBlur stdDeviation="8"/>
+ </filter>
+ <filter id="smoke-wisp" x="-40%" y="-90%" width="180%" height="280%">
+  <feTurbulence type="fractalNoise" baseFrequency=".019 .043" numOctaves="3" seed="17" result="draft"/>
+  <feDisplacementMap in="SourceGraphic" in2="draft" scale="23" xChannelSelector="R" yChannelSelector="G"/>
+  <feGaussianBlur stdDeviation="3.7"/>
  </filter>
 </defs>
-<!-- Smoky lettering only: crisp digit forms with smoke-textured edges. No haze, no cloud, no background. -->
+<!-- The digits 420 rendered as smoky lettering, not a hard outline or background cloud. -->
 <g font-family="Arial Black,Impact,sans-serif" font-size="148" font-weight="900" letter-spacing="-10">
+ <text x="23" y="129" fill="#dcefe1" opacity=".36" filter="url(#smoke-haze)">420</text>
  <text x="23" y="129" fill="url(#vapor)" filter="url(#smoke-edge)">420</text>
+</g>
+<g fill="none" stroke="#d8eade" stroke-linecap="round" opacity=".42" filter="url(#smoke-wisp)">
+ <path d="M48 36C24 12 70 4 42-23M119 27C95 0 135-10 115-32M205 32C186 10 232-2 207-29M275 34C251 11 297 1 275-30M358 33C334 2 372-8 360-29" stroke-width="7"/>
+ <path d="M30 107C8 83 29 65 14 42M391 83C423 57 397 35 425 9M69 139C51 158 85 177 61 197M320 135C307 155 340 168 327 192" stroke-width="5"/>
 </g>
 </svg>
