@@ -118,14 +118,14 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(html, /class="fx-switch"/);
 });
 
-test("Dank Shield card uses the owner's uploaded logo, not a hand-drawn cannabis crest", () => {
-  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-logo\.avif"/);
+test("Dank Shield card uses an original crest, not the owner's uploaded logo", () => {
+  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-original\.svg"/);
   assert.doesNotMatch(html,/dank-shield-card-crest\.svg/);
   assert.doesNotMatch(html,/class="shield-mark"/);
   assert.match(css,/\.dank-shield-brand-art\{position:relative;/);
   assert.match(css,/aspect-ratio:1;object-fit:contain/);
-  assert.match(css,/mask-image:radial-gradient\(ellipse 70% 70% at 50% 33%,#000 40%,transparent 86%\)/);
-  assert.match(css,/clip-path:circle\(49% at 50% 50%\)/);
+  assert.doesNotMatch(css.match(/\.dank-shield-brand-art\{[^}]+\}/)?.[0] ?? "",/mask-image|clip-path/);
+  assert.doesNotMatch(html,/dank-shield-logo\.avif/);
   assert.match(html, /<h3>DANK<br>SHIELD\.<\/h3>/);
 });
 
