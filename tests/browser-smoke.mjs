@@ -49,7 +49,8 @@ try {
     assert.equal(initialHeroOpacity,"1","hero text must be readable immediately, not hidden behind scroll observer");
     assert.equal(await page.title(),"The 420 Lobby | After Cheers, We Play");
     assert.equal(await page.locator(".experience-card").count(),4);
-    assert.equal(await page.locator(".card-body").count(),4,"custom feature card content needs to be present");
+    assert.equal(await page.locator(".card-body").count(),3,"three cards retain live HTML content; Dank Shield uses approved full-card artwork");
+    assert.equal(await page.locator(".shield-card .shield-card-hitarea").count(),1,"approved full-card Dank Shield must preserve its accessible link");
     assert.equal(await page.locator("#sesh-stage").count(),1,"arcade field is missing");
     assert.equal(await page.locator("#sesh-start").count(),1,"arcade start is missing");
     assert.equal(await page.locator(".arcade-play").count(),1,"mobile game wrapper is missing");
