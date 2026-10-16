@@ -80,7 +80,7 @@
     });
     menu.querySelectorAll("a").forEach(function(link) { link.addEventListener("click",closeMenu); });
     document.addEventListener("keydown", function(event) { if (event.key === "Escape") closeMenu(); });
-    window.addEventListener("resize", function() { if (window.innerWidth > 760) closeMenu(); }, {passive:true});
+    window.addEventListener("resize", function() { if (window.innerWidth > 1050) closeMenu(); }, {passive:true});
   }
 
   function updateScroll() {
