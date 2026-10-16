@@ -66,6 +66,8 @@ test("approved natural leaf art replaces the old geometric foreground", () => {
   assert.match(html, /src="\/assets\/approved-leaf\.svg" class="botanical-foreground/);
   assert.match(lounge, /gaming controller/i);
   assert.match(lounge, /id="lounge-controller"[^>]*scale\(\.75\)/);
+  assert.doesNotMatch(lounge, /d="M388 777h223"/);
+  assert.doesNotMatch(lounge, /d="M435 732h134l17 44H414Z"/);
   assert.match(icon, /haunted|ghost|\/svg>/i);
 });
 
