@@ -162,7 +162,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 @media(max-width:460px){
   /* Preserve a usable FX switch without allowing it to obscure the wordmark. */
   .fx-toggle{display:flex;right:0;z-index:15;height:42px;padding-inline:6px}
-  .hero-content{padding-top:clamp(280px,48svh,395px);padding-bottom:50px}
+  .hero-content{padding-top:clamp(190px,28svh,235px);padding-bottom:50px}
   .hero-heading,.hero-heading-cheers{font-size:clamp(48px,12vw,66px)}
   .hero-scene{width:110vw;right:-19vw;height:390px}
   .experience-grid>.shield-card{grid-template-columns:1fr;display:flex!important;flex-direction:column}
