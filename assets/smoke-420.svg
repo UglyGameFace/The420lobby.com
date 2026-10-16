@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -32 452 218" role="img" aria-labelledby="title desc">
-<title id="title">420 in drifting smoke</title>
+<title id="title">420 made of pale green swirling smoke</title>
 <desc id="desc">The digits 420 rendered as smoky lettering, with soft translucent haze and wispy edges.</desc>
 <defs>
  <linearGradient id="vapor" x1="0" y1="1" x2="0" y2="0">
-  <stop stop-color="#c8dbcc" stop-opacity=".82"/>
-  <stop offset=".45" stop-color="#ecf4eb" stop-opacity=".93"/>
+  <stop stop-color="#b8ecb8" stop-opacity=".75"/>
+  <stop offset=".45" stop-color="#e8ffe2" stop-opacity=".95"/>
   <stop offset="1" stop-color="#f8fff9" stop-opacity=".71"/>
  </linearGradient>
  <filter id="smoke-edge" x="-35%" y="-60%" width="170%" height="220%">
@@ -23,7 +23,7 @@
 </defs>
 <!-- The digits 420 rendered as smoky lettering, not a hard outline or background cloud. -->
 <g font-family="Arial Black,Impact,sans-serif" font-size="148" font-weight="900" letter-spacing="-10">
- <text x="23" y="129" fill="#dcefe1" opacity=".36" filter="url(#smoke-haze)">420</text>
+ <text x="23" y="129" fill="#bfeaba" opacity=".43" filter="url(#smoke-haze)">420</text>
  <text x="23" y="129" fill="url(#vapor)" filter="url(#smoke-edge)">420</text>
 </g>
 <g fill="none" stroke="#d8eade" stroke-linecap="round" opacity=".42" filter="url(#smoke-wisp)">
