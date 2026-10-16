@@ -43,6 +43,8 @@ test("approved Cheers hero retains actual text, independent motion and original 
   assert.match(cheersCss, /\.hero-heading-cheers \.headline-cheers/);
   assert.match(html, /class="cheers-art" src="\/assets\/approved-smoke-cheers\.svg"/);
   assert.match(cheersArt, /data:image\/png;base64,/);
+  assert.match(html, /class="cheers-leaf" src="\/assets\/approved-leaf\.svg"/);
+  assert.match(cheersCss, /\.hero-heading-cheers \.cheers-leaf\{display:block;position:absolute;z-index:1/);
   assert.doesNotMatch(html,/class="cheers-vapor"/);
   assert.match(cheersCss, /html\.fx-off/);
   assert.match(cheersCss, /prefers-reduced-motion:reduce/);
