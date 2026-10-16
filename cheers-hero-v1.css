@@ -9,7 +9,7 @@
   position:relative;
   display:block;
   box-sizing:border-box;
-  width:min(6em,100%);
+  width:min(4.0em,100%);
   height:1.02em;
   margin:.035em 0 .07em;
   padding:0;
@@ -66,7 +66,7 @@
 @media(max-width:760px){
   .hero-heading.hero-heading-cheers{font-size:clamp(61px,13.5vw,102px)}
   .hero-heading-cheers .headline-cheers{
-    width:min(6.1em,91%);
+    width:min(4.05em,84%);
     height:1.02em;
     margin:.04em 0 .10em;
   }
@@ -83,7 +83,7 @@
 }
 @media(max-width:420px){
   .hero-heading.hero-heading-cheers{font-size:clamp(57px,13.1vw,78px)}
-  .hero-heading-cheers .headline-cheers{width:min(6.1em,92%)}
+  .hero-heading-cheers .headline-cheers{width:min(4.05em,84%)}
   .hero-heading-cheers .cheers-leaf{width:40%;right:-14%;top:-.51em}
 }
 @media(max-width:360px){
