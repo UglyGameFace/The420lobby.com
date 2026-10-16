@@ -100,7 +100,12 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   :root{--gutter:clamp(17px,5vw,28px)}
   html{scroll-padding-top:72px}
   .site-header,.header-shell{min-height:72px}
-  .header-shell{gap:8px}
+  /* The original mobile nav button is absolutely positioned on the left.
+     Keep the centered logo clear of its tap area; never let logo glyphs
+     intercept menu interactions on 320-760px screens. */
+  .header-shell{gap:0;justify-content:center;position:relative}
+  .logo{width:min(210px,calc(100% - 108px));max-width:calc(100% - 108px);justify-content:center;flex:0 1 auto}
+  .menu-toggle{z-index:15}
   .logo-smoke{width:clamp(75px,22vw,116px);height:60px}
   .logo-type{font-size:clamp(10px,2.9vw,14px)}
   .menu-toggle{width:42px;height:42px}
