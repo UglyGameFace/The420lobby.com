@@ -160,6 +160,13 @@ try {
     });
     if(scenario.mobile){
       assert.ok(layout.mark.top >= 0,"smoke 420 image must not crop above the viewport");
+      const parts=await page.evaluate(()=>{
+        const get=s=>{const r=document.querySelector(s).getBoundingClientRect();return {left:r.left,right:r.right,width:r.width}};
+        return {prefix:get(".logo-prefix"),smoke:get(".logo-smoke"),suffix:get(".logo-suffix")};
+      });
+      assert.ok(parts.prefix.right+1<=parts.smoke.left && parts.smoke.right+1<=parts.suffix.left,
+        "THE 420 LOBBY must have zero overlap between words and smoke image: "+JSON.stringify(parts));
+      assert.ok(parts.smoke.width>=65,"smoky 420 is too small: "+JSON.stringify(parts));
       assert.ok(layout.mark.bottom <= layout.header.bottom+5,"smoke 420 image must fit inside the header");
       assert.ok(layout.logo.left >= layout.header.left-2 && layout.logo.right <= layout.header.right+2,
         "full brand must fit inside the header");

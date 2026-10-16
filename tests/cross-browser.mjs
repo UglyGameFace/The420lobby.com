@@ -149,6 +149,16 @@ try{
             const rect=selector=>document.querySelector(selector).getBoundingClientRect();
             return {logo:rect(".logo"),mark:rect(".logo-smoke"),fx:rect("#fx-toggle"),menu:rect("#menu-toggle"),header:rect(".header-shell"),eyebrow:rect(".hero-copy-block .eyebrow")};
           });
+          const brandParts=await page.evaluate(()=>{
+            const rect=q=>{const r=document.querySelector(q).getBoundingClientRect();return {left:r.left,right:r.right,width:r.width}};
+            return {prefix:rect(".logo-prefix"),image:rect(".logo-smoke"),suffix:rect(".logo-suffix")};
+          });
+          assert.ok(brandParts.prefix.right+1<=brandParts.image.left,
+            name+" THE overlaps smoky 420: "+JSON.stringify(brandParts));
+          assert.ok(brandParts.image.right+1<=brandParts.suffix.left,
+            name+" zero is obscured by LOBBY: "+JSON.stringify(brandParts));
+          assert.ok(brandParts.image.width>=65,
+            name+" 420 compressed beyond legibility: "+JSON.stringify(brandParts));
           assert.ok(controls.mark.bottom<=controls.header.bottom+5,name+" smoke artwork outside header");
           assert.ok(controls.logo.left>=controls.header.left-2 && controls.logo.right<=controls.header.right+2,name+" full brand outside header");
           assert.ok(controls.menu.left>=controls.header.left-2 && controls.fx.right<=controls.header.right+2,name+" header controls outside bounds");
