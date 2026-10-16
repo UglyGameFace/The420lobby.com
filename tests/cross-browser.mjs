@@ -118,6 +118,14 @@ try{
         assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed joint art load");
         assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,");
         assert.equal(await page.locator(".sesh-item").count(),0,"No targets before start");
+        const completeLogo=await page.evaluate(()=>{
+          const rect=q=>{const r=document.querySelector(q).getBoundingClientRect();return {left:r.left,right:r.right,width:r.width}};
+          return {prefix:rect(".logo-prefix"),image:rect(".logo-smoke"),suffix:rect(".logo-suffix")};
+        });
+        assert.ok(completeLogo.prefix.right<=completeLogo.image.left+.5,
+          name+" THE overlaps smoky 4: "+JSON.stringify(completeLogo));
+        assert.ok(completeLogo.image.right<=completeLogo.suffix.left+.5,
+          name+" smoky zero overlaps LOBBY: "+JSON.stringify(completeLogo));
         const logoBounds=await page.locator(".logo-smoke").boundingBox();
         if(mobile){
           assert.ok(logoBounds && logoBounds.width<=Math.min(165,width*.45),"Mobile smoke logo width exceeds available space: "+JSON.stringify(logoBounds));
