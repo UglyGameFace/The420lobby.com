@@ -118,6 +118,16 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(html, /class="fx-switch"/);
 });
 
+test("Dank Shield card uses uploaded official brand artwork, not fabricated shield glyph", () => {
+  const image=fs.readFileSync(new URL("../assets/dank-shield-logo.avif",import.meta.url));
+  assert.ok(image.length>4000 && image.length<30000,"logo must be optimized and present");
+  assert.equal(image.subarray(4,12).toString("ascii"),"ftypavif");
+  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-logo\.avif"/);
+  assert.doesNotMatch(html,/class="shield-mark"/);
+  assert.match(css,/\.dank-shield-brand-art\{position:relative;/);
+  assert.doesNotMatch(css,/\.shield-mark\{/);
+});
+
 test("all advertised community experiences remain present", () => {
   for(const id of ["main","vibe","experiences","after-dark","join"])assert.match(html,new RegExp('id="'+id+'"'));
   for(const term of ["DANK","SHIELD","CINEMA","MINECRAFT","BEDROCK","JAVA","VOICE"])assert.ok(html.toUpperCase().includes(term),term);

@@ -106,6 +106,18 @@ try {
     await page.locator(".leaf-seal img.seal-cannabis-photo").evaluate(img => img.decode());
     assert.ok(await page.locator(".leaf-seal img.seal-cannabis-photo").evaluate(img => img.complete && img.naturalWidth>0),
       "photographic Good Stuff badge leaf failed to load");
+    await page.locator(".shield-card").scrollIntoViewIfNeeded();
+    const brand=page.locator(".shield-card img.dank-shield-brand-art");
+    await brand.evaluate(img=>img.decode());
+    const placement=await brand.evaluate(img=>{
+      const card=img.closest(".shield-card").getBoundingClientRect();
+      const art=img.getBoundingClientRect();
+      return {loaded:img.complete&&img.naturalWidth===224,
+        visible:art.width>=110&&art.height>=110,
+        inside:art.left>=card.left-1&&art.right<=card.right+1};
+    });
+    assert.ok(placement.loaded&&placement.visible&&placement.inside,
+      "uploaded Dank Shield image must load and fit within card: "+JSON.stringify(placement));
     await page.locator(".hangout-card").scrollIntoViewIfNeeded();
     await page.locator("img.card-foliage-photo").evaluate(img=>img.decode());
     assert.ok(await page.locator("img.card-foliage-photo").evaluate(img=>img.naturalWidth>0),
