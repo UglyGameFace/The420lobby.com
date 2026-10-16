@@ -69,3 +69,12 @@ html.fx-off{scroll-behavior:auto}html.fx-off *,html.fx-off *::before,html.fx-off
 @media(max-width:760px) and (prefers-reduced-motion:reduce){
   .hero-scene{transform:none}
 }
+
+/* Mobile visual acceptance: preserve card copy and keep artwork in its own visual zone. */
+.shield-card .shield-visual{padding-top:0;display:block}
+.shield-card .dank-shield-brand-art{position:absolute;top:62px;left:50%;transform:translateX(-50%);width:min(48%,190px);height:auto;max-height:230px;animation:none;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35))}
+.shield-card .card-body{padding-top:0}
+.shield-card .card-info h3{font-size:clamp(54px,6vw,94px);line-height:.94;overflow-wrap:normal}
+@media(max-width:760px){.shield-card .dank-shield-brand-art{top:72px;width:min(42%,174px);max-height:192px}.shield-card .card-info h3{font-size:clamp(55px,12vw,78px)}.shield-card .card-body{padding-top:0}}
+/* Do not show a rectangular product photograph behind the hero headline. */
+.lounge-xbox-controller{display:none}
