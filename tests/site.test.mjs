@@ -124,10 +124,10 @@ test("Dank Shield card uses purpose-built crest integrated into card, without ge
   assert.doesNotMatch(html,/class="shield-mark"/);
   assert.match(css,/\.dank-shield-brand-art\{position:relative;/);
   assert.doesNotMatch(css,/\.shield-mark\{/);
-  assert.match(crest,/<svg[^>]+viewBox="0 0 640 610"/);
+  assert.match(crest,/<svg[^>]+viewBox="0 0 640 480"/);
   assert.match(crest,/id="smoke-zero"|id="complete-numerals"|id="blade"/);
-  assert.match(crest,/DANK<\/text>/);
-  assert.match(crest,/SHIELD<\/text>/);
+  assert.doesNotMatch(crest, /<text\b/, "crest must not duplicate the card's large wordmark");
+  assert.match(html, /<h3>DANK<br>SHIELD\.<\/h3>/);
   assert.match(crest,/id="inner"/);
   assert.doesNotMatch(crest,/<image\b|data:image\/|href="https?:/,"brand crest should be locally drawn, not pasted photo");
 });
