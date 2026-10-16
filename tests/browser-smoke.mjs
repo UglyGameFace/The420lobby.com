@@ -114,9 +114,10 @@ try {
       const art=img.getBoundingClientRect();
       return {loaded:img.complete&&img.naturalWidth===224,
         visible:art.width>=110&&art.height>=110,
+        unmasked:getComputedStyle(img).clipPath==="none"&&getComputedStyle(img).maskImage==="none",
         inside:art.left>=card.left-1&&art.right<=card.right+1 && art.top>=card.top-1};
     });
-    assert.ok(placement.loaded&&placement.visible&&placement.inside,
+    assert.ok(placement.loaded&&placement.visible&&placement.inside&&placement.unmasked,
       "uploaded Dank Shield logo must load and fit within card: "+JSON.stringify(placement));
     await page.locator(".hangout-card").scrollIntoViewIfNeeded();
     await page.locator("img.card-foliage-photo").evaluate(img=>img.decode());
