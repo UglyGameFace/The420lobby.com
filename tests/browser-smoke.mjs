@@ -105,6 +105,14 @@ try {
     await page.locator("img.lounge-xbox-controller").evaluate(el => el.decode());
     assert.equal(await page.locator("img.lounge-xbox-controller").evaluate(el=>el.complete && el.naturalWidth>0),true,
       "actual Xbox controller photograph failed to load");
+    if (scenario.mobile) {
+      const controller=await page.locator("img.lounge-xbox-controller").evaluate(el=>{
+        const r=el.getBoundingClientRect();
+        return {left:r.left,right:r.right,width:r.width,viewport:innerWidth};
+      });
+      assert.ok(controller.width>=100 && controller.left>=-3 && controller.right<=controller.viewport+3,
+        "real Xbox controller is clipped outside the mobile viewport: "+JSON.stringify(controller));
+    }
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
     assert.equal(await page.locator("img.logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");
     const countPaintedPixels = async locator => locator.evaluate(img => {
