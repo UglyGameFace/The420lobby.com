@@ -114,9 +114,18 @@ try {
     if(scenario.mobile){
       assert.ok(layout.mark.top >= 0,"smoke 420 image must not crop above the viewport");
       assert.ok(layout.mark.bottom <= layout.header.bottom+2,"smoke 420 image must fit inside the header");
-      assert.ok(layout.logo.right+3 <= layout.fx.left, "brand and FX controls overlap");
-      assert.ok(layout.fx.right+3 <= layout.menu.left, "effects and menu buttons overlap");
-      assert.ok(layout.menu.right <= layout.viewport+1,"menu is offscreen");
+      assert.ok(layout.logo.left >= layout.header.left-2 && layout.logo.right <= layout.header.right+2,
+        "full brand must fit inside the header");
+      assert.ok(layout.menu.left >= layout.header.left-2 && layout.fx.right <= layout.header.right+2,
+        "header controls must fit inside the header");
+      assert.ok(layout.menu.right+3 <= layout.fx.left, "effects and menu buttons overlap");
+      if(layout.viewport<=460){
+        assert.ok(layout.logo.top >= Math.max(layout.menu.bottom,layout.fx.bottom)-2,
+          "narrow mobile brand and header controls overlap vertically");
+      }else{
+        assert.ok(layout.menu.right+3 <= layout.logo.left, "menu and brand overlap");
+        assert.ok(layout.logo.right+3 <= layout.fx.left, "brand and FX controls overlap");
+      }
       assert.ok(layout.heading.left >= 0 && layout.heading.right <= layout.viewport+2,
         "hero headline exceeds mobile viewport");
       assert.equal(await page.locator(".scene-label").first().evaluate(el=>getComputedStyle(el).display),"none",
