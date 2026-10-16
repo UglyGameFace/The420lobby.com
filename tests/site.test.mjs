@@ -120,7 +120,7 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
 });
 
 test("Dank Shield card uses the exact approved full-card PNG and preserves an accessible link", () => {
-  assert.match(html,/class="dank-shield-brand-art" src="\\/assets\\/dank-shield-approved\\.png"/);
+  assert.match(html,/class="dank-shield-brand-art" src="\\/assets\\/file_00000000b25c822f94a1d2b422440108\\.png"/);
   assert.doesNotMatch(html,/dank-shield-original\\.svg/);
   assert.match(html,/class="shield-card-hitarea" aria-label="Meet the tech: Dank Shield"/);
   assert.match(css,/\\.shield-card\\{aspect-ratio:2\\/3;min-height:0/);
