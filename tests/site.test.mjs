@@ -11,7 +11,7 @@ const jointArt = read("assets/cheers-joint.svg");
 const arcadeCss = read("sesh-signal-v3.css");
 const client = read("script.js");
 const renderer = read("visual-engine.js");
-const leaf = read("assets/botanical-leaf.svg");
+const leaf = read("assets/approved-leaf.svg");
 const lounge = read("assets/haunted-lounge.svg");
 const icon = read("favicon.svg");
 const smokeLogo = read("assets/approved-smoke-420.svg");
@@ -25,7 +25,7 @@ test("hero communicates a 420-friendly gaming community, not haunted house brand
   }
   assert.match(html,/id="hero-heading"/);
   assert.match(html,/src="\/assets\/haunted-lounge\.svg"/);
-  assert.match(html,/src="\/assets\/botanical-leaf\.svg"/);
+  assert.match(html,/src="\/assets\/approved-leaf\.svg"/);
   assert.match(html,/src="\/assets\/approved-smoke-420\.svg"/);
   const textOnly=html.replace(/<(?:img|meta|link)[^>]*>/g,"");
   assert.doesNotMatch(textOnly,/haunted|haunt|ghost towns|spooky/i);
@@ -53,15 +53,13 @@ test("approved Cheers hero retains actual text, independent motion and original 
   assert.match(jointArt, /<\/svg>\s*$/);
 });
 
-test("custom botanical art uses seven distinct serrated and veined leaflets", () => {
-  assert.equal((leaf.match(/transform="rotate\(-?\d+ 300 464\)"/g)||[]).length,7);
-  assert.ok((leaf.match(/<path/g)||[]).length>35);
-  assert.match(leaf,/serrated leaflets/);
-  assert.match(leaf,/veins/);
-  assert.match(leaf,/<\/svg>\s*$/);
-  assert.match(lounge,/ghostly|phantom|spectral/i);
-  assert.match(lounge,/gaming controller/i);
-  assert.match(icon,/haunted|ghost|\/svg>/i);
+test("approved natural leaf art replaces the old geometric foreground", () => {
+  assert.match(leaf, /Organic green leaf from approved design/);
+  assert.match(leaf, /data:image\/png;base64,/);
+  assert.match(leaf, /viewBox="0 0 130 185"/);
+  assert.doesNotMatch(html, /src="\/assets\/botanical-leaf\.svg"/);
+  assert.match(lounge, /gaming controller/i);
+  assert.match(icon, /haunted|ghost|\/svg>/i);
 });
 
 test("custom smoke 420 brand has accessible branding without the old clipped square", () => {
