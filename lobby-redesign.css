@@ -103,20 +103,19 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   /* The original mobile nav button is absolutely positioned on the left.
      Keep the centered logo clear of its tap area; never let logo glyphs
      intercept menu interactions on 320-760px screens. */
-  .header-shell{gap:0;justify-content:center;position:relative}
-  /* Center brand independently of flex sizing, with real room for both controls. */
-  .logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:min(210px,calc(100% - 116px));max-width:calc(100% - 116px);
-    justify-content:center;flex:0 0 auto;z-index:1}
-  .menu-toggle{z-index:15}
-  .logo-smoke{width:clamp(75px,22vw,116px);height:60px}
-  .logo-type{font-size:clamp(10px,2.9vw,14px)}
-  .menu-toggle{width:42px;height:42px}
-  .header-actions{gap:6px;position:relative;z-index:12}
-  .header-shell{position:relative;isolation:isolate}
-  .header-shell .logo{max-width:calc(100% - 64px);position:relative;z-index:2;overflow:hidden}
-  .header-shell .logo-smoke{flex-shrink:1;min-width:66px}
-  .header-shell .menu-toggle{position:relative;z-index:15;flex:0 0 42px;pointer-events:auto}
+  .header-shell{position:relative;isolation:isolate;justify-content:center;gap:0}
+  /* Independent absolute positions prevent flex from moving the brand.
+     Keep both mobile buttons clickable without overlapping the logo. */
+  .header-shell .logo{position:absolute;left:50%;top:50%;translate:-50% -50%;
+    transform:none;width:min(210px,calc(100% - 116px));max-width:calc(100% - 116px);
+    justify-content:center;flex:none;z-index:2;overflow:visible}
+  .header-shell .logo-smoke{width:clamp(75px,22vw,116px);min-width:0;flex:1 1 auto;height:60px}
+  .header-shell .logo-type{font-size:clamp(10px,2.9vw,14px)}
+  .header-shell .header-actions{display:contents}
+  .header-shell .menu-toggle{position:absolute;left:0;right:auto;top:50%;translate:0 -50%;
+    transform:none;width:42px;height:42px;z-index:15;pointer-events:auto}
+  .header-shell .fx-toggle{position:absolute;left:auto;right:0;top:50%;translate:0 -50%;
+    transform:none;z-index:15;pointer-events:auto}
   .desktop-nav{display:none}
   .desktop-nav.open{display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;padding:12px var(--gutter) 23px;background:#0b1b14;border-bottom:1px solid var(--stroke)}
   .desktop-nav.open a{font-size:13px;padding:12px 6px}
