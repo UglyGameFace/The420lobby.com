@@ -120,7 +120,7 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
 });
 
 test("Dank Shield card uses approved realistic artwork, not the old SVG", () => {
-  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-card-art\\.webp"/);
+  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-card-art\.webp"/);
   assert.doesNotMatch(html,/dank-shield-card-crest\.svg/);
   assert.doesNotMatch(html,/class="shield-mark"/);
   assert.match(css,/\.dank-shield-brand-art\{position:relative;/);
