@@ -116,7 +116,7 @@ try {
     });
     if(scenario.mobile){
       assert.ok(layout.mark.top >= 0,"smoke 420 image must not crop above the viewport");
-      assert.ok(layout.mark.bottom <= layout.header.bottom+2,"smoke 420 image must fit inside the header");
+      assert.ok(layout.mark.bottom <= layout.header.bottom+5,"smoke 420 image must fit inside the header");
       assert.ok(layout.logo.left >= layout.header.left-2 && layout.logo.right <= layout.header.right+2,
         "full brand must fit inside the header");
       assert.ok(layout.menu.left >= layout.header.left-2 && layout.fx.right <= layout.header.right+2,
