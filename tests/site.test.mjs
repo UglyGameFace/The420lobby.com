@@ -119,23 +119,27 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(html, /class="fx-switch"/);
 });
 
-test("Dank Shield card uses the exact approved full-card PNG and preserves an accessible link", () => {
-  assert.ok(html.includes('class="dank-shield-brand-art" src="/assets/file_00000000b25c822f94a1d2b422440108.png"'));
-  assert.ok(!html.includes('dank-shield-original.svg'));
-  assert.ok(html.includes('class="shield-card-hitarea" aria-label="Meet the tech: Dank Shield"'));
-  assert.match(css, /\.experience-grid > \.shield-card\{[\s\S]*?aspect-ratio:2\/3;/);
-  assert.match(css, /\.experience-grid > \.shield-card \.dank-shield-brand-art\{[\s\S]*?object-fit:contain;/);
-  assert.doesNotMatch(css, /\.experience-grid>\.shield-card\{aspect-ratio:auto;min-height:670px/);
-  assert.doesNotMatch(css, /\.experience-grid>\.shield-card \.dank-shield-brand-art\{[^}]*object-fit:cover/);
-  assert.doesNotMatch(css, /transform:scale\(1\.14\)/);
-  assert.ok(css.includes('.shield-card-hitarea:focus-visible'));
+test("Dank Shield is semantic responsive content, not a stretched poster", () => {
+  const redesign=read("lobby-redesign.css");
+  assert.ok(html.includes('class="dank-shield-brand-art" src="/assets/dank-shield-logo.avif"'));
+  assert.ok(!html.includes('file_00000000b25c822f94a1d2b422440108.png'));
+  assert.ok(html.includes('class="shield-feature-art"'));
+  assert.ok(html.includes('class="shield-feature-copy"'));
+  assert.ok(html.includes('id="shield-title"'));
+  assert.ok(html.includes('class="card-link shield-card-link" href="#after-dark"'));
+  assert.ok(html.includes('href="/lobby-redesign.css?v=20261016-rebuild1"'));
+  for (const rule of [".experience-grid>.shield-card{display:grid!important",
+    ".hero-content", ".arcade-layout", ".community-proof .proof-grid",
+    "@media(max-width:1100px)", "@media(max-width:760px)", "@media(max-width:460px)"])
+    assert.ok(redesign.includes(rule), "missing responsive rule: " + rule);
 });
 
 test("all advertised community experiences remain present", () => {
   for(const id of ["main","vibe","experiences","after-dark","join"])assert.match(html,new RegExp('id="'+id+'"'));
   for(const term of ["DANK","SHIELD","CINEMA","MINECRAFT","BEDROCK","JAVA","VOICE"])assert.ok(html.toUpperCase().includes(term),term);
   assert.equal((html.match(/<article class="experience-card/g)||[]).length,4);
-  assert.equal((html.match(/class="card-body"/g)||[]).length,3, "Dank Shield uses the approved full-card composition instead of duplicated HTML text");
+  assert.equal((html.match(/class="card-body"/g)||[]).length,3, "Other cards retain HTML content");
+  assert.equal((html.match(/class="shield-feature-copy"/g)||[]).length,1,"Shield has readable text, not text baked into an image");
 });
 
 test("internal anchors resolve and IDs are unique", () => {
