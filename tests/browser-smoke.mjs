@@ -130,8 +130,8 @@ try {
     assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,","hero slogan regressed");
     assert.equal(await page.locator(".logo-glyph").count(),0,"outdated sticky-note mark still present");
     assert.equal(await page.locator(".logo-prefix").textContent(),"THE");
-    assert.equal(await page.locator(".logo-suffix").textContent(),"LOBBY.");
-    assert.equal(await page.locator(".logo").textContent(),"THELOBBY.","smoky 420 must be an image between words, not duplicated text");
+    assert.equal(await page.locator(".logo-suffix").textContent(),"LOBBY");
+    assert.equal(await page.locator(".logo").textContent(),"THELOBBY","smoky 420 must be an image between words, not duplicated text");
     const layout = await page.evaluate(() => {
       const get = selector => {
         const rect=document.querySelector(selector).getBoundingClientRect();
