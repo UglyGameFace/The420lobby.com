@@ -124,6 +124,7 @@ test("Dank Shield card uses the owner's uploaded logo, not a hand-drawn cannabis
   assert.doesNotMatch(html,/class="shield-mark"/);
   assert.match(css,/\.dank-shield-brand-art\{position:relative;/);
   assert.match(css,/aspect-ratio:1;object-fit:contain/);
+  assert.match(css,/mask-image:linear-gradient\(to bottom,#000 0%,#000 49%,transparent 77%\)/);
   assert.match(html, /<h3>DANK<br>SHIELD\.<\/h3>/);
 });
 
