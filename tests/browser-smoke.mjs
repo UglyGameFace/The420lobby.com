@@ -255,7 +255,7 @@ try {
         leaf:rect(".cheers-leaf"),joint:rect(".cheers-roll img"),
         after:rect(".hero-heading-cheers > span:first-child"),
         play:rect(".hero-heading-cheers > span.headline-highlight"),
-        scene:rect(".hero-scene"),
+        scene:rect(".hero-scene"),hero:rect(".hero"),
         pseudo:getComputedStyle(document.querySelector(".headline-cheers"),"::before").content
       };
     });
@@ -279,7 +279,7 @@ try {
       cheersArt.play.top-cheersArt.cheers.bottom<=24,
       "extra gap between CHEERS and WE PLAY: "+JSON.stringify(cheersArt));
     if(scenario.mobile){
-      assert.ok(cheersArt.scene.top>=-8 && cheersArt.scene.top<=15,
+      assert.ok(Math.abs(cheersArt.scene.top-cheersArt.hero.top)<=15,
         "controller/CRT background must anchor at hero top: "+JSON.stringify(cheersArt));
       assert.ok(cheersArt.leaf.left<cheersArt.cheers.right+25 &&
         cheersArt.leaf.bottom>=cheersArt.cheers.top && cheersArt.leaf.top<=cheersArt.cheers.bottom,
