@@ -191,6 +191,14 @@ try {
       };
     });
     assert.equal(cheersArt.pseudo,"none","old CHEERS text still painted behind image");
+    const liveHaze=await page.locator(".cheers-art").evaluate(el=>{
+      const st=getComputedStyle(el);
+      return {animationName:st.animationName,transform:st.transform};
+    });
+    assert.ok(liveHaze.animationName.includes("cheers-smoke-hover"),
+      "smoky CHEERS motion disappeared");
+    assert.equal(liveHaze.transform,"none",
+      "CHEERS animation must not displace its line");
     assert.ok(cheersArt.joint.height>8,"joint must be visibly scaled");
     assert.ok(cheersArt.artwork.top>=cheersArt.cheers.top-3 &&
       cheersArt.artwork.bottom<=cheersArt.cheers.bottom+3,
