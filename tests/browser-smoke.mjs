@@ -38,6 +38,11 @@ try {
     const errors=[];
     page.on("pageerror",error=>errors.push(error.message));
     await page.goto(address,{waitUntil:"domcontentloaded"});
+    await page.waitForFunction(() => {
+      return ['/styles.css','/cheers-hero-v1.css','/sesh-signal-v3.css'].every(path=>
+        !!document.querySelector('link[rel="stylesheet"][href^="'+path+'"]')?.sheet
+      );
+    },{timeout:11000});
     await page.locator("#hero-heading").waitFor({state:"visible"});
     await page.evaluate(()=>document.fonts.ready);
     const initialHeroOpacity = await page.locator("#hero-heading").evaluate(el=>getComputedStyle(el).opacity);
