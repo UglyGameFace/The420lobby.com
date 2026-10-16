@@ -85,3 +85,7 @@ html.fx-off{scroll-behavior:auto}html.fx-off *,html.fx-off *::before,html.fx-off
 .shield-card .dank-shield-brand-art{top:64px;width:min(43%,180px);max-height:190px}
 .shield-card .card-info h3{font-size:clamp(48px,5.8vw,86px);line-height:.94}
 @media(max-width:760px){.shield-card .card-info{min-height:670px}.shield-card .dank-shield-brand-art{top:66px;width:min(40%,154px);max-height:168px}.shield-card .card-info h3{font-size:clamp(48px,11vw,70px);line-height:.96}.shield-card .card-body{margin-top:auto}}
+
+/* Approved photographic Dank Shield artwork. Keep live card copy outside image. */
+.shield-card .dank-shield-brand-art{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:calc(100% - 36px);max-width:540px;height:auto;max-height:300px;aspect-ratio:700/444;object-fit:contain;animation:none;filter:none;border-radius:10px;mask-image:linear-gradient(to bottom,#000 0%,#000 77%,transparent 100%)}
+@media(max-width:760px){.shield-card .dank-shield-brand-art{top:62px;width:calc(100% - 24px);max-width:none;max-height:340px}.shield-card .card-body{margin-top:auto}}
