@@ -33,6 +33,7 @@
   white-space:nowrap;
   visibility:hidden;
 }
+ .hero-heading-cheers .cheers-leaf{display:none}
 .hero-heading-cheers .cheers-art{
   position:absolute;
   z-index:2;
@@ -128,6 +129,7 @@
   .hero-heading.hero-heading-cheers{font-size:clamp(78px,10.6vw,138px)}
 }
 @media(max-width:760px){
+  .hero-heading-cheers .cheers-leaf{display:block;position:absolute;z-index:1;left:86%;top:-.64em;width:44%;height:auto;pointer-events:none;filter:brightness(1.25) saturate(1.15) drop-shadow(0 3px 12px rgba(35,99,39,.20))}
   .hero-heading.hero-heading-cheers{font-size:clamp(61px,13.5vw,102px)}
   .hero-heading-cheers .headline-cheers{font-size:1.02em;letter-spacing:-.087em;margin:.06em 0 .025em;padding-bottom:.14em}
   .hero-heading-cheers .cheers-roll{bottom:-.14em}
