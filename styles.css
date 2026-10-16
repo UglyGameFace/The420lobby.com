@@ -102,3 +102,8 @@ html.fx-off{scroll-behavior:auto}html.fx-off *,html.fx-off *::before,html.fx-off
 .experience-grid>.shield-card .shield-visual{inset:0;overflow:hidden}
 .experience-grid>.shield-card .dank-shield-brand-art{inset:0;width:100%;height:100%;max-width:none;max-height:none;aspect-ratio:auto;object-fit:cover;object-position:center;transform:scale(1.14);transform-origin:center;filter:none}
 @media(max-width:760px){.experience-grid>.shield-card{aspect-ratio:auto;min-height:670px}.experience-grid>.shield-card .dank-shield-brand-art{inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.14)}}
+
+/* Keep the approved image's DOM bounds within the card for hit testing and layout checks.
+   Crop surplus screenshot margin via object sizing instead of transforming the image element. */
+.experience-grid>.shield-card .dank-shield-brand-art{transform:none;object-fit:cover;object-position:center}
+@media(max-width:760px){.experience-grid>.shield-card .dank-shield-brand-art{transform:none}}
