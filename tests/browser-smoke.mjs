@@ -102,6 +102,11 @@ try {
 
     assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),4);
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
+    await page.locator(".hangout-card").scrollIntoViewIfNeeded();
+    await page.locator("img.card-foliage-photo").evaluate(img=>img.decode());
+    assert.ok(await page.locator("img.card-foliage-photo").evaluate(img=>img.naturalWidth>0),
+      "real Hangout card foliage photo failed to load");
+    await page.locator("#hero-heading").scrollIntoViewIfNeeded();
     await page.locator("img.lounge-xbox-controller").evaluate(el => el.decode());
     assert.equal(await page.locator("img.lounge-xbox-controller").evaluate(el=>el.complete && el.naturalWidth>0),true,
       "actual Xbox controller photograph failed to load");
