@@ -66,6 +66,10 @@ try{
         });
         assert.ok(await countPaintedPixels(page.locator(".logo-smoke"))>200,name+" smoke logo paints no pixels");
         assert.ok(await countPaintedPixels(page.locator(".cheers-art"))>200,name+" photographic Cheers art paints no pixels");
+        if(mobile){
+          assert.ok(await page.locator(".cheers-leaf").isVisible(),name+" mobile leaf not visible beside Cheers");
+          assert.ok(await countPaintedPixels(page.locator(".cheers-leaf"))>100,name+" leaf artwork paints no pixels");
+        }
         assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed joint art load");
         assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,");
         assert.equal(await page.locator(".sesh-item").count(),0,"No targets before start");
