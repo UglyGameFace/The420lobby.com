@@ -119,6 +119,39 @@ try {
     });
     assert.ok(placement.loaded&&placement.visible&&placement.inside,
       "approved full-card Dank Shield PNG must decode and fit within card: "+JSON.stringify(placement));
+    // Rendered acceptance, not just a CSS grep: keep the *full* approved
+    // portrait poster legible, uncropped and proportional on every viewport.
+    // This catches 670px mobile height overrides and object-fit:cover.
+    const shieldGeometry = await brand.evaluate(img => {
+      const card = img.closest(".shield-card");
+      const bounds = card.getBoundingClientRect();
+      const art = img.getBoundingClientRect();
+      const fit = getComputedStyle(img).objectFit;
+      return {
+        cardWidth:bounds.width, cardHeight:bounds.height,
+        imageWidth:art.width, imageHeight:art.height,
+        naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight,
+        ratio:bounds.width/bounds.height, fit,
+        viewport:innerWidth, left:bounds.left, right:bounds.right,
+      };
+    });
+    assert.equal(shieldGeometry.fit,"contain",
+      "approved poster is cropped by CSS: "+JSON.stringify(shieldGeometry));
+    assert.ok(Math.abs(shieldGeometry.ratio-2/3)<0.025,
+      "Dank Shield mobile card must match the approved art's natural 2:3 ratio: "+JSON.stringify(shieldGeometry));
+    assert.ok(shieldGeometry.left>=-1 && shieldGeometry.right<=scenario.size.width+2,
+      "Dank Shield card overflows screen: "+JSON.stringify(shieldGeometry));
+    assert.ok(shieldGeometry.naturalWidth>0 && shieldGeometry.naturalHeight>0 &&
+      Math.abs(shieldGeometry.naturalWidth/shieldGeometry.naturalHeight-2/3)<0.02,
+      "unexpected approved image dimensions: "+JSON.stringify(shieldGeometry));
+    if(scenario.mobile){
+      assert.ok(shieldGeometry.cardHeight<670,
+        "old fixed 670px mobile poster regression: "+JSON.stringify(shieldGeometry));
+    }
+    await page.locator(".shield-card").screenshot({
+      path:"artifacts/"+scenario.name+"-shield-card.png",
+      animations:"disabled",
+    });
     await page.locator(".hangout-card").scrollIntoViewIfNeeded();
     await page.locator("img.card-foliage-photo").evaluate(img=>img.decode());
     assert.ok(await page.locator("img.card-foliage-photo").evaluate(img=>img.naturalWidth>0),
