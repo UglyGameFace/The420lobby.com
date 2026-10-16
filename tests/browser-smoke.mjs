@@ -112,12 +112,12 @@ try {
     const placement=await brand.evaluate(img=>{
       const card=img.closest(".shield-card").getBoundingClientRect();
       const art=img.getBoundingClientRect();
-      return {loaded:img.complete&&img.naturalWidth===600,
+      return {loaded:img.complete&&img.naturalWidth>0&&img.naturalHeight>0,
         visible:art.width>=110&&art.height>=110,
         inside:art.left>=card.left-1&&art.right<=card.right+1 && art.top>=card.top-1};
     });
     assert.ok(placement.loaded&&placement.visible&&placement.inside,
-      "uploaded Dank Shield logo must load and fit within card: "+JSON.stringify(placement));
+      "original Dank Shield SVG must decode and fit within card: "+JSON.stringify(placement));
     await page.locator(".hangout-card").scrollIntoViewIfNeeded();
     await page.locator("img.card-foliage-photo").evaluate(img=>img.decode());
     assert.ok(await page.locator("img.card-foliage-photo").evaluate(img=>img.naturalWidth>0),
