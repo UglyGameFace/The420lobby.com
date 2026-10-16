@@ -131,7 +131,7 @@ test("all advertised community experiences remain present", () => {
   for(const id of ["main","vibe","experiences","after-dark","join"])assert.match(html,new RegExp('id="'+id+'"'));
   for(const term of ["DANK","SHIELD","CINEMA","MINECRAFT","BEDROCK","JAVA","VOICE"])assert.ok(html.toUpperCase().includes(term),term);
   assert.equal((html.match(/<article class="experience-card/g)||[]).length,4);
-  assert.equal((html.match(/class="card-body"/g)||[]).length,4);
+  assert.equal((html.match(/class="card-body"/g)||[]).length,3, "Dank Shield uses the approved full-card composition instead of duplicated HTML text");
 });
 
 test("internal anchors resolve and IDs are unique", () => {
