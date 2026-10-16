@@ -189,7 +189,8 @@ try{
           assert.ok(controls.logo.left>=controls.header.left-2 && controls.logo.right<=controls.header.right+2,name+" full brand outside header");
           assert.ok(controls.menu.left>=controls.header.left-2 && controls.fx.right<=controls.header.right+2,name+" header controls outside bounds");
           assert.ok(controls.header.height<=96,name+" mobile header is too thick");
-          assert.ok(Math.abs((controls.logo.left+controls.logo.right)/2-(controls.header.left+controls.header.right)/2)<=2,name+" brand not centered");
+          assert.ok(Math.abs((controls.logo.left+controls.logo.right)/2-(controls.header.left+controls.header.right)/2)<=2,
+            name+" brand not centered: "+JSON.stringify(controls));
           assert.ok(controls.menu.right+3<=controls.logo.left,name+" menu and brand overlap");
           assert.ok(controls.logo.right+3<=controls.fx.left,name+" brand and FX overlap");
           assert.ok(controls.eyebrow.top-controls.header.bottom>=135 && controls.eyebrow.top-controls.header.bottom<=240,name+" hero top gap out of range");
