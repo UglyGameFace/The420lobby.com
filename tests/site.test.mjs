@@ -124,7 +124,9 @@ test("Dank Shield card uses uploaded official brand artwork, not fabricated shie
   assert.equal(image.subarray(4,12).toString("ascii"),"ftypavif");
   assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-logo\.avif"/);
   assert.doesNotMatch(html,/class="shield-mark"/);
-  assert.match(css,/\.dank-shield-brand-art\{position:relative;/);
+  assert.match(css,/\.dank-shield-brand-art\{position:absolute;z-index:1;top:0;left:0;display:block;width:100%/);
+  assert.match(css,/mask-image:linear-gradient\(to bottom/);
+  assert.doesNotMatch(css,/\.shield-visual::before\{content:"";/);
   assert.doesNotMatch(css,/\.shield-mark\{/);
 });
 
