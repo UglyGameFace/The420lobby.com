@@ -78,7 +78,7 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.doesNotMatch(html, /<span class="logo-type">THE 420/);
   assert.doesNotMatch(css,/\.header-shell\{height:130px/);
   assert.match(html, /ENTER THE LOBBY<\/span>/);
-  assert.match(html, /class="hero-smoke-trail"/);
+  assert.match(html, /class="hero-smoke-trail" src="\/assets\/approved-left-smoke\.svg"/);
   assert.match(css, /\.hero-smoke-trail\{display:block/);
   assert.match(html, /class="fx-switch"/);
 });
