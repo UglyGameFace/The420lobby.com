@@ -30,11 +30,11 @@ try{
         const errors=[];
         page.on("pageerror",e=>errors.push(e.message));
         const cssFailures=[];
-        page.on("requestfailed",request=>{if(request.url().endsWith(".css"))cssFailures.push(request.url()+": "+request.failure()?.errorText);});
+        page.on("requestfailed",request=>{if(new URL(request.url()).pathname.endsWith(".css"))cssFailures.push(request.url()+": "+request.failure()?.errorText);});
         await page.goto(url,{waitUntil:"domcontentloaded"});
         try {
           await page.waitForFunction(() => {
-            const site=document.querySelector('link[href="/styles.css"]');
+            const site=document.querySelector('link[href^="/styles.css"]');
             const arcade=document.querySelector('link[href="/sesh-signal-v3.css"]');
             const hero=document.querySelector(".hero");
             return !!site?.sheet && !!arcade?.sheet && !!hero &&
@@ -43,7 +43,7 @@ try{
           }, {timeout:11000});
         }catch(error){
           const detail=await page.evaluate(()=>{
-            const base=document.querySelector('link[href="/styles.css"]');
+            const base=document.querySelector('link[href^="/styles.css"]');
             const arcade=document.querySelector('link[href="/sesh-signal-v3.css"]');
             return {baseLoaded:!!base?.sheet,arcadeLoaded:!!arcade?.sheet,
               heroOverflow:getComputedStyle(document.querySelector(".hero")).overflowX,
@@ -66,6 +66,28 @@ try{
         });
         assert.ok(await countPaintedPixels(page.locator(".logo-smoke"))>200,name+" smoke logo paints no pixels");
         assert.ok(await countPaintedPixels(page.locator(".cheers-art"))>200,name+" photographic Cheers art paints no pixels");
+        const composition=await page.evaluate(()=>{
+          const rect=s=>document.querySelector(s).getBoundingClientRect();
+          const after=rect(".hero-heading-cheers > span:first-child"),
+                cheers=rect(".headline-cheers"),art=rect(".cheers-art"),
+                play=rect(".hero-heading-cheers > span.headline-highlight"),
+                scene=rect(".hero-scene");
+          return {afterBottom:after.bottom,cheersTop:cheers.top,cheersBottom:cheers.bottom,
+            artTop:art.top,artBottom:art.bottom,playTop:play.top,sceneTop:scene.top,
+            pseudo:getComputedStyle(document.querySelector(".headline-cheers"),"::before").content};
+        });
+        assert.equal(composition.pseudo,"none",name+" duplicate CHEERS pseudo text");
+        assert.ok(Math.abs(composition.artTop-composition.cheersTop)<=3 &&
+          Math.abs(composition.artBottom-composition.cheersBottom)<=3,
+          name+" detached CHEERS artwork: "+JSON.stringify(composition));
+        assert.ok(composition.cheersTop-composition.afterBottom>=-10 &&
+          composition.cheersTop-composition.afterBottom<=20,
+          name+" giant AFTER/CHEERS gap: "+JSON.stringify(composition));
+        assert.ok(composition.playTop-composition.cheersBottom>=-10 &&
+          composition.playTop-composition.cheersBottom<=24,
+          name+" giant CHEERS/PLAY gap: "+JSON.stringify(composition));
+        if(mobile) assert.ok(composition.sceneTop>=-8 && composition.sceneTop<=15,
+          name+" displaced controller scene: "+JSON.stringify(composition));
         if(mobile){
           assert.ok(await page.locator(".cheers-leaf").isVisible(),name+" mobile leaf not visible beside Cheers");
           assert.ok(await countPaintedPixels(page.locator(".cheers-leaf"))>100,name+" leaf artwork paints no pixels");
