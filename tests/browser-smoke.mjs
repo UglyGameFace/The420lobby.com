@@ -171,14 +171,39 @@ try {
     assert.ok(smokeMargins.edge < Math.max(4,smokeMargins.total*.005),
       "smoke numerals bleed past their artwork boundaries");
     assert.equal(await page.locator(".reality-prism").count(),1,"optical prism missing");
-    const cheersArt=await page.locator(".headline-cheers").evaluate(el=>{
-      const r=el.getBoundingClientRect();
-      const roll=el.querySelector(".cheers-roll img").getBoundingClientRect();
-      const font=getComputedStyle(el).fontFamily;
-      return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,rollHeight:roll.height,font};
+    const cheersArt=await page.evaluate(()=>{
+      const rect=s=>{
+        const r=document.querySelector(s).getBoundingClientRect();
+        return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};
+      };
+      return {
+        cheers:rect(".headline-cheers"),artwork:rect(".cheers-art"),
+        leaf:rect(".cheers-leaf"),joint:rect(".cheers-roll img"),
+        after:rect(".hero-heading-cheers > span:first-child"),
+        play:rect(".hero-heading-cheers > span.headline-highlight"),
+        scene:rect(".hero-scene"),
+        pseudo:getComputedStyle(document.querySelector(".headline-cheers"),"::before").content
+      };
     });
-    assert.ok(cheersArt.rollHeight>8,"joint must be visibly scaled");
-    assert.ok(cheersArt.left>=0 && cheersArt.right<=scenario.size.width+2,
+    assert.equal(cheersArt.pseudo,"none","old CHEERS text still painted behind image");
+    assert.ok(cheersArt.joint.height>8,"joint must be visibly scaled");
+    assert.ok(cheersArt.artwork.top>=cheersArt.cheers.top-3 &&
+      cheersArt.artwork.bottom<=cheersArt.cheers.bottom+3,
+      "CHEERS smoke image detached from its line: "+JSON.stringify(cheersArt));
+    assert.ok(cheersArt.cheers.top-cheersArt.after.bottom>=-10 &&
+      cheersArt.cheers.top-cheersArt.after.bottom<=20,
+      "extra gap between AFTER and CHEERS: "+JSON.stringify(cheersArt));
+    assert.ok(cheersArt.play.top-cheersArt.cheers.bottom>=-10 &&
+      cheersArt.play.top-cheersArt.cheers.bottom<=24,
+      "extra gap between CHEERS and WE PLAY: "+JSON.stringify(cheersArt));
+    if(scenario.mobile){
+      assert.ok(cheersArt.scene.top>=-8 && cheersArt.scene.top<=15,
+        "controller/CRT background must anchor at hero top: "+JSON.stringify(cheersArt));
+      assert.ok(cheersArt.leaf.left<cheersArt.cheers.right+25 &&
+        cheersArt.leaf.bottom>=cheersArt.cheers.top && cheersArt.leaf.top<=cheersArt.cheers.bottom,
+        "leaf must frame CHEERS, not float away: "+JSON.stringify(cheersArt));
+    }
+    assert.ok(cheersArt.cheers.left>=0 && cheersArt.cheers.right<=scenario.size.width+2,
       "Cheers text must fit viewport: "+JSON.stringify(cheersArt));
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
     assert.ok(overflow<=2,scenario.name+" horizontal overflow "+overflow+"px");
