@@ -78,3 +78,10 @@ html.fx-off{scroll-behavior:auto}html.fx-off *,html.fx-off *::before,html.fx-off
 @media(max-width:760px){.shield-card .dank-shield-brand-art{top:72px;width:min(42%,174px);max-height:192px}.shield-card .card-info h3{font-size:clamp(55px,12vw,78px)}.shield-card .card-body{padding-top:0}}
 /* Do not show a rectangular product photograph behind the hero headline. */
 .lounge-xbox-controller{display:none}
+
+/* Corrective layout: logo and title occupy separate zones, not overlapping layers. */
+.shield-card .card-info{min-height:670px}
+.shield-card .card-body{padding-top:0}
+.shield-card .dank-shield-brand-art{top:64px;width:min(43%,180px);max-height:190px}
+.shield-card .card-info h3{font-size:clamp(48px,5.8vw,86px);line-height:.94}
+@media(max-width:760px){.shield-card .card-info{min-height:670px}.shield-card .dank-shield-brand-art{top:66px;width:min(40%,154px);max-height:168px}.shield-card .card-info h3{font-size:clamp(48px,11vw,70px);line-height:.96}.shield-card .card-body{margin-top:auto}}
