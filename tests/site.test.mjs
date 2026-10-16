@@ -123,8 +123,12 @@ test("Dank Shield card uses the exact approved full-card PNG and preserves an ac
   assert.ok(html.includes('class="dank-shield-brand-art" src="/assets/file_00000000b25c822f94a1d2b422440108.png"'));
   assert.ok(!html.includes('dank-shield-original.svg'));
   assert.ok(html.includes('class="shield-card-hitarea" aria-label="Meet the tech: Dank Shield"'));
-  assert.ok(css.includes('.shield-card{aspect-ratio:2/3;min-height:0'));
-  assert.ok(css.includes('object-fit:fill'));
+  assert.match(css, /\.experience-grid > \.shield-card\{[\s\S]*?aspect-ratio:2\/3;/);
+  assert.match(css, /\.experience-grid > \.shield-card \.dank-shield-brand-art\{[\s\S]*?object-fit:contain;/);
+  assert.doesNotMatch(css, /\.experience-grid>\.shield-card\{aspect-ratio:auto;min-height:670px/);
+  assert.doesNotMatch(css, /\.experience-grid>\.shield-card \.dank-shield-brand-art\{[^}]*object-fit:cover/);
+  assert.doesNotMatch(css, /transform:scale\(1\.14\)/);
+  assert.ok(css.includes('.shield-card-hitarea:focus-visible'));
 });
 
 test("all advertised community experiences remain present", () => {
