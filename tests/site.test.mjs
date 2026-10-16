@@ -151,9 +151,9 @@ test("CSS has original haunted experience and mobile/performance fallbacks",()=>
 });
 
 test("static Pages hosting remains build-free", () => {
-  assert.match(html,/<link rel="stylesheet" href="\/styles\.css">/);
+  assert.match(html,/<link rel="stylesheet" href="\/styles\.css\?v=20261016-hero3">/);
   assert.match(html,/<link rel="stylesheet" href="\/sesh-signal-v3\.css">/);
-  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css">/);
+  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css\?v=20261016-hero3">/);
   assert.match(html,/<script defer src="\/script\.js"><\/script>/);
   assert.match(html,/<script defer src="\/visual-engine\.js"><\/script>/);
   assert.doesNotMatch(html,/https?:\/\/cdn\..*\/.*\.js/);
@@ -207,7 +207,7 @@ test("custom arcade styling supports touch, keyboard, and phones", () => {
 
 
 test("arcade CSS is independently versioned and not hidden in stale global styles", () => {
-  assert.match(html, /href="\/styles\.css">[\s\S]*href="\/sesh-signal-v3\.css">/);
+  assert.match(html, /href="\/styles\.css\?v=20261016-hero3">[\s\S]*href="\/sesh-signal-v3\.css">/);
   assert.match(arcadeCss,/\.sesh-arcade\{/);
   assert.match(arcadeCss,/\.sesh-stage\{/);
   assert.match(arcadeCss,/\.arcade-machine\{/);
