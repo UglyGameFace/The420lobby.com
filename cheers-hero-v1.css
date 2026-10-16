@@ -35,6 +35,7 @@
   object-fit:fill;
   pointer-events:none;
   filter:drop-shadow(0 0 7px rgba(220,247,210,.3));
+  animation:cheers-smoke-hover 8s ease-in-out infinite alternate;
 }
 .hero-heading-cheers .cheers-leaf{
   display:none;
@@ -59,6 +60,28 @@
   width:100%;
   height:100%;
   object-fit:contain;
+}
+.hero-heading-cheers .cheers-roll::after{
+  content:"";
+  position:absolute;
+  z-index:1;
+  right:9%;
+  top:40%;
+  width:.2em;
+  height:.2em;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,243,174,.95) 0%,rgba(255,165,57,.75) 36%,rgba(231,57,19,.34) 65%,transparent 100%);
+  filter:blur(1px);
+  pointer-events:none;
+  animation:cheers-ember-pulse 2.2s ease-in-out infinite alternate;
+}
+@keyframes cheers-smoke-hover {
+  from {opacity:.94;transform:translateY(.008em) scale(1)}
+  to {opacity:1;transform:translateY(-.027em) scale(1.008)}
+}
+@keyframes cheers-ember-pulse {
+  from {opacity:.65;transform:scale(.9)}
+  to {opacity:1;transform:scale(1.18)}
 }
 @media(max-width:1130px){
   .hero-heading.hero-heading-cheers{font-size:clamp(78px,10.6vw,138px)}
@@ -92,7 +115,8 @@
   .hero-heading-cheers .cheers-leaf{right:-11%;width:49%}
 }
 @media(prefers-reduced-motion:reduce){
-  .hero-heading-cheers .cheers-art,.hero-heading-cheers .cheers-roll{animation:none}
+  .hero-heading-cheers .cheers-art,
+  .hero-heading-cheers .cheers-roll::after{animation:none}
 }
 html.fx-off .hero-heading-cheers .cheers-art,
-html.fx-off .hero-heading-cheers .cheers-roll{animation:none}
+html.fx-off .hero-heading-cheers .cheers-roll::after{animation:none}
