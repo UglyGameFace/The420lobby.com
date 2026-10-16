@@ -131,8 +131,8 @@ try {
         const r=el.getBoundingClientRect();
         return {left:r.left,right:r.right,width:r.width,viewport:innerWidth};
       });
-      assert.ok(controller.width>=100 && controller.left>=-3 && controller.right<=controller.viewport+3,
-        "real Xbox controller is clipped outside the mobile viewport: "+JSON.stringify(controller));
+      assert.equal(controller.width,0,
+        "unretouched controller photo must remain hidden until a clean licensed cutout is integrated: "+JSON.stringify(controller));
     }
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
     assert.equal(await page.locator("img.logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");
