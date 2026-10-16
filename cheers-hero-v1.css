@@ -27,6 +27,7 @@
 }
 .hero-heading-cheers .cheers-art{
   display:block;
+  font-size:inherit;
   position:absolute;
   z-index:2;
   inset:0;
