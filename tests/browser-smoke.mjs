@@ -294,7 +294,7 @@ try {
     }
     if(scenario.name==="desktop" || scenario.name==="mobile" || scenario.name==="narrow-mobile") {
       await page.locator("#sesh-signal").scrollIntoViewIfNeeded();
-      await page.locator(".arcade-machine").screenshot({path:"artifacts/"+scenario.name+"-arcade-styled.png",animations:"disabled",timeout:10000});
+      page.screenshot({path:"artifacts/"+scenario.name+"-arcade-styled.png",animations:"disabled",timeout:30000});
     }
     await page.screenshot({path:"artifacts/"+scenario.name+".png",animations:"disabled",timeout:10000});
     for (const selector of ["#vibe","#experiences","#sesh-signal",".hangout-card",".shield-card",".cinema-card",".minecraft-card","#after-dark",".community-proof","#join"]) {
@@ -309,10 +309,13 @@ try {
   }
   // Regression: an old browser-cached copy of styles.css must NOT erase the game.
   const stale=await browser.newPage({viewport:{width:390,height:844}});
-  await stale.route("**/styles.css",route=>route.fulfill({
-    status:200,contentType:"text/css",body:":root{--lime:#b8f875} body{margin:0}"
-  }));
+  let staleCssIntercepted=false;
+  await stale.route(/\/styles\.css(?:\?.*)?$/,route=>{
+    staleCssIntercepted=true;
+    return route.fulfill({status:200,contentType:"text/css",body:":root{--lime:#b8f875} body{margin:0}"});
+  });
   await stale.goto(address,{waitUntil:"domcontentloaded"});
+  assert.ok(staleCssIntercepted,"stale CSS regression did not intercept versioned global stylesheet");
   const resilient=await stale.evaluate(()=>{
     const arcade=document.querySelector(".arcade-layout");
     const stage=document.querySelector("#sesh-stage");
