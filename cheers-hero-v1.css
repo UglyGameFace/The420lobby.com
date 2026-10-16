@@ -48,8 +48,8 @@
   display:block;
   width:85%;
   left:12%;
-  bottom:-.12em;
-  height:.29em;
+  bottom:-.25em;
+  height:.58em;
   pointer-events:none;
   transform:rotate(-1.2deg);
   filter:drop-shadow(0 4px 7px rgba(0,0,0,.65));
@@ -72,24 +72,24 @@
   }
   .hero-heading-cheers .cheers-leaf{
     display:block;
-    width:41%;
-    height:2.25em;
-    right:-19%;
-    top:-.55em;
+    width:55%;
+    height:2.8em;
+    right:-15%;
+    top:-.48em;
     object-fit:contain;
     filter:brightness(1.2) saturate(1.12) drop-shadow(0 2px 10px rgba(38,98,39,.22));
   }
-  .hero-heading-cheers .cheers-roll{width:88%;left:13%;bottom:-.13em}
+  .hero-heading-cheers .cheers-roll{width:89%;left:12%;bottom:-.25em}
 }
 @media(max-width:420px){
   .hero-heading.hero-heading-cheers{font-size:clamp(57px,13.1vw,78px)}
   .hero-heading-cheers .headline-cheers{width:min(4.05em,84%)}
-  .hero-heading-cheers .cheers-leaf{width:40%;right:-14%;top:-.51em}
+  .hero-heading-cheers .cheers-leaf{width:55%;right:-15%;top:-.48em}
 }
 @media(max-width:360px){
   .hero-heading.hero-heading-cheers{font-size:clamp(50px,13.4vw,59px)}
-  .hero-heading-cheers .headline-cheers{width:min(6.1em,91%)}
-  .hero-heading-cheers .cheers-leaf{right:-10%;width:36%}
+  .hero-heading-cheers .headline-cheers{width:min(4.05em,84%)}
+  .hero-heading-cheers .cheers-leaf{right:-11%;width:49%}
 }
 @media(prefers-reduced-motion:reduce){
   .hero-heading-cheers .cheers-art,.hero-heading-cheers .cheers-roll{animation:none}
