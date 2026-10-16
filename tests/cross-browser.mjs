@@ -53,6 +53,19 @@ try{
         }
         await page.locator("#hero-heading").waitFor({state:"visible"});
         assert.equal(await page.locator(".logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed smoke logo load");
+        const countPaintedPixels = async locator => locator.evaluate(img => {
+          const c=document.createElement("canvas");
+          c.width=img.naturalWidth;
+          c.height=img.naturalHeight;
+          const ctx=c.getContext("2d");
+          ctx.drawImage(img,0,0);
+          const px=ctx.getImageData(0,0,c.width,c.height).data;
+          let painted=0;
+          for(let i=3;i<px.length;i+=4) if(px[i]>24) painted++;
+          return painted;
+        });
+        assert.ok(await countPaintedPixels(page.locator(".logo-smoke"))>200,name+" smoke logo paints no pixels");
+        assert.ok(await countPaintedPixels(page.locator(".cheers-art"))>200,name+" photographic Cheers art paints no pixels");
         assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed joint art load");
         assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,");
         assert.equal(await page.locator(".sesh-item").count(),0,"No targets before start");
