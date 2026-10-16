@@ -109,7 +109,7 @@ try {
       };
       return {viewport:window.innerWidth,header:get(".header-shell"),logo:get(".logo"),
         mark:get(".logo-smoke"),fx:get("#fx-toggle"),menu:get("#menu-toggle"),
-        heading:get("#hero-heading"),smokeLabel:get(".scene-label")};
+        heading:get("#hero-heading"),eyebrow:get(".hero-copy-block .eyebrow"),smokeLabel:get(".scene-label")};
     });
     if(scenario.mobile){
       assert.ok(layout.mark.top >= 0,"smoke 420 image must not crop above the viewport");
@@ -118,14 +118,13 @@ try {
         "full brand must fit inside the header");
       assert.ok(layout.menu.left >= layout.header.left-2 && layout.fx.right <= layout.header.right+2,
         "header controls must fit inside the header");
-      assert.ok(layout.menu.right+3 <= layout.fx.left, "effects and menu buttons overlap");
-      if(layout.viewport<=460){
-        assert.ok(layout.logo.top >= Math.max(layout.menu.bottom,layout.fx.bottom)-2,
-          "narrow mobile brand and header controls overlap vertically");
-      }else{
-        assert.ok(layout.menu.right+3 <= layout.logo.left, "menu and brand overlap");
-        assert.ok(layout.logo.right+3 <= layout.fx.left, "brand and FX controls overlap");
-      }
+      assert.ok(layout.header.height <= 102, "mobile header grew too tall");
+      assert.ok(Math.abs((layout.logo.left+layout.logo.right)/2-(layout.header.left+layout.header.right)/2)<=2,
+        "full THE LOBBY 420 logo is not centered");
+      assert.ok(layout.menu.right+3 <= layout.logo.left, "menu and brand overlap");
+      assert.ok(layout.logo.right+3 <= layout.fx.left, "brand and FX controls overlap");
+      assert.ok(layout.eyebrow.top-layout.header.bottom>=55 && layout.eyebrow.top-layout.header.bottom<=260,
+        "gap between header and After Cheers is too small or too big");
       assert.ok(layout.heading.left >= 0 && layout.heading.right <= layout.viewport+2,
         "hero headline exceeds mobile viewport");
       assert.equal(await page.locator(".scene-label").first().evaluate(el=>getComputedStyle(el).display),"none",
