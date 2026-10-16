@@ -95,11 +95,18 @@ try{
           assert.equal(await page.locator("#menu-toggle").getAttribute("aria-expanded"),"false");
           const controls=await page.evaluate(()=>{
             const rect=selector=>document.querySelector(selector).getBoundingClientRect();
-            return {mark:rect(".logo-smoke"),fx:rect("#fx-toggle"),menu:rect("#menu-toggle"),header:rect(".header-shell")};
+            return {logo:rect(".logo"),mark:rect(".logo-smoke"),fx:rect("#fx-toggle"),menu:rect("#menu-toggle"),header:rect(".header-shell")};
           });
           assert.ok(controls.mark.bottom<=controls.header.bottom+2,name+" smoke artwork outside header");
-          assert.ok(controls.mark.right+3<=controls.fx.left,name+" header logo and FX overlap");
-          assert.ok(controls.fx.right+3<=controls.menu.left,name+" FX and menu overlap");
+          assert.ok(controls.logo.left>=controls.header.left-2 && controls.logo.right<=controls.header.right+2,name+" full brand outside header");
+          assert.ok(controls.menu.left>=controls.header.left-2 && controls.fx.right<=controls.header.right+2,name+" header controls outside bounds");
+          assert.ok(controls.menu.right+3<=controls.fx.left,name+" FX and menu overlap");
+          if(width<=460){
+            assert.ok(controls.logo.top>=Math.max(controls.menu.bottom,controls.fx.bottom)-2,name+" stacked mobile brand touches controls");
+          }else{
+            assert.ok(controls.menu.right+3<=controls.logo.left,name+" menu and brand overlap");
+            assert.ok(controls.logo.right+3<=controls.fx.left,name+" brand and FX overlap");
+          }
         }
         await page.evaluate(()=>{Math.random=()=>0.5;});
         await page.locator("#sesh-start").click();
