@@ -68,15 +68,7 @@
 <circle cx="756" cy="685" r="6" fill="#588c62"/>
 <!-- The old pedestal was exposed as a floating bar after the controller was scaled back. The framed monitor is intentionally stand-free. -->
 </g>
-<!-- Gaming controller: smaller and farther back than the CRT, with room for the headline. -->
-<g id="lounge-controller" filter="url(#shadow)" transform="translate(225 245) scale(.75)" opacity=".6">
-<path d="M340 758c25-11 46-8 70-2 30 7 139 4 160-4 24-9 52-3 72 19 17 20 28 69 18 94-5 16-19 23-31 16-11-6-20-25-31-36l-32-28H408l-31 31c-13 14-23 30-37 28-19-3-23-16-24-34-3-38 2-67 24-84Z" fill="#192b28" stroke="#a4d194" stroke-width="4"/>
-<path d="M344 774q20-16 59-4 27 9 157 3 53-15 72 9" stroke="#d3ffb5" stroke-opacity=".48" stroke-width="4" fill="none"/>
-<path d="M381 782h16v19h20v16h-20v18h-16v-18h-20v-16h20Z" fill="#98cb84"/>
-<g fill="#315d45" stroke="#c7ecad" stroke-width="3"><circle cx="578" cy="789" r="11"/><circle cx="608" cy="815" r="11"/><circle cx="549" cy="815" r="11"/><circle cx="577" cy="838" r="11"/></g>
-<circle cx="452" cy="829" r="19" fill="#0a1b1a" stroke="#739b77" stroke-width="3"/><circle cx="528" cy="829" r="19" fill="#0a1b1a" stroke="#739b77" stroke-width="3"/>
-<rect x="473" y="783" width="30" height="8" rx="4" fill="#a5d993" opacity=".55"/>
-</g>
+<!-- Xbox controller is rendered by the image in the hero scene; no duplicate hand-drawn controller. -->
 <!-- Graveyard silhouettes and hanging tendrils for spookiness -->
 <path d="M89 757V596l38-61 30 61v153M875 747V604l-39-65-29 65v143" stroke="#152a21" stroke-width="26" fill="none"/>
 <path d="M97 577q-13-79 8-132M882 584q5-69-28-136" stroke="#3a5d49" stroke-opacity=".7" stroke-width="7" fill="none"/>

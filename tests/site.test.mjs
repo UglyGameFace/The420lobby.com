@@ -71,8 +71,10 @@ test("approved natural leaf art replaces the old geometric foreground", () => {
   assert.match(leaf, /data:image\/png;base64,/);
   assert.match(leaf, /viewBox="0 0 130 185"/);
   assert.match(html, /src="\/assets\/approved-leaf\.svg" class="botanical-foreground/);
-  assert.match(lounge, /gaming controller/i);
-  assert.match(lounge, /id="lounge-controller"[^>]*scale\(\.75\)/);
+  assert.match(lounge, /controller is rendered by the image in the hero scene/i);
+  assert.doesNotMatch(lounge, /id="lounge-controller"/, "do not keep the fake drawn gamepad");
+  assert.match(html, /class="lounge-xbox-controller scene-layer" src="https:\/\/thumb\.wikimedia\.org\/wikipedia\/commons\/thumb\/6\/60\/Xbox-360-Controller-Black\.png\/960px-Xbox-360-Controller-Black\.png"/);
+  assert.match(css, /\.lounge-xbox-controller\{position:absolute;/);
   assert.doesNotMatch(lounge, /d="M388 777h223"/);
   assert.doesNotMatch(lounge, /d="M435 732h134l17 44H414Z"/);
   assert.match(icon, /haunted|ghost|\/svg>/i);
@@ -90,7 +92,8 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(css,/\.fx-toggle #fx-label\{display:none\}/);
   assert.match(css,/\.scene-label\{display:none\}/);
   assert.match(html, /class="logo-type logo-prefix">THE<\/span><img class="logo-smoke"[^>]+><span class="logo-type logo-suffix">LOBBY/);
-  assert.match(css,/\.logo-smoke\{position:absolute;z-index:1;left:clamp\(16px,5vw,25px\)/);
+  assert.match(css,/\.logo-smoke\{position:absolute;z-index:1;left:clamp\(26px,8vw,39px\)/);
+  assert.doesNotMatch(html,/class="logo-dot"/);
   assert.doesNotMatch(html, /<span class="logo-type">THE 420/);
   assert.doesNotMatch(css,/\.header-shell\{height:130px/);
   assert.match(html, /ENTER THE LOBBY<\/span>/);
