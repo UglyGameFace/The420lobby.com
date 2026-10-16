@@ -102,6 +102,10 @@ try {
 
     assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),4);
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
+    await page.locator(".leaf-seal").scrollIntoViewIfNeeded();
+    await page.locator(".leaf-seal img.seal-cannabis-photo").evaluate(img => img.decode());
+    assert.ok(await page.locator(".leaf-seal img.seal-cannabis-photo").evaluate(img => img.complete && img.naturalWidth>0),
+      "photographic Good Stuff badge leaf failed to load");
     await page.locator(".hangout-card").scrollIntoViewIfNeeded();
     await page.locator("img.card-foliage-photo").evaluate(img=>img.decode());
     assert.ok(await page.locator("img.card-foliage-photo").evaluate(img=>img.naturalWidth>0),
