@@ -83,7 +83,8 @@ test("approved natural leaf art replaces the old geometric foreground", () => {
   assert.match(css, /\.card-foliage-photo\{position:absolute;/);
   assert.match(lounge, /controller is rendered by the image in the hero scene/i);
   assert.doesNotMatch(lounge, /id="lounge-controller"/, "do not keep the fake drawn gamepad");
-  assert.match(html, /class="lounge-xbox-controller scene-layer" src="https:\/\/thumb\.wikimedia\.org\/wikipedia\/commons\/thumb\/6\/60\/Xbox-360-Controller-Black\.png\/960px-Xbox-360-Controller-Black\.png"/);
+  assert.match(html, /class="lounge-xbox-controller scene-layer" src="https:\/\/commons\.wikimedia\.org\/wiki\/Special:Redirect\/file\/Xbox_Series_Controller_Carbon_Black\.jpg"/);
+  assert.match(css, /\.lounge-xbox-controller\{display:none\}/, "do not display a rectangular controller photograph behind the hero");
   assert.match(css, /\.lounge-xbox-controller\{position:absolute;/);
   assert.doesNotMatch(lounge, /d="M388 777h223"/);
   assert.doesNotMatch(lounge, /d="M435 732h134l17 44H414Z"/);
