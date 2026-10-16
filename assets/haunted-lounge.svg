@@ -69,7 +69,7 @@
 <path d="M435 732h134l17 44H414Z" fill="#203a32"/>
 <path d="M388 777h223" stroke="#6a9572" stroke-width="18" stroke-linecap="round"/>
 </g>
-<!-- Restrained controller: smaller and farther back than the CRT, with room for the headline. -->
+<!-- Gaming controller: smaller and farther back than the CRT, with room for the headline. -->
 <g id="lounge-controller" filter="url(#shadow)" transform="translate(225 245) scale(.75)" opacity=".6">
 <path d="M340 758c25-11 46-8 70-2 30 7 139 4 160-4 24-9 52-3 72 19 17 20 28 69 18 94-5 16-19 23-31 16-11-6-20-25-31-36l-32-28H408l-31 31c-13 14-23 30-37 28-19-3-23-16-24-34-3-38 2-67 24-84Z" fill="#192b28" stroke="#a4d194" stroke-width="4"/>
 <path d="M344 774q20-16 59-4 27 9 157 3 53-15 72 9" stroke="#d3ffb5" stroke-opacity=".48" stroke-width="4" fill="none"/>
