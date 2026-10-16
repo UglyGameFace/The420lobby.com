@@ -113,6 +113,7 @@ try {
     assert.ok(await countPaintedPixels(page.locator("img.logo-smoke"))>200,"smoke logo SVG loaded but is invisible");
     assert.ok(await countPaintedPixels(page.locator("img.cheers-art"))>200,"CHEERS smoke art loaded but is invisible");
     assert.ok(await countPaintedPixels(page.locator("img.botanical-foreground"))>100,"new leaf asset loaded but is invisible");
+    if(scenario.mobile) assert.ok(await countPaintedPixels(page.locator("img.hero-smoke-trail"))>100,"natural left smoke image is invisible");
     assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,"approved joint art failed to load");
     assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,","hero slogan regressed");
     assert.equal(await page.locator(".logo-glyph").count(),0,"outdated sticky-note mark still present");
