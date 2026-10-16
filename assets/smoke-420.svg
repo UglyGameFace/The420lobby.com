@@ -23,11 +23,13 @@
 </defs>
 <!-- The digits 420 rendered as smoky lettering, not a hard outline or background cloud. -->
 <g font-family="Arial Black,Impact,sans-serif" font-size="148" font-weight="900" letter-spacing="-10">
- <text x="23" y="129" fill="#bfeaba" opacity=".43" filter="url(#smoke-haze)">420</text>
+ <text x="23" y="129" fill="#bfeaba" opacity=".52" filter="url(#smoke-haze)">420</text>
+ <text x="23" y="129" fill="#e1f8df" opacity=".24" filter="url(#smoke-wisp)">420</text>
  <text x="23" y="129" fill="url(#vapor)" filter="url(#smoke-edge)">420</text>
 </g>
-<g fill="none" stroke="#d8eade" stroke-linecap="round" opacity=".42" filter="url(#smoke-wisp)">
- <path d="M48 36C24 12 70 4 42-23M119 27C95 0 135-10 115-32M205 32C186 10 232-2 207-29M275 34C251 11 297 1 275-30M358 33C334 2 372-8 360-29" stroke-width="7"/>
- <path d="M30 107C8 83 29 65 14 42M391 83C423 57 397 35 425 9M69 139C51 158 85 177 61 197M320 135C307 155 340 168 327 192" stroke-width="5"/>
+<g fill="none" stroke="#d8f5d6" stroke-linecap="round" filter="url(#smoke-wisp)">
+ <path d="M15 99C-3 65 66 48 40 21S78-18 64-29M99 116C148 77 88 52 135 15S162-14 150-30M194 126C151 88 236 73 191 42S251-12 232-30" stroke-width="14" opacity=".49"/>
+ <path d="M266 119C307 78 247 50 298 21S326-19 334-30M353 125C389 93 338 69 394 33S411-5 427-27" stroke-width="11" opacity=".37"/>
+ <path d="M18 131C-7 153 44 173 23 190M107 132C79 165 129 178 116 196M310 131C292 158 335 168 320 193" stroke-width="10" opacity=".33"/>
 </g>
 </svg>

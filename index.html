@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Cormorant+Garamond:wght@600&family=DM+Sans:wght@400;500;600;700&family=Unbounded:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="preload" href="/assets/haunted-lounge.svg" as="image" type="image/svg+xml">
-<link rel="preload" href="/assets/smoke-420.svg" as="image" type="image/svg+xml">
+<link rel="preload" href="/assets/approved-smoke-420.svg" as="image" type="image/svg+xml">
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/cheers-hero-v1.css">
 <link rel="stylesheet" href="/sesh-signal-v3.css">
@@ -29,7 +29,7 @@
 
 <header class="site-header" id="top">
   <div class="header-shell shell">
-    <a class="logo" href="#top" aria-label="The 420 Lobby home"><span class="logo-type logo-prefix">THE</span><img class="logo-smoke" src="/assets/smoke-420.svg" alt="" width="452" height="218" fetchpriority="high"><span class="logo-type logo-suffix">LOBBY<span class="logo-dot">.</span></span></a>
+    <a class="logo" href="#top" aria-label="The 420 Lobby home"><span class="logo-type logo-prefix">THE</span><img class="logo-smoke" src="/assets/approved-smoke-420.svg" alt="" width="120" height="85" fetchpriority="high"><span class="logo-type logo-suffix">LOBBY<span class="logo-dot">.</span></span></a>
     <nav class="desktop-nav" id="primary-nav" aria-label="Main navigation">
       <a href="#vibe">THE VIBE</a><a href="#experiences">WHAT WE DO</a><a href="#sesh-signal">PLAY THE ARCADE</a><a href="#after-dark">AFTER DARK</a>
       <a class="nav-join" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer">JOIN THE SERVER <span aria-hidden="true">↗</span></a>
@@ -49,10 +49,11 @@
     <div class="hero-background-rune rune-b" aria-hidden="true">✧</div>
     <div class="hero-background-rune rune-c" aria-hidden="true">✦</div>
 
+    <img class="hero-smoke-trail" src="/assets/approved-left-smoke.svg" width="160" height="190" alt="" decoding="async">
     <div class="hero-scene" id="hero-scene" aria-hidden="true">
       <div class="scene-arch scene-layer" data-depth=".18"></div>
       <img src="/assets/haunted-lounge.svg" class="lounge-illustration scene-layer" data-depth=".43" alt="" width="1000" height="1050" fetchpriority="high">
-      <img src="/assets/botanical-leaf.svg" class="botanical-foreground scene-layer" data-depth=".9" alt="" width="600" height="640" decoding="async">
+      <img src="/assets/approved-leaf.svg" class="botanical-foreground scene-layer" data-depth=".9" alt="" width="130" height="185" decoding="async">
       <div class="scene-cobweb scene-layer" data-depth=".22"></div>
       <div class="scene-spectral-glow"></div>
       <span class="scene-label label-one">[ THE LATE-NIGHT LOBBY ]</span>
@@ -66,19 +67,8 @@
           <span>AFTER</span>
           <span class="headline-cheers">
             <span class="cheers-word">CHEERS,</span>
-            <svg class="cheers-filter-defs" aria-hidden="true" width="0" height="0" focusable="false"><defs><filter id="cheers-letter-waver" x="-12%" y="-24%" width="124%" height="150%"><feTurbulence type="fractalNoise" baseFrequency=".012 .044" numOctaves="3" seed="5" result="distortion"/><feDisplacementMap in="SourceGraphic" in2="distortion" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs></svg>
-            <svg class="cheers-vapor" aria-hidden="true" viewBox="0 0 670 250" preserveAspectRatio="none" focusable="false">
-              <defs><filter id="cheers-wisp-displacement" x="-18%" y="-18%" width="136%" height="136%"><feTurbulence type="fractalNoise" baseFrequency=".013 .032" numOctaves="3" seed="8" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="11" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
-              <g filter="url(#cheers-wisp-displacement)">
-              <path d="M51 229 C3 181 90 156 54 118 S15 58 61 7"/>
-              <path class="thin-smoke" d="M129 244 C84 197 154 174 124 131 S93 60 135 1"/>
-              <path d="M303 242 C253 181 351 153 301 110 S272 41 308 4"/>
-              <path class="thin-smoke" d="M473 244 C428 186 510 164 468 120 S445 48 490 4"/>
-              <path d="M594 247 C557 202 629 177 597 141 S563 71 605 9"/>
-              <path class="thin-smoke" d="M223 248 C188 200 261 151 218 116 S221 45 263 7"/>
-              <path d="M386 247 C411 208 365 170 418 119 S392 47 426 0"/>
-              </g>
-            </svg>
+            <img class="cheers-art" src="/assets/approved-smoke-cheers.svg" alt="" width="200" height="45" decoding="async">
+            <img class="cheers-leaf" src="/assets/approved-leaf.svg" alt="" width="130" height="185" decoding="async">
             <span class="cheers-roll" aria-hidden="true"><img src="/assets/cheers-joint.svg" alt="" width="780" height="128" decoding="async"></span>
           </span>
           <span class="headline-highlight">WE PLAY<span class="final-dot">.</span></span>

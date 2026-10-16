@@ -11,10 +11,11 @@ const jointArt = read("assets/cheers-joint.svg");
 const arcadeCss = read("sesh-signal-v3.css");
 const client = read("script.js");
 const renderer = read("visual-engine.js");
-const leaf = read("assets/botanical-leaf.svg");
+const leaf = read("assets/approved-leaf.svg");
 const lounge = read("assets/haunted-lounge.svg");
 const icon = read("favicon.svg");
-const smokeLogo = read("assets/smoke-420.svg");
+const smokeLogo = read("assets/approved-smoke-420.svg");
+const cheersArt = read("assets/approved-smoke-cheers.svg");
 const game = read("sesh-signal.js");
 const gear = read("assets/sesh-gear.svg");
 
@@ -24,8 +25,8 @@ test("hero communicates a 420-friendly gaming community, not haunted house brand
   }
   assert.match(html,/id="hero-heading"/);
   assert.match(html,/src="\/assets\/haunted-lounge\.svg"/);
-  assert.match(html,/src="\/assets\/botanical-leaf\.svg"/);
-  assert.match(html,/src="\/assets\/smoke-420\.svg"/);
+  assert.match(html,/src="\/assets\/approved-leaf\.svg"/);
+  assert.match(html,/src="\/assets\/approved-smoke-420\.svg"/);
   const textOnly=html.replace(/<(?:img|meta|link)[^>]*>/g,"");
   assert.doesNotMatch(textOnly,/haunted|haunt|ghost towns|spooky/i);
   assert.doesNotMatch(html,/UNREAL VIBES|PICK YOUR REALITY|ON ANOTHER FREQUENCY/i);
@@ -40,7 +41,11 @@ test("approved Cheers hero retains actual text, independent motion and original 
   assert.match(html, /The 420 Lobby \| After Cheers, We Play/);
   assert.doesNotMatch(html, /headline-hollow">DARK,/);
   assert.match(cheersCss, /\.hero-heading-cheers \.headline-cheers/);
-  assert.match(cheersCss, /@keyframes cheers-rise/);
+  assert.match(html, /class="cheers-art" src="\/assets\/approved-smoke-cheers\.svg"/);
+  assert.match(cheersArt, /data:image\/png;base64,/);
+  assert.match(html, /class="cheers-leaf" src="\/assets\/approved-leaf\.svg"/);
+  assert.match(cheersCss, /\.hero-heading-cheers \.cheers-leaf\{display:block;position:absolute;z-index:1/);
+  assert.doesNotMatch(html,/class="cheers-vapor"/);
   assert.match(cheersCss, /html\.fx-off/);
   assert.match(cheersCss, /prefers-reduced-motion:reduce/);
   for(const width of ["max-width:760px","max-width:420px","max-width:360px"]) assert.ok(cheersCss.includes(width),width);
@@ -50,37 +55,33 @@ test("approved Cheers hero retains actual text, independent motion and original 
   assert.match(jointArt, /<\/svg>\s*$/);
 });
 
-test("custom botanical art uses seven distinct serrated and veined leaflets", () => {
-  assert.equal((leaf.match(/transform="rotate\(-?\d+ 300 464\)"/g)||[]).length,7);
-  assert.ok((leaf.match(/<path/g)||[]).length>35);
-  assert.match(leaf,/serrated leaflets/);
-  assert.match(leaf,/veins/);
-  assert.match(leaf,/<\/svg>\s*$/);
-  assert.match(lounge,/ghostly|phantom|spectral/i);
-  assert.match(lounge,/gaming controller/i);
-  assert.match(icon,/haunted|ghost|\/svg>/i);
+test("approved natural leaf art replaces the old geometric foreground", () => {
+  assert.match(leaf, /Organic green leaf from approved design/);
+  assert.match(leaf, /data:image\/png;base64,/);
+  assert.match(leaf, /viewBox="0 0 130 185"/);
+  assert.match(html, /src="\/assets\/approved-leaf\.svg" class="botanical-foreground/);
+  assert.match(lounge, /gaming controller/i);
+  assert.match(icon, /haunted|ghost|\/svg>/i);
 });
 
 test("custom smoke 420 brand has accessible branding without the old clipped square", () => {
-  assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/smoke-420\.svg"/);
+  assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/approved-smoke-420\.svg"/);
   assert.match(html, /class="logo"[^>]+aria-label="The 420 Lobby home"/);
-  assert.match(smokeLogo, /digits 420 rendered as smoky lettering/i);
-  assert.match(smokeLogo, /fractalNoise/);
-  assert.match(smokeLogo, /feDisplacementMap/);
-  assert.doesNotMatch(smokeLogo,/stroke-width="23"|stroke-width="16"|filter="url\(#aura\)"/);
-  assert.match(smokeLogo, /<svg[^>]*viewBox="-12 -32 452 218"/);
+  assert.match(smokeLogo, /Smoke-formed 420 lettering/);
+  assert.match(smokeLogo, /data:image\/png;base64,/);
+  assert.match(smokeLogo, /viewBox="0 0 120 85"/);
   assert.match(smokeLogo, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
-  assert.doesNotMatch(smokeLogo, /id="outer-cloud"/);
-  assert.doesNotMatch(smokeLogo, /id="billow"/);
   assert.doesNotMatch(html,/class="logo-glyph"/);
   assert.doesNotMatch(css,/\.logo-glyph/);
   assert.match(css,/\.fx-toggle #fx-label\{display:none\}/);
   assert.match(css,/\.scene-label\{display:none\}/);
   assert.match(html, /class="logo-type logo-prefix">THE<\/span><img class="logo-smoke"[^>]+><span class="logo-type logo-suffix">LOBBY/);
-  assert.match(css,/\.logo-smoke\{width:clamp\(78px,26vw,108px\)/);
+  assert.match(css,/\.logo-smoke\{position:absolute;z-index:1;left:clamp\(26px,8vw,35px\)/);
   assert.doesNotMatch(html, /<span class="logo-type">THE 420/);
   assert.doesNotMatch(css,/\.header-shell\{height:130px/);
   assert.match(html, /ENTER THE LOBBY<\/span>/);
+  assert.match(html, /class="hero-smoke-trail" src="\/assets\/approved-left-smoke\.svg"/);
+  assert.match(css, /\.hero-smoke-trail\{display:block/);
   assert.match(html, /class="fx-switch"/);
 });
 
