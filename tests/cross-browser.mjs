@@ -67,6 +67,16 @@ try{
           return painted;
         });
         assert.ok(await countPaintedPixels(page.locator(".logo-smoke"))>200,name+" smoke logo paints no pixels");
+        const zeroPixels=await page.locator(".logo-smoke").evaluate(img=>{
+          const c=document.createElement("canvas");c.width=245;c.height=116;
+          const context=c.getContext("2d");context.drawImage(img,0,0,245,116);
+          const bytes=context.getImageData(0,0,245,116).data;
+          let lit=0;
+          for(let y=14;y<105;y++)for(let x=180;x<236;x++)
+            if(bytes[(y*245+x)*4+3]>90)lit++;
+          return lit;
+        });
+        assert.ok(zeroPixels>350,name+" right-hand zero is missing from painted SVG: "+zeroPixels);
         assert.ok(await countPaintedPixels(page.locator(".cheers-art"))>200,name+" photographic Cheers art paints no pixels");
         const composition=await page.evaluate(()=>{
           const rect=s=>document.querySelector(s).getBoundingClientRect();
