@@ -49,6 +49,15 @@
     <div class="hero-background-rune rune-b" aria-hidden="true">✧</div>
     <div class="hero-background-rune rune-c" aria-hidden="true">✦</div>
 
+    <svg class="hero-smoke-trail" viewBox="0 0 260 500" aria-hidden="true" focusable="false">
+      <defs><filter id="ambient-smoke-curl" x="-40%" y="-25%" width="180%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".017 .035" numOctaves="3" seed="7" result="draft"/><feDisplacementMap in="SourceGraphic" in2="draft" scale="13" xChannelSelector="R" yChannelSelector="G"/><feGaussianBlur stdDeviation="2.1"/></filter></defs>
+      <g filter="url(#ambient-smoke-curl)" fill="none" stroke-linecap="round">
+        <path d="M42 480 C-30 411 151 378 84 310 S9 224 95 172 S42 75 123 3" stroke="#dbeadd" stroke-opacity=".58" stroke-width="9"/>
+        <path d="M66 489 C145 435 14 395 109 326 S180 235 100 196 S158 97 178 35" stroke="#d2edd0" stroke-opacity=".43" stroke-width="12"/>
+        <path d="M24 458 C121 423 187 373 138 312 S52 222 157 162 S229 92 180 11" stroke="#c4e9cd" stroke-opacity=".30" stroke-width="17"/>
+        <path d="M46 384 C93 353 41 305 104 274 M52 216 C10 175 77 135 58 82" stroke="#ebf4e7" stroke-opacity=".44" stroke-width="5"/>
+      </g>
+    </svg>
     <div class="hero-scene" id="hero-scene" aria-hidden="true">
       <div class="scene-arch scene-layer" data-depth=".18"></div>
       <img src="/assets/haunted-lounge.svg" class="lounge-illustration scene-layer" data-depth=".43" alt="" width="1000" height="1050" fetchpriority="high">
