@@ -64,7 +64,7 @@ test("custom botanical art uses seven distinct serrated and veined leaflets", ()
 test("custom smoke 420 brand has accessible branding without the old clipped square", () => {
   assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/smoke-420\.svg"/);
   assert.match(html, /class="logo"[^>]+aria-label="The 420 Lobby home"/);
-  assert.match(smokeLogo, /digits 420 are formed from translucent curling vapor and feathery smoke/i);
+  assert.match(smokeLogo, /digits 420 rendered as smoky lettering/i);
   assert.match(smokeLogo, /fractalNoise/);
   assert.match(smokeLogo, /feDisplacementMap/);
   assert.doesNotMatch(smokeLogo,/stroke-width="23"|stroke-width="16"|filter="url\(#aura\)"/);
@@ -76,7 +76,11 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.doesNotMatch(css,/\.logo-glyph/);
   assert.match(css,/\.fx-toggle #fx-label\{display:none\}/);
   assert.match(css,/\.scene-label\{display:none\}/);
-  assert.match(css,/\.logo-smoke\{width:124px;height:60px/);
+  assert.match(html, /class="logo-type logo-prefix">THE<\/span><img class="logo-smoke"[^>]+><span class="logo-type logo-suffix">LOBBY/);
+  assert.match(css,/\.logo-smoke\{width:clamp\(78px,26vw,108px\)/);
+  assert.doesNotMatch(html, /<span class="logo-type">THE 420/);
+  assert.doesNotMatch(css,/\.header-shell\{height:130px/);
+  assert.match(html, /ENTER THE LOBBY<\/span>/);
   assert.match(html, /class="fx-switch"/);
 });
 

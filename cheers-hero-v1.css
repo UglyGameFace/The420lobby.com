@@ -1,5 +1,5 @@
 /* The approved "After Cheers, We Play" headline is deliberately isolated from
-   the shared site and Sesh Signal styles. Preserve the original 420 header. */
+   the shared site and Sesh Signal styles. */
 .hero-heading.hero-heading-cheers{
   font-size:clamp(85px,10.6vw,167px);
   line-height:.81;
@@ -22,8 +22,8 @@
   color:#e4efdb;
   -webkit-text-stroke:.18px rgba(240,250,232,.22);
   text-shadow:
-    0 0 14px rgba(218,250,200,.38),
-    0 0 42px rgba(195,242,162,.22),
+    0 0 18px rgba(218,250,200,.49),
+    0 0 45px rgba(195,242,162,.34),
     0 3px 3px rgba(3,13,9,.8);
 }
 .hero-heading-cheers .cheers-word{
@@ -47,7 +47,7 @@
   font:inherit;
   letter-spacing:inherit;
   color:rgba(205,239,191,.56);
-  filter:blur(12px);
+  filter:blur(15px);
   pointer-events:none;
   animation:cheers-haze 6.5s ease-in-out infinite alternate;
 }
@@ -109,19 +109,19 @@
   height:1.9em;
   pointer-events:none;
   overflow:visible;
-  opacity:.8;
-  filter:blur(4.5px) drop-shadow(0 0 8px rgba(207,251,180,.28));
+  opacity:.93;
+  filter:blur(3.2px) drop-shadow(0 0 9px rgba(207,251,180,.42));
   animation:cheers-rise 9s ease-in-out infinite alternate;
 }
 .hero-heading-cheers .cheers-vapor path{
-  stroke:rgba(221,245,211,.40);
-  stroke-width:2.5;
+  stroke:rgba(221,245,211,.57);
+  stroke-width:3.5;
   fill:none;
   stroke-linecap:round;
 }
 .hero-heading-cheers .cheers-vapor .thin-smoke{
-  stroke:rgba(197,236,174,.24);
-  stroke-width:5;
+  stroke:rgba(197,236,174,.38);
+  stroke-width:6;
 }
 .hero-heading-cheers .headline-highlight{
   position:relative;

@@ -60,7 +60,7 @@
 <path d="M325 464q50-39 144-22" stroke="#c4ffc7" stroke-opacity=".19" stroke-width="17" fill="none" stroke-linecap="round"/>
 <path d="M657 650q-99 19-297 16" stroke="#d8ffbc" stroke-opacity=".15" stroke-width="8" fill="none" stroke-linecap="round"/>
 <path d="M355 523q50-61 133-64 85-3 148 47" stroke="#d5ff9c" stroke-opacity=".25" stroke-width="3" fill="none"/>
-<text x="508" y="514" transform="rotate(-2 508 514)" text-anchor="middle" fill="#dfffb3" font-family="Arial Black,Arial,sans-serif" font-size="47" font-weight="900" letter-spacing="-2">THE 420</text>
+<text x="508" y="514" transform="rotate(-2 508 514)" text-anchor="middle" fill="#dfffb3" font-family="Arial Black,Arial,sans-serif" font-size="47" font-weight="900" letter-spacing="-2">THE</text>
 <text x="508" y="571" transform="rotate(-2 508 571)" text-anchor="middle" fill="#afff92" font-family="Arial Black,Arial,sans-serif" font-size="76" font-weight="900" letter-spacing="-6" filter="url(#glow)">LOBBY</text>
 <text x="509" y="605" transform="rotate(-2 509 605)" text-anchor="middle" fill="#c1efbc" font-family="monospace" font-size="14" font-weight="bold" letter-spacing="3">GAME • SESH • REPEAT</text>
 <rect x="292" y="702" width="449" height="17" fill="#172822"/>
