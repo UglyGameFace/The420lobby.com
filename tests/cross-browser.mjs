@@ -35,17 +35,19 @@ try{
         try {
           await page.waitForFunction(() => {
             const site=document.querySelector('link[href^="/styles.css"]');
+            const cheers=document.querySelector('link[href^="/cheers-hero-v1.css"]');
             const arcade=document.querySelector('link[href="/sesh-signal-v3.css"]');
             const hero=document.querySelector(".hero");
-            return !!site?.sheet && !!arcade?.sheet && !!hero &&
+            return !!site?.sheet && !!cheers?.sheet && !!arcade?.sheet && !!hero &&
               getComputedStyle(hero).overflowX==="hidden" &&
               getComputedStyle(document.querySelector(".arcade-layout")).display==="grid";
           }, {timeout:11000});
         }catch(error){
           const detail=await page.evaluate(()=>{
             const base=document.querySelector('link[href^="/styles.css"]');
+            const cheers=document.querySelector('link[href^="/cheers-hero-v1.css"]');
             const arcade=document.querySelector('link[href="/sesh-signal-v3.css"]');
-            return {baseLoaded:!!base?.sheet,arcadeLoaded:!!arcade?.sheet,
+            return {baseLoaded:!!base?.sheet,cheersLoaded:!!cheers?.sheet,arcadeLoaded:!!arcade?.sheet,
               heroOverflow:getComputedStyle(document.querySelector(".hero")).overflowX,
               arcadeDisplay:getComputedStyle(document.querySelector(".arcade-layout")).display};
           });
