@@ -43,6 +43,7 @@ test("approved Cheers hero retains actual text, independent motion and original 
   assert.doesNotMatch(html, /headline-hollow">DARK,/);
   assert.match(cheersCss, /\.hero-heading-cheers \.headline-cheers/);
   assert.match(html, /class="cheers-art" src="\/assets\/approved-smoke-cheers\.svg"/);
+  assert.doesNotMatch(html, /class="cheers-art"[^>]*\bheight="45"/);
   assert.match(cheersArt, /data:image\/png;base64,/);
   assert.match(html, /class="cheers-leaf" src="\/assets\/approved-leaf\.svg"/);
   assert.match(cheersCss, /\.hero-heading-cheers \.cheers-leaf\{[\s\S]*?display:block;/);
