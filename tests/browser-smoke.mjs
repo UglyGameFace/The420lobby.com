@@ -113,7 +113,7 @@ try {
       const card=img.closest(".shield-card").getBoundingClientRect();
       const art=img.getBoundingClientRect();
       return {loaded:img.complete&&img.naturalWidth===224,
-        visible:art.width>=110&&art.height>=110,
+        visible:art.width>=card.width*.95&&art.height>=card.width*.95,
         inside:art.left>=card.left-1&&art.right<=card.right+1};
     });
     assert.ok(placement.loaded&&placement.visible&&placement.inside,
