@@ -74,9 +74,20 @@ try{
                 cheers=rect(".headline-cheers"),art=rect(".cheers-art"),
                 play=rect(".hero-heading-cheers > span.headline-highlight"),
                 scene=rect(".hero-scene");
+          const c=document.querySelector(".headline-cheers"),a=document.querySelector(".cheers-art");
+          const cs=getComputedStyle(c),as=getComputedStyle(a);
+          const css=document.querySelector('link[href^="/cheers-hero-v1.css"]');
           return {afterBottom:after.bottom,cheersTop:cheers.top,cheersBottom:cheers.bottom,
             artTop:art.top,artBottom:art.bottom,playTop:play.top,sceneTop:scene.top,
-            pseudo:getComputedStyle(document.querySelector(".headline-cheers"),"::before").content};
+            pseudo:getComputedStyle(c,"::before").content,
+            debug:{
+              headline:{fontSize:cs.fontSize,height:cs.height,width:cs.width,position:cs.position,display:cs.display},
+              image:{fontSize:as.fontSize,height:as.height,width:as.width,position:as.position,display:as.display,objectFit:as.objectFit},
+              tag:{height:a.getAttribute("height"),width:a.getAttribute("width")},
+              stylesheet:{href:css?.href,loaded:!!css?.sheet,rules:css?.sheet?.cssRules?.length ?? null},
+              mobile:matchMedia("(max-width:760px)").matches,
+              topHeading:{fontSize:getComputedStyle(document.querySelector(".hero-heading-cheers")).fontSize}
+            }};
         });
         assert.equal(composition.pseudo,"none",name+" duplicate CHEERS pseudo text");
         assert.ok(Math.abs(composition.artTop-composition.cheersTop)<=3 &&
