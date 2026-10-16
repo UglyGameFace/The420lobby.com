@@ -119,22 +119,19 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(html, /class="fx-switch"/);
 });
 
-test("Dank Shield card uses an original crest, not the owner's uploaded logo", () => {
-  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-original\.svg"/);
-  assert.doesNotMatch(html,/dank-shield-card-crest\.svg/);
-  assert.doesNotMatch(html,/class="shield-mark"/);
-  assert.match(css,/\.dank-shield-brand-art\{position:relative;/);
-  assert.match(css,/aspect-ratio:1;object-fit:contain/);
-  assert.doesNotMatch(css.match(/\.dank-shield-brand-art\{[^}]+\}/)?.[0] ?? "",/mask-image|clip-path/);
-  assert.doesNotMatch(html,/dank-shield-logo\.avif/);
-  assert.match(html, /<h3>DANK<br>SHIELD\.<\/h3>/);
+test("Dank Shield card uses the exact approved full-card PNG and preserves an accessible link", () => {
+  assert.ok(html.includes('class="dank-shield-brand-art" src="/assets/file_00000000b25c822f94a1d2b422440108.png"'));
+  assert.ok(!html.includes('dank-shield-original.svg'));
+  assert.ok(html.includes('class="shield-card-hitarea" aria-label="Meet the tech: Dank Shield"'));
+  assert.ok(css.includes('.shield-card{aspect-ratio:2/3;min-height:0'));
+  assert.ok(css.includes('object-fit:fill'));
 });
 
 test("all advertised community experiences remain present", () => {
   for(const id of ["main","vibe","experiences","after-dark","join"])assert.match(html,new RegExp('id="'+id+'"'));
   for(const term of ["DANK","SHIELD","CINEMA","MINECRAFT","BEDROCK","JAVA","VOICE"])assert.ok(html.toUpperCase().includes(term),term);
   assert.equal((html.match(/<article class="experience-card/g)||[]).length,4);
-  assert.equal((html.match(/class="card-body"/g)||[]).length,4);
+  assert.equal((html.match(/class="card-body"/g)||[]).length,3, "Dank Shield uses the approved full-card composition instead of duplicated HTML text");
 });
 
 test("internal anchors resolve and IDs are unique", () => {
