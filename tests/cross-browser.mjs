@@ -90,6 +90,8 @@ try{
             }};
         });
         assert.equal(composition.pseudo,"none",name+" duplicate CHEERS pseudo text");
+        assert.equal(composition.debug.image.fontSize,composition.debug.headline.fontSize,
+          name+" image font size must inherit from its CHEERS line");
         assert.ok(Math.abs(composition.artTop-composition.cheersTop)<=3 &&
           Math.abs(composition.artBottom-composition.cheersBottom)<=3,
           name+" detached CHEERS artwork: "+JSON.stringify(composition));
