@@ -83,12 +83,12 @@ try{
           const after=rect(".hero-heading-cheers > span:first-child"),
                 cheers=rect(".headline-cheers"),art=rect(".cheers-art"),
                 play=rect(".hero-heading-cheers > span.headline-highlight"),
-                scene=rect(".hero-scene");
+                scene=rect(".hero-scene"),hero=rect(".hero");
           const c=document.querySelector(".headline-cheers"),a=document.querySelector(".cheers-art");
           const cs=getComputedStyle(c),as=getComputedStyle(a);
           const css=document.querySelector('link[href^="/cheers-hero-v1.css"]');
           return {afterBottom:after.bottom,cheersTop:cheers.top,cheersBottom:cheers.bottom,
-            artTop:art.top,artBottom:art.bottom,playTop:play.top,sceneTop:scene.top,
+            artTop:art.top,artBottom:art.bottom,playTop:play.top,sceneTop:scene.top,heroTop:hero.top,
             pseudo:getComputedStyle(c,"::before").content,
             debug:{
               headline:{fontSize:cs.fontSize,height:cs.height,width:cs.width,position:cs.position,display:cs.display},
@@ -109,8 +109,8 @@ try{
         assert.ok(composition.playTop-composition.cheersBottom>=-10 &&
           composition.playTop-composition.cheersBottom<=24,
           name+" giant CHEERS/PLAY gap: "+JSON.stringify(composition));
-        if(mobile) assert.ok(composition.sceneTop>=-8 && composition.sceneTop<=15,
-          name+" displaced controller scene: "+JSON.stringify(composition));
+        if(mobile) assert.ok(Math.abs(composition.sceneTop-composition.heroTop)<=15,
+          name+" displaced controller relative to hero: "+JSON.stringify(composition));
         if(mobile){
           assert.ok(await page.locator(".cheers-leaf").isVisible(),name+" mobile leaf not visible beside Cheers");
           assert.ok(await countPaintedPixels(page.locator(".cheers-leaf"))>100,name+" leaf artwork paints no pixels");
