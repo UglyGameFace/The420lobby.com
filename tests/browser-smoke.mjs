@@ -117,7 +117,7 @@ try {
         inside:art.left>=card.left-1&&art.right<=card.right+1 && art.top>=card.top-1};
     });
     assert.ok(placement.loaded&&placement.visible&&placement.inside,
-      "original Dank Shield SVG must decode and fit within card: "+JSON.stringify(placement));
+      "approved Dank Shield WebP must decode and fit within card: "+JSON.stringify(placement));
     await page.locator(".hangout-card").scrollIntoViewIfNeeded();
     await page.locator("img.card-foliage-photo").evaluate(img=>img.decode());
     assert.ok(await page.locator("img.card-foliage-photo").evaluate(img=>img.naturalWidth>0),
