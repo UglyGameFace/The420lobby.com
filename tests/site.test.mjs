@@ -99,6 +99,8 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(smokeLogo, /id="smoke-zero"/);
   assert.match(smokeLogo, /fill-rule="evenodd"/);
   assert.match(smokeLogo, /id="complete-numerals"/);
+  assert.match(css, /@media\(min-width:761px\) and \(max-width:1050px\)\{/);
+  assert.match(css, /\.desktop-nav\.open\{display:flex\}/);
   assert.match(smokeLogo, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
   assert.doesNotMatch(html,/class="logo-glyph"/);
   assert.doesNotMatch(css,/\.logo-glyph/);
