@@ -39,7 +39,7 @@ try {
     page.on("pageerror",error=>errors.push(error.message));
     await page.goto(address,{waitUntil:"domcontentloaded"});
     await page.waitForFunction(() => {
-      return ['/styles.css','/cheers-hero-v1.css','/sesh-signal-v3.css'].every(path=>
+      return ['/styles.css','/cheers-hero-v1.css','/sesh-signal-v3.css','/lobby-redesign.css'].every(path=>
         !!document.querySelector('link[rel="stylesheet"][href^="'+path+'"]')?.sheet
       );
     },{timeout:11000});
@@ -49,8 +49,8 @@ try {
     assert.equal(initialHeroOpacity,"1","hero text must be readable immediately, not hidden behind scroll observer");
     assert.equal(await page.title(),"The 420 Lobby | After Cheers, We Play");
     assert.equal(await page.locator(".experience-card").count(),4);
-    assert.equal(await page.locator(".card-body").count(),3,"three cards retain live HTML content; Dank Shield uses approved full-card artwork");
-    assert.equal(await page.locator(".shield-card .shield-card-hitarea").count(),1,"approved full-card Dank Shield must preserve its accessible link");
+    assert.equal(await page.locator(".card-body").count(),3,"other three experience cards retain semantic HTML");
+    assert.equal(await page.locator(".shield-card .shield-card-link").count(),1,"responsive Shield card preserves visible accessible CTA");
     assert.equal(await page.locator("#sesh-stage").count(),1,"arcade field is missing");
     assert.equal(await page.locator("#sesh-start").count(),1,"arcade start is missing");
     assert.equal(await page.locator(".arcade-play").count(),1,"mobile game wrapper is missing");
@@ -110,15 +110,44 @@ try {
     await page.locator(".shield-card").scrollIntoViewIfNeeded();
     const brand=page.locator(".shield-card img.dank-shield-brand-art");
     await brand.evaluate(img=>img.decode());
-    const placement=await brand.evaluate(img=>{
-      const card=img.closest(".shield-card").getBoundingClientRect();
-      const art=img.getBoundingClientRect();
-      return {loaded:img.complete&&img.naturalWidth>0&&img.naturalHeight>0,
-        visible:art.width>=110&&art.height>=110,
-        inside:art.left>=card.left-1&&art.right<=card.right+1 && art.top>=card.top-1};
+    // Test the actual responsive composition rather than a hardcoded 2:3
+    // poster ratio. Media, text and CTA must remain readable at any width.
+    const shieldGeometry = await brand.evaluate(img => {
+      const card = img.closest(".shield-card");
+      const art = card.querySelector(".shield-feature-art");
+      const copy = card.querySelector(".shield-feature-copy");
+      const heading = card.querySelector("#shield-title");
+      const action = card.querySelector(".shield-card-link");
+      const box = el => {
+        const r = el.getBoundingClientRect();
+        return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};
+      };
+      return {loaded:img.complete&&img.naturalWidth>0, card:box(card),img:box(img),
+        art:box(art),copy:box(copy),title:box(heading),cta:box(action),
+        viewport:innerWidth,documentWidth:document.documentElement.scrollWidth};
     });
-    assert.ok(placement.loaded&&placement.visible&&placement.inside,
-      "approved full-card Dank Shield PNG must decode and fit within card: "+JSON.stringify(placement));
+    assert.ok(shieldGeometry.loaded,"approved logo asset failed to decode: "+JSON.stringify(shieldGeometry));
+    assert.ok(shieldGeometry.card.left>=-2 && shieldGeometry.card.right<=scenario.size.width+2,
+      "Shield card overflows viewport: "+JSON.stringify(shieldGeometry));
+    assert.ok(shieldGeometry.documentWidth<=scenario.size.width+2,
+      "page has horizontal overflow: "+JSON.stringify(shieldGeometry));
+    assert.ok(shieldGeometry.img.width>=90 && shieldGeometry.img.height>=90,
+      "Shield logo is microscopic: "+JSON.stringify(shieldGeometry));
+    assert.ok(shieldGeometry.title.width>80&&shieldGeometry.title.height>45,
+      "Shield title collapsed: "+JSON.stringify(shieldGeometry));
+    assert.ok(shieldGeometry.cta.height>=30,
+      "Shield CTA not tappable: "+JSON.stringify(shieldGeometry));
+    if (scenario.size.width<=460) {
+      assert.ok(shieldGeometry.art.bottom<=shieldGeometry.copy.top+3,
+        "phone layout must stack artwork over content: "+JSON.stringify(shieldGeometry));
+    } else {
+      assert.ok(shieldGeometry.art.right<=shieldGeometry.copy.left+3,
+        "tablet/desktop layout must use side-by-side media and copy: "+JSON.stringify(shieldGeometry));
+    }
+    await page.locator(".shield-card").screenshot({
+      path:"artifacts/"+scenario.name+"-shield-card.png",
+      animations:"disabled",
+    });
     await page.locator(".hangout-card").scrollIntoViewIfNeeded();
     await page.locator("img.card-foliage-photo").evaluate(img=>img.decode());
     assert.ok(await page.locator("img.card-foliage-photo").evaluate(img=>img.naturalWidth>0),
@@ -226,7 +255,7 @@ try {
         leaf:rect(".cheers-leaf"),joint:rect(".cheers-roll img"),
         after:rect(".hero-heading-cheers > span:first-child"),
         play:rect(".hero-heading-cheers > span.headline-highlight"),
-        scene:rect(".hero-scene"),
+        scene:rect(".hero-scene"),hero:rect(".hero"),
         pseudo:getComputedStyle(document.querySelector(".headline-cheers"),"::before").content
       };
     });
@@ -250,7 +279,7 @@ try {
       cheersArt.play.top-cheersArt.cheers.bottom<=24,
       "extra gap between CHEERS and WE PLAY: "+JSON.stringify(cheersArt));
     if(scenario.mobile){
-      assert.ok(cheersArt.scene.top>=-8 && cheersArt.scene.top<=15,
+      assert.ok(Math.abs(cheersArt.scene.top-cheersArt.hero.top)<=15,
         "controller/CRT background must anchor at hero top: "+JSON.stringify(cheersArt));
       assert.ok(cheersArt.leaf.left<cheersArt.cheers.right+25 &&
         cheersArt.leaf.bottom>=cheersArt.cheers.top && cheersArt.leaf.top<=cheersArt.cheers.bottom,

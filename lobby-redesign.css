@@ -1,0 +1,181 @@
+/* THE 420 LOBBY • 2026 responsive rebuild
+   One coordinated system for phone, tablet, and desktop.
+   Source artwork stays intact; no full-card image stretched into a layout. */
+:root{
+  --ink:#07100e;--panel:#10211b;--panel-raised:#142820;
+  --leaf:#b4f280;--mint:#83d7a7;--paper:#eef7e9;
+  --muted:#afc6b5;--stroke:rgba(187,240,187,.17);
+  --max-page:1260px;--gutter:clamp(20px,4.6vw,76px);
+}
+html{scroll-padding-top:84px}
+body{background:var(--ink);color:var(--paper);overflow-x:clip}
+.shell{width:min(calc(100% - var(--gutter)*2),var(--max-page));max-width:var(--max-page);margin-inline:auto}
+.section-space{padding-block:clamp(76px,9vw,136px)}
+h1,h2,h3,p{overflow-wrap:normal}
+img{max-width:100%}
+button,a{-webkit-tap-highlight-color:transparent}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--leaf);outline-offset:4px}
+.site-header{position:relative;z-index:80;min-height:84px;background:rgba(7,18,15,.93);border-bottom:1px solid var(--stroke);backdrop-filter:blur(20px)}
+.header-shell{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:84px}
+.logo{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;min-width:0;text-decoration:none}
+.logo-smoke{width:clamp(88px,10vw,128px);height:64px;object-fit:contain;flex-shrink:0}
+.logo-type{font-size:clamp(12px,1.3vw,16px);line-height:1;white-space:nowrap}
+.desktop-nav{display:flex;align-items:center;gap:clamp(13px,2vw,29px);margin-left:auto}
+.desktop-nav a{font-size:clamp(9px,.82vw,11px);white-space:nowrap;letter-spacing:.09em}
+.desktop-nav .nav-join{padding:14px 17px;border:1px solid rgba(184,240,147,.36);border-radius:10px;color:var(--leaf)}
+.header-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.hero{position:relative;min-height:clamp(680px,84svh,970px);isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 80% 36%,#234339 0%,transparent 50%),linear-gradient(140deg,#101e19,#07110e 64%)}
+.hero-content{min-height:clamp(680px,84svh,970px);display:flex;align-items:center;padding-block:clamp(115px,13vw,180px);position:relative;z-index:6}
+.hero-copy-block{width:min(670px,58%);position:relative;z-index:5}
+.hero-heading,.hero-heading-cheers{font-size:clamp(65px,8vw,140px);line-height:.88;letter-spacing:-.045em;max-width:100%;overflow:visible;margin:16px 0 27px}
+.hero-heading-cheers .headline-cheers{isolation:isolate}
+.hero-subtitle{font-size:clamp(16px,1.5vw,21px);line-height:1.58;max-width:550px;color:var(--muted)}
+.hero-subtitle strong{color:var(--paper)}
+.hero-scene{inset:auto -7% 0 auto;top:7%;right:-4%;width:min(57%,810px);height:90%;transform:none;opacity:.8;pointer-events:none}
+.hero-vignette{background:linear-gradient(90deg,rgba(5,15,12,.68) 0%,transparent 76%),linear-gradient(0deg,#07100e,transparent 27%)}
+.hero-details{display:flex;flex-wrap:wrap;gap:8px}
+.hero-details span{border:1px solid var(--stroke);background:rgba(10,30,22,.7);border-radius:40px;padding:8px 12px}
+.cta-primary{border-radius:12px;box-shadow:0 10px 30px rgba(3,9,5,.23)}
+.cta-secondary{border-radius:12px}
+.section-kicker{display:flex;justify-content:space-between;gap:16px;border-top:1px solid var(--stroke);padding-top:21px;margin-bottom:clamp(32px,5vw,60px)}
+.big-type{font-size:clamp(59px,7vw,116px);line-height:.92;letter-spacing:-.035em}
+.vibe-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);align-items:center;gap:clamp(36px,6vw,90px)}
+.vibe-aside{min-width:0}
+.traits{display:flex;flex-wrap:wrap;row-gap:13px}
+.experiences{background:linear-gradient(180deg,#0a1712,#0d1e18 65%,#09130f)}
+.experiences-heading{display:flex;align-items:end;justify-content:space-between;gap:clamp(24px,5vw,70px);margin-bottom:45px}
+.experiences-heading>p{max-width:370px;font-size:clamp(15px,1.4vw,18px);line-height:1.6}
+.experience-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(17px,2.4vw,31px);align-items:stretch}
+.experience-card:nth-child(n),.experience-grid>.experience-card:nth-child(n){grid-column:auto;min-height:0;margin:0;transform:none;clip-path:none;border:1px solid var(--stroke);border-radius:19px;overflow:hidden;display:flex;flex-direction:column;isolation:isolate;background:#13271e;box-shadow:0 20px 48px rgba(0,0,0,.12)}
+.experience-grid>.experience-card .card-info{min-height:0;flex:1;padding:clamp(24px,4vw,44px);display:flex;flex-direction:column}
+.experience-card .card-visual{position:relative;flex:0 0 auto;min-height:clamp(190px,20vw,285px);height:clamp(190px,20vw,285px);overflow:hidden}
+.experience-card .card-topline{display:flex;align-items:center;justify-content:space-between;gap:15px;color:var(--mint);font-size:clamp(10px,.85vw,12px);letter-spacing:.13em}
+.experience-card .card-body{display:flex;flex-direction:column;flex:1;margin-top:20px}
+.experience-card .card-body h3{font-size:clamp(58px,6vw,98px);line-height:.87;letter-spacing:-.035em;margin:0 0 17px}
+.experience-card .card-body p{max-width:46ch;font-size:clamp(14px,1.2vw,17px);line-height:1.6;color:var(--muted);margin:0 0 28px}
+.experience-card .card-link{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:18px;border-top:1px solid var(--stroke);font-size:clamp(10px,.92vw,12px);text-decoration:none;color:var(--paper);letter-spacing:.1em;min-height:46px}
+.experience-card .card-link span{font-size:22px;color:var(--leaf)}
+.experience-card .card-glow{opacity:.28;pointer-events:none}
+.experience-card .card-visual-stamp{transform:none;top:auto;bottom:17px;left:20px}
+.experience-card .film-reel{width:min(45%,230px);height:auto;aspect-ratio:1.65}
+.experience-card .voxel-scape{scale:.77;transform-origin:50% 10%}
+.experience-grid>.shield-card{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:clamp(360px,31vw,470px)!important;aspect-ratio:auto!important;background:radial-gradient(ellipse at 28% 42%,rgba(71,126,82,.34),transparent 55%),#0f241b!important;clip-path:none!important}
+.experience-grid>.shield-card .shield-feature-art{position:relative;min-width:0;min-height:100%;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at center,rgba(87,174,107,.24),transparent 65%)}
+.shield-feature-art::before{content:"";position:absolute;width:80%;aspect-ratio:1;border:1px solid rgba(160,226,165,.12);border-radius:50%;box-shadow:0 0 0 24px rgba(132,220,146,.025),0 0 0 59px rgba(132,220,146,.022)}
+.shield-feature-art .shield-orbit{position:absolute;border-radius:50%;border:1px solid rgba(135,227,147,.15);width:56%;aspect-ratio:1;transform:rotateX(64deg) rotate(-18deg)}
+.shield-feature-art .shield-orbit-two{transform:rotateY(65deg) rotate(32deg);width:68%}
+.experience-grid>.shield-card .dank-shield-brand-art{position:relative!important;inset:auto!important;z-index:2;width:min(73%,245px)!important;height:auto!important;aspect-ratio:1;object-fit:contain!important;transform:none!important;animation:none!important;filter:drop-shadow(0 25px 25px rgba(0,0,0,.4)) drop-shadow(0 0 22px rgba(101,235,105,.17))!important;max-height:none!important}
+.shield-art-label{position:absolute;bottom:19px;left:20px;right:15px;color:var(--mint);font:700 10px "DM Sans",sans-serif;letter-spacing:.12em}
+.experience-grid>.shield-card .shield-feature-copy{position:relative;min-width:0;padding:clamp(21px,2.5vw,36px);display:flex;flex-direction:column;justify-content:center;background:linear-gradient(90deg,transparent,rgba(5,18,13,.18))}
+.shield-feature-copy h3{font-family:"Barlow Condensed",sans-serif;font-size:clamp(58px,6vw,101px);font-weight:900;line-height:.84;letter-spacing:-.025em;margin:clamp(18px,3vw,32px) 0 18px}
+.shield-feature-copy h3 em{color:var(--leaf);font-style:normal}
+.shield-feature-copy p{max-width:34ch;color:var(--muted);font-size:clamp(14px,1.2vw,17px);line-height:1.56;margin:0 0 24px}
+.shield-feature-copy .card-link{margin-top:auto}
+.experience-card .card-info h3,.shield-feature-copy h3{overflow-wrap:normal;word-break:normal}
+.arcade-layout{display:grid;grid-template-columns:minmax(0,.68fr) minmax(0,1.32fr);align-items:start;gap:clamp(32px,5vw,78px)}
+.arcade-copy,.arcade-play{min-width:0}
+.sesh-arcade{background:linear-gradient(140deg,#0c1a15,#10271d 52%,#09150f)}
+.arcade-heading{font-size:clamp(72px,8.2vw,130px);line-height:.86}
+.arcade-machine{border-radius:18px;overflow:hidden;box-shadow:0 22px 70px rgba(0,0,0,.22)}
+.arcade-controls{display:flex;flex-wrap:wrap;gap:10px}
+.arcade-btn{min-height:44px;border-radius:9px}
+.reality-section{min-height:clamp(580px,66vw,850px);padding-block:clamp(90px,10vw,135px)}
+.reality-title{font-size:clamp(60px,8vw,124px);line-height:.9}
+.community-proof .proof-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,75px);align-items:center}
+.proof-panel{border:1px solid var(--stroke);border-radius:18px}
+.join{min-height:0;padding-block:clamp(85px,11vw,150px)}
+.join h2{font-size:clamp(68px,9vw,138px)}
+.footer{gap:35px}
+@media(max-width:1100px){
+  .desktop-nav{gap:12px}
+  .header-shell{gap:15px}
+  .hero-copy-block{width:65%}
+  .hero-scene{width:64%;right:-14%}
+  .experience-grid>.shield-card{grid-template-columns:45% 55%}
+  .shield-feature-copy h3{font-size:clamp(54px,7vw,81px)}
+  .arcade-layout{grid-template-columns:1fr}
+  .arcade-copy{max-width:640px}
+}
+@media(max-width:760px){
+  :root{--gutter:clamp(17px,5vw,28px)}
+  html{scroll-padding-top:72px}
+  .site-header,.header-shell{min-height:72px}
+  /* The original mobile nav button is absolutely positioned on the left.
+     Keep the centered logo clear of its tap area; never let logo glyphs
+     intercept menu interactions on 320-760px screens. */
+  .header-shell{position:relative;isolation:isolate;justify-content:center;gap:0}
+  /* Independent absolute positions prevent flex from moving the brand.
+     Keep both mobile buttons clickable without overlapping the logo. */
+  .header-shell .logo{position:absolute;left:50%;top:50%;translate:-50% -50%;
+    transform:none;width:min(210px,calc(100% - 116px));max-width:calc(100% - 116px);
+    justify-content:center;flex:none;z-index:2;overflow:visible}
+  .header-shell .logo-smoke{width:clamp(75px,22vw,116px);min-width:0;flex:1 1 auto;height:60px}
+  .header-shell .logo-type{font-size:clamp(10px,2.9vw,14px)}
+  .header-shell .header-actions{display:contents}
+  .header-shell .menu-toggle{position:absolute;left:0;right:auto;top:50%;translate:0 -50%;
+    transform:none;width:42px;height:42px;z-index:15;pointer-events:auto}
+  .header-shell .fx-toggle{position:absolute;left:auto;right:0;top:50%;translate:0 -50%;
+    transform:none;z-index:15;pointer-events:auto}
+  .desktop-nav{display:none}
+  .desktop-nav.open{display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;padding:12px var(--gutter) 23px;background:#0b1b14;border-bottom:1px solid var(--stroke)}
+  .desktop-nav.open a{font-size:13px;padding:12px 6px}
+  .hero,.hero-content{min-height:0}
+  .hero{padding-bottom:45px}
+  .hero-content{align-items:flex-end;padding-top:clamp(315px,55svh,460px);padding-bottom:74px}
+  .hero-copy-block{width:100%;max-width:640px}
+  .hero-heading,.hero-heading-cheers{font-size:clamp(55px,11.6vw,92px);line-height:.91;margin-bottom:19px}
+  .hero-subtitle{font-size:clamp(14px,3.4vw,17px);max-width:470px}
+  .hero-scene{top:0;right:-14%;width:min(112vw,660px);height:clamp(360px,60svh,510px);opacity:.6;filter:brightness(.95)}
+  .hero-vignette{background:linear-gradient(0deg,#07100e 0%,rgba(7,16,14,.88) 40%,rgba(7,16,14,.12) 87%),linear-gradient(90deg,rgba(7,16,14,.4),transparent)}
+  .hero-cta{flex-wrap:wrap}
+  .hero-details{gap:6px}
+  .hero-details span{font-size:9px;padding:8px}
+  .hero-scroll-hint{display:none}
+  .section-kicker{margin-bottom:30px;font-size:10px}
+  .section-kicker span:last-child{text-align:right}
+  .vibe-grid,.community-proof .proof-grid{grid-template-columns:1fr;gap:30px}
+  .big-type{font-size:clamp(52px,11.3vw,86px)}
+  .vibe-aside{grid-template-columns:90px 1fr;gap:15px}
+  .leaf-seal{width:90px;height:90px}
+  .experiences-heading{display:block;margin-bottom:30px}
+  .experiences-heading>p{margin-top:22px}
+  .experience-grid{grid-template-columns:1fr;gap:17px}
+  .experience-card:nth-child(n),.experience-grid>.experience-card:nth-child(n){min-height:0!important;grid-column:1!important}
+  .experience-card .card-visual{height:clamp(185px,48vw,270px);min-height:0}
+  .experience-grid>.experience-card .card-info{padding:24px;min-height:0!important}
+  .experience-card .card-body h3{font-size:clamp(59px,15vw,90px)}
+  .experience-card .card-body{margin-top:15px}
+  .experience-grid>.shield-card{grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0!important}
+  .experience-grid>.shield-card .shield-feature-art{min-height:300px}
+  .experience-grid>.shield-card .dank-shield-brand-art{width:min(76%,200px)!important}
+  .experience-grid>.shield-card .shield-feature-copy{padding:22px}
+  .shield-feature-copy h3{font-size:clamp(45px,10vw,78px);margin:22px 0 14px}
+  .shield-feature-copy p{font-size:14px;line-height:1.5;margin-bottom:16px}
+  .shield-art-label{font-size:8px;bottom:14px;left:12px}
+  .arcade-layout{grid-template-columns:1fr;gap:28px}
+  .arcade-heading{font-size:clamp(64px,14vw,92px)}
+  .reality-section{min-height:620px}
+  .reality-title{font-size:clamp(53px,11vw,84px)}
+  .join h2{font-size:clamp(62px,12vw,93px)}
+  .footer{display:flex;flex-direction:column;gap:25px}
+}
+@media(max-width:460px){
+  /* Preserve a usable FX switch without allowing it to obscure the wordmark. */
+  .fx-toggle{display:flex;right:0;z-index:15;height:42px;padding-inline:6px}
+  .hero-content{padding-top:clamp(190px,28svh,235px);padding-bottom:50px}
+  .hero-heading,.hero-heading-cheers{font-size:clamp(48px,12vw,66px)}
+  .hero-scene{width:110vw;right:-19vw;height:390px}
+  .experience-grid>.shield-card{grid-template-columns:1fr;display:flex!important;flex-direction:column}
+  .experience-grid>.shield-card .shield-feature-art{min-height:0;height:clamp(185px,56vw,265px);flex:0 0 auto}
+  .experience-grid>.shield-card .dank-shield-brand-art{width:clamp(116px,40%,180px)!important}
+  .experience-grid>.shield-card .shield-feature-copy{padding:22px 24px 25px;min-height:0}
+  .shield-feature-copy h3{font-size:clamp(65px,18vw,88px);margin:16px 0 11px}
+  .shield-feature-copy p{font-size:14px}
+  .experience-card .card-link{padding-top:13px}
+  .shield-art-label{left:16px;bottom:12px}
+  .arcade-machine{border-radius:12px}
+  .section-kicker span:last-child{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .shield-orbit,.shield-feature-art::before{animation:none}
+}

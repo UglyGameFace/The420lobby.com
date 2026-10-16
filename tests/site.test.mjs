@@ -42,7 +42,7 @@ test("approved Cheers hero retains actual text, independent motion and original 
   assert.match(html, /class="cheers-word">CHEERS,/);
   assert.match(html, /src="\/assets\/cheers-joint\.svg"/);
   assert.match(html, /href="\/cheers-hero-v1\.css\?v=20261016-hero3"/);
-  assert.match(html, /href="\/styles\.css\?v=20261016-hero3"/);
+  assert.match(html, /href="\/styles\.css\?v=20261016-shieldmobile29"/);
   assert.match(html, /The 420 Lobby \| After Cheers, We Play/);
   assert.doesNotMatch(html, /headline-hollow">DARK,/);
   assert.match(cheersCss, /\.hero-heading-cheers \.headline-cheers/);
@@ -119,19 +119,27 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(html, /class="fx-switch"/);
 });
 
-test("Dank Shield card uses the exact approved full-card PNG and preserves an accessible link", () => {
-  assert.ok(html.includes('class="dank-shield-brand-art" src="/assets/file_00000000b25c822f94a1d2b422440108.png"'));
-  assert.ok(!html.includes('dank-shield-original.svg'));
-  assert.ok(html.includes('class="shield-card-hitarea" aria-label="Meet the tech: Dank Shield"'));
-  assert.ok(css.includes('.shield-card{aspect-ratio:2/3;min-height:0'));
-  assert.ok(css.includes('object-fit:fill'));
+test("Dank Shield is semantic responsive content, not a stretched poster", () => {
+  const redesign=read("lobby-redesign.css");
+  assert.ok(html.includes('class="dank-shield-brand-art" src="/assets/dank-shield-logo.avif"'));
+  assert.ok(!html.includes('file_00000000b25c822f94a1d2b422440108.png'));
+  assert.ok(html.includes('class="shield-feature-art"'));
+  assert.ok(html.includes('class="shield-feature-copy"'));
+  assert.ok(html.includes('id="shield-title"'));
+  assert.ok(html.includes('class="card-link shield-card-link" href="#after-dark"'));
+  assert.ok(html.includes('href="/lobby-redesign.css?v=20261016-rebuild1"'));
+  for (const rule of [".experience-grid>.shield-card{display:grid!important",
+    ".hero-content", ".arcade-layout", ".community-proof .proof-grid",
+    "@media(max-width:1100px)", "@media(max-width:760px)", "@media(max-width:460px)"])
+    assert.ok(redesign.includes(rule), "missing responsive rule: " + rule);
 });
 
 test("all advertised community experiences remain present", () => {
   for(const id of ["main","vibe","experiences","after-dark","join"])assert.match(html,new RegExp('id="'+id+'"'));
   for(const term of ["DANK","SHIELD","CINEMA","MINECRAFT","BEDROCK","JAVA","VOICE"])assert.ok(html.toUpperCase().includes(term),term);
   assert.equal((html.match(/<article class="experience-card/g)||[]).length,4);
-  assert.equal((html.match(/class="card-body"/g)||[]).length,3, "Dank Shield uses the approved full-card composition instead of duplicated HTML text");
+  assert.equal((html.match(/class="card-body"/g)||[]).length,3, "Other cards retain HTML content");
+  assert.equal((html.match(/class="shield-feature-copy"/g)||[]).length,1,"Shield has readable text, not text baked into an image");
 });
 
 test("internal anchors resolve and IDs are unique", () => {
@@ -190,7 +198,7 @@ test("CSS has original haunted experience and mobile/performance fallbacks",()=>
 });
 
 test("static Pages hosting remains build-free", () => {
-  assert.match(html,/<link rel="stylesheet" href="\/styles\.css\?v=20261016-hero3">/);
+  assert.match(html,/<link rel="stylesheet" href="\/styles\.css\?v=20261016-shieldmobile29">/);
   assert.match(html,/<link rel="stylesheet" href="\/sesh-signal-v3\.css">/);
   assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css\?v=20261016-hero3">/);
   assert.match(html,/<script defer src="\/script\.js"><\/script>/);
@@ -246,7 +254,7 @@ test("custom arcade styling supports touch, keyboard, and phones", () => {
 
 
 test("arcade CSS is independently versioned and not hidden in stale global styles", () => {
-  assert.match(html, /href="\/styles\.css\?v=20261016-hero3">[\s\S]*href="\/sesh-signal-v3\.css">/);
+  assert.match(html, /href="\/styles\.css\?v=20261016-shieldmobile29">[\s\S]*href="\/sesh-signal-v3\.css">/);
   assert.match(arcadeCss,/\.sesh-arcade\{/);
   assert.match(arcadeCss,/\.sesh-stage\{/);
   assert.match(arcadeCss,/\.arcade-machine\{/);

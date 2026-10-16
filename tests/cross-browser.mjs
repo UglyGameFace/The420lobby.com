@@ -83,12 +83,12 @@ try{
           const after=rect(".hero-heading-cheers > span:first-child"),
                 cheers=rect(".headline-cheers"),art=rect(".cheers-art"),
                 play=rect(".hero-heading-cheers > span.headline-highlight"),
-                scene=rect(".hero-scene");
+                scene=rect(".hero-scene"),hero=rect(".hero");
           const c=document.querySelector(".headline-cheers"),a=document.querySelector(".cheers-art");
           const cs=getComputedStyle(c),as=getComputedStyle(a);
           const css=document.querySelector('link[href^="/cheers-hero-v1.css"]');
           return {afterBottom:after.bottom,cheersTop:cheers.top,cheersBottom:cheers.bottom,
-            artTop:art.top,artBottom:art.bottom,playTop:play.top,sceneTop:scene.top,
+            artTop:art.top,artBottom:art.bottom,playTop:play.top,sceneTop:scene.top,heroTop:hero.top,
             pseudo:getComputedStyle(c,"::before").content,
             debug:{
               headline:{fontSize:cs.fontSize,height:cs.height,width:cs.width,position:cs.position,display:cs.display},
@@ -109,8 +109,8 @@ try{
         assert.ok(composition.playTop-composition.cheersBottom>=-10 &&
           composition.playTop-composition.cheersBottom<=24,
           name+" giant CHEERS/PLAY gap: "+JSON.stringify(composition));
-        if(mobile) assert.ok(composition.sceneTop>=-8 && composition.sceneTop<=15,
-          name+" displaced controller scene: "+JSON.stringify(composition));
+        if(mobile) assert.ok(Math.abs(composition.sceneTop-composition.heroTop)<=15,
+          name+" displaced controller relative to hero: "+JSON.stringify(composition));
         if(mobile){
           assert.ok(await page.locator(".cheers-leaf").isVisible(),name+" mobile leaf not visible beside Cheers");
           assert.ok(await countPaintedPixels(page.locator(".cheers-leaf"))>100,name+" leaf artwork paints no pixels");
@@ -189,7 +189,8 @@ try{
           assert.ok(controls.logo.left>=controls.header.left-2 && controls.logo.right<=controls.header.right+2,name+" full brand outside header");
           assert.ok(controls.menu.left>=controls.header.left-2 && controls.fx.right<=controls.header.right+2,name+" header controls outside bounds");
           assert.ok(controls.header.height<=96,name+" mobile header is too thick");
-          assert.ok(Math.abs((controls.logo.left+controls.logo.right)/2-(controls.header.left+controls.header.right)/2)<=2,name+" brand not centered");
+          assert.ok(Math.abs((controls.logo.left+controls.logo.right)/2-(controls.header.left+controls.header.right)/2)<=2,
+            name+" brand not centered: "+JSON.stringify(controls));
           assert.ok(controls.menu.right+3<=controls.logo.left,name+" menu and brand overlap");
           assert.ok(controls.logo.right+3<=controls.fx.left,name+" brand and FX overlap");
           assert.ok(controls.eyebrow.top-controls.header.bottom>=135 && controls.eyebrow.top-controls.header.bottom<=240,name+" hero top gap out of range");
