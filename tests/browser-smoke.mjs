@@ -112,7 +112,7 @@ try {
     const placement=await brand.evaluate(img=>{
       const card=img.closest(".shield-card").getBoundingClientRect();
       const art=img.getBoundingClientRect();
-      return {loaded:img.complete&&img.naturalWidth===224,
+      return {loaded:img.complete&&img.naturalWidth===600,
         visible:art.width>=110&&art.height>=110,
         inside:art.left>=card.left-1&&art.right<=card.right+1 && art.top>=card.top-1};
     });
