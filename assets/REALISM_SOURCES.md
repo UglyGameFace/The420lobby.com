@@ -18,3 +18,11 @@ This file documents third-party visual source assets and their licensing. Track 
 - **Risk**: external hosting dependency; move to local compressed asset when binary repository upload is available.
 
 Do not replace genuine photos with drawn polygons merely to avoid third-party asset hosting.
+
+## Good Stuff badge natural cannabis leaf photograph
+
+- **Image**: Potleaf.jpg; photographed by Dohduhdah, public domain.
+- **Source**: https://commons.wikimedia.org/wiki/File:Potleaf.jpg
+- **Original**: https://upload.wikimedia.org/wikipedia/commons/f/ff/Potleaf.jpg
+- **Use**: single seven-leaflet photographed cannabis leaf, masked and color graded inside circular Good Stuff badge, with original label preserved. It is a real leaf, not a cultivar-specific claim.
+- **Current delivery**: remote Commons original, must be localized/optimized and visually approved before production readiness.
