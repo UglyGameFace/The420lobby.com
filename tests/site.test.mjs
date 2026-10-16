@@ -118,18 +118,15 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(html, /class="fx-switch"/);
 });
 
-test("Dank Shield card uses purpose-built crest integrated into card, without generic shield placeholder", () => {
-  const crest=read("assets/dank-shield-card-crest.svg");
-  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-card-crest\.svg"/);
+test("Dank Shield card uses the owner's uploaded logo, not a hand-drawn cannabis crest", () => {
+  assert.match(html,/class="dank-shield-brand-art" src="\/assets\/dank-shield-logo\.avif"/);
+  assert.doesNotMatch(html,/dank-shield-card-crest\.svg/);
   assert.doesNotMatch(html,/class="shield-mark"/);
   assert.match(css,/\.dank-shield-brand-art\{position:relative;/);
-  assert.doesNotMatch(css,/\.shield-mark\{/);
-  assert.match(crest,/<svg[^>]+viewBox="0 0 640 480"/);
-  assert.match(crest,/id="smoke-zero"|id="complete-numerals"|id="blade"/);
-  assert.doesNotMatch(crest, /<text\b/, "crest must not duplicate the card's large wordmark");
+  assert.match(css,/aspect-ratio:1;object-fit:contain/);
+  assert.match(css,/mask-image:radial-gradient\(ellipse 70% 70% at 50% 33%,#000 40%,transparent 86%\)/);
+  assert.match(css,/clip-path:circle\(49% at 50% 50%\)/);
   assert.match(html, /<h3>DANK<br>SHIELD\.<\/h3>/);
-  assert.match(crest,/id="inner"/);
-  assert.doesNotMatch(crest,/<image\b|data:image\/|href="https?:/,"brand crest should be locally drawn, not pasted photo");
 });
 
 test("all advertised community experiences remain present", () => {
