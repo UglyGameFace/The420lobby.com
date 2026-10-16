@@ -299,7 +299,7 @@ try {
     }
     if(scenario.name==="desktop" || scenario.name==="mobile" || scenario.name==="narrow-mobile") {
       await page.locator("#sesh-signal").scrollIntoViewIfNeeded();
-      page.screenshot({path:"artifacts/"+scenario.name+"-arcade-styled.png",animations:"disabled",timeout:30000});
+      await page.screenshot({path:"artifacts/"+scenario.name+"-arcade-styled.png",animations:"disabled",timeout:30000});
     }
     await page.screenshot({path:"artifacts/"+scenario.name+".png",animations:"disabled",timeout:10000});
     for (const selector of ["#vibe","#experiences","#sesh-signal",".hangout-card",".shield-card",".cinema-card",".minecraft-card","#after-dark",".community-proof","#join"]) {
