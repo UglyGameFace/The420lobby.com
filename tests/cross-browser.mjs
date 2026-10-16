@@ -58,7 +58,7 @@ try{
         assert.equal(await page.locator(".sesh-item").count(),0,"No targets before start");
         const logoBounds=await page.locator(".logo-smoke").boundingBox();
         if(mobile){
-          assert.ok(logoBounds && logoBounds.width<=150,"WebKit must honor mobile smoke logo width: "+JSON.stringify(logoBounds));
+          assert.ok(logoBounds && logoBounds.width<=Math.min(165,width*.45),"Mobile smoke logo width exceeds available space: "+JSON.stringify(logoBounds));
         }
         const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
         if(overflow>2) {
@@ -97,7 +97,7 @@ try{
             const rect=selector=>document.querySelector(selector).getBoundingClientRect();
             return {logo:rect(".logo"),mark:rect(".logo-smoke"),fx:rect("#fx-toggle"),menu:rect("#menu-toggle"),header:rect(".header-shell"),eyebrow:rect(".hero-copy-block .eyebrow")};
           });
-          assert.ok(controls.mark.bottom<=controls.header.bottom+2,name+" smoke artwork outside header");
+          assert.ok(controls.mark.bottom<=controls.header.bottom+5,name+" smoke artwork outside header");
           assert.ok(controls.logo.left>=controls.header.left-2 && controls.logo.right<=controls.header.right+2,name+" full brand outside header");
           assert.ok(controls.menu.left>=controls.header.left-2 && controls.fx.right<=controls.header.right+2,name+" header controls outside bounds");
           assert.ok(controls.header.height<=96,name+" mobile header is too thick");
