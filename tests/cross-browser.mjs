@@ -30,22 +30,24 @@ try{
         const errors=[];
         page.on("pageerror",e=>errors.push(e.message));
         const cssFailures=[];
-        page.on("requestfailed",request=>{if(request.url().endsWith(".css"))cssFailures.push(request.url()+": "+request.failure()?.errorText);});
+        page.on("requestfailed",request=>{if(new URL(request.url()).pathname.endsWith(".css"))cssFailures.push(request.url()+": "+request.failure()?.errorText);});
         await page.goto(url,{waitUntil:"domcontentloaded"});
         try {
           await page.waitForFunction(() => {
-            const site=document.querySelector('link[href="/styles.css"]');
+            const site=document.querySelector('link[href^="/styles.css"]');
+            const cheers=document.querySelector('link[href^="/cheers-hero-v1.css"]');
             const arcade=document.querySelector('link[href="/sesh-signal-v3.css"]');
             const hero=document.querySelector(".hero");
-            return !!site?.sheet && !!arcade?.sheet && !!hero &&
+            return !!site?.sheet && !!cheers?.sheet && !!arcade?.sheet && !!hero &&
               getComputedStyle(hero).overflowX==="hidden" &&
               getComputedStyle(document.querySelector(".arcade-layout")).display==="grid";
           }, {timeout:11000});
         }catch(error){
           const detail=await page.evaluate(()=>{
-            const base=document.querySelector('link[href="/styles.css"]');
+            const base=document.querySelector('link[href^="/styles.css"]');
+            const cheers=document.querySelector('link[href^="/cheers-hero-v1.css"]');
             const arcade=document.querySelector('link[href="/sesh-signal-v3.css"]');
-            return {baseLoaded:!!base?.sheet,arcadeLoaded:!!arcade?.sheet,
+            return {baseLoaded:!!base?.sheet,cheersLoaded:!!cheers?.sheet,arcadeLoaded:!!arcade?.sheet,
               heroOverflow:getComputedStyle(document.querySelector(".hero")).overflowX,
               arcadeDisplay:getComputedStyle(document.querySelector(".arcade-layout")).display};
           });
@@ -66,6 +68,39 @@ try{
         });
         assert.ok(await countPaintedPixels(page.locator(".logo-smoke"))>200,name+" smoke logo paints no pixels");
         assert.ok(await countPaintedPixels(page.locator(".cheers-art"))>200,name+" photographic Cheers art paints no pixels");
+        const composition=await page.evaluate(()=>{
+          const rect=s=>document.querySelector(s).getBoundingClientRect();
+          const after=rect(".hero-heading-cheers > span:first-child"),
+                cheers=rect(".headline-cheers"),art=rect(".cheers-art"),
+                play=rect(".hero-heading-cheers > span.headline-highlight"),
+                scene=rect(".hero-scene");
+          const c=document.querySelector(".headline-cheers"),a=document.querySelector(".cheers-art");
+          const cs=getComputedStyle(c),as=getComputedStyle(a);
+          const css=document.querySelector('link[href^="/cheers-hero-v1.css"]');
+          return {afterBottom:after.bottom,cheersTop:cheers.top,cheersBottom:cheers.bottom,
+            artTop:art.top,artBottom:art.bottom,playTop:play.top,sceneTop:scene.top,
+            pseudo:getComputedStyle(c,"::before").content,
+            debug:{
+              headline:{fontSize:cs.fontSize,height:cs.height,width:cs.width,position:cs.position,display:cs.display},
+              image:{fontSize:as.fontSize,height:as.height,width:as.width,position:as.position,display:as.display,objectFit:as.objectFit},
+              tag:{height:a.getAttribute("height"),width:a.getAttribute("width")},
+              stylesheet:{href:css?.href,loaded:!!css?.sheet,rules:css?.sheet?.cssRules?.length ?? null},
+              mobile:matchMedia("(max-width:760px)").matches,
+              topHeading:{fontSize:getComputedStyle(document.querySelector(".hero-heading-cheers")).fontSize}
+            }};
+        });
+        assert.equal(composition.pseudo,"none",name+" duplicate CHEERS pseudo text");
+        assert.ok(Math.abs(composition.artTop-composition.cheersTop)<=3 &&
+          Math.abs(composition.artBottom-composition.cheersBottom)<=3,
+          name+" detached CHEERS artwork: "+JSON.stringify(composition));
+        assert.ok(composition.cheersTop-composition.afterBottom>=-10 &&
+          composition.cheersTop-composition.afterBottom<=20,
+          name+" giant AFTER/CHEERS gap: "+JSON.stringify(composition));
+        assert.ok(composition.playTop-composition.cheersBottom>=-10 &&
+          composition.playTop-composition.cheersBottom<=24,
+          name+" giant CHEERS/PLAY gap: "+JSON.stringify(composition));
+        if(mobile) assert.ok(composition.sceneTop>=-8 && composition.sceneTop<=15,
+          name+" displaced controller scene: "+JSON.stringify(composition));
         if(mobile){
           assert.ok(await page.locator(".cheers-leaf").isVisible(),name+" mobile leaf not visible beside Cheers");
           assert.ok(await countPaintedPixels(page.locator(".cheers-leaf"))>100,name+" leaf artwork paints no pixels");

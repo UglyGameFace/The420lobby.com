@@ -38,6 +38,11 @@ try {
     const errors=[];
     page.on("pageerror",error=>errors.push(error.message));
     await page.goto(address,{waitUntil:"domcontentloaded"});
+    await page.waitForFunction(() => {
+      return ['/styles.css','/cheers-hero-v1.css','/sesh-signal-v3.css'].every(path=>
+        !!document.querySelector('link[rel="stylesheet"][href^="'+path+'"]')?.sheet
+      );
+    },{timeout:11000});
     await page.locator("#hero-heading").waitFor({state:"visible"});
     await page.evaluate(()=>document.fonts.ready);
     const initialHeroOpacity = await page.locator("#hero-heading").evaluate(el=>getComputedStyle(el).opacity);
@@ -171,14 +176,47 @@ try {
     assert.ok(smokeMargins.edge < Math.max(4,smokeMargins.total*.005),
       "smoke numerals bleed past their artwork boundaries");
     assert.equal(await page.locator(".reality-prism").count(),1,"optical prism missing");
-    const cheersArt=await page.locator(".headline-cheers").evaluate(el=>{
-      const r=el.getBoundingClientRect();
-      const roll=el.querySelector(".cheers-roll img").getBoundingClientRect();
-      const font=getComputedStyle(el).fontFamily;
-      return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,rollHeight:roll.height,font};
+    const cheersArt=await page.evaluate(()=>{
+      const rect=s=>{
+        const r=document.querySelector(s).getBoundingClientRect();
+        return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};
+      };
+      return {
+        cheers:rect(".headline-cheers"),artwork:rect(".cheers-art"),
+        leaf:rect(".cheers-leaf"),joint:rect(".cheers-roll img"),
+        after:rect(".hero-heading-cheers > span:first-child"),
+        play:rect(".hero-heading-cheers > span.headline-highlight"),
+        scene:rect(".hero-scene"),
+        pseudo:getComputedStyle(document.querySelector(".headline-cheers"),"::before").content
+      };
     });
-    assert.ok(cheersArt.rollHeight>8,"joint must be visibly scaled");
-    assert.ok(cheersArt.left>=0 && cheersArt.right<=scenario.size.width+2,
+    assert.equal(cheersArt.pseudo,"none","old CHEERS text still painted behind image");
+    const liveHaze=await page.locator(".cheers-art").evaluate(el=>{
+      const st=getComputedStyle(el);
+      return {animationName:st.animationName,transform:st.transform};
+    });
+    assert.ok(liveHaze.animationName.includes("cheers-smoke-hover"),
+      "smoky CHEERS motion disappeared");
+    assert.equal(liveHaze.transform,"none",
+      "CHEERS animation must not displace its line");
+    assert.ok(cheersArt.joint.height>8,"joint must be visibly scaled");
+    assert.ok(cheersArt.artwork.top>=cheersArt.cheers.top-3 &&
+      cheersArt.artwork.bottom<=cheersArt.cheers.bottom+3,
+      "CHEERS smoke image detached from its line: "+JSON.stringify(cheersArt));
+    assert.ok(cheersArt.cheers.top-cheersArt.after.bottom>=-10 &&
+      cheersArt.cheers.top-cheersArt.after.bottom<=20,
+      "extra gap between AFTER and CHEERS: "+JSON.stringify(cheersArt));
+    assert.ok(cheersArt.play.top-cheersArt.cheers.bottom>=-10 &&
+      cheersArt.play.top-cheersArt.cheers.bottom<=24,
+      "extra gap between CHEERS and WE PLAY: "+JSON.stringify(cheersArt));
+    if(scenario.mobile){
+      assert.ok(cheersArt.scene.top>=-8 && cheersArt.scene.top<=15,
+        "controller/CRT background must anchor at hero top: "+JSON.stringify(cheersArt));
+      assert.ok(cheersArt.leaf.left<cheersArt.cheers.right+25 &&
+        cheersArt.leaf.bottom>=cheersArt.cheers.top && cheersArt.leaf.top<=cheersArt.cheers.bottom,
+        "leaf must frame CHEERS, not float away: "+JSON.stringify(cheersArt));
+    }
+    assert.ok(cheersArt.cheers.left>=0 && cheersArt.cheers.right<=scenario.size.width+2,
       "Cheers text must fit viewport: "+JSON.stringify(cheersArt));
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
     assert.ok(overflow<=2,scenario.name+" horizontal overflow "+overflow+"px");
@@ -269,7 +307,7 @@ try {
     }
     if(scenario.name==="desktop" || scenario.name==="mobile" || scenario.name==="narrow-mobile") {
       await page.locator("#sesh-signal").scrollIntoViewIfNeeded();
-      await page.locator(".arcade-machine").screenshot({path:"artifacts/"+scenario.name+"-arcade-styled.png",animations:"disabled",timeout:10000});
+      await page.screenshot({path:"artifacts/"+scenario.name+"-arcade-styled.png",animations:"disabled",timeout:30000});
     }
     await page.screenshot({path:"artifacts/"+scenario.name+".png",animations:"disabled",timeout:10000});
     for (const selector of ["#vibe","#experiences","#sesh-signal",".hangout-card",".shield-card",".cinema-card",".minecraft-card","#after-dark",".community-proof","#join"]) {
@@ -284,10 +322,13 @@ try {
   }
   // Regression: an old browser-cached copy of styles.css must NOT erase the game.
   const stale=await browser.newPage({viewport:{width:390,height:844}});
-  await stale.route("**/styles.css",route=>route.fulfill({
-    status:200,contentType:"text/css",body:":root{--lime:#b8f875} body{margin:0}"
-  }));
+  let staleCssIntercepted=false;
+  await stale.route(/\/styles\.css(?:\?.*)?$/,route=>{
+    staleCssIntercepted=true;
+    return route.fulfill({status:200,contentType:"text/css",body:":root{--lime:#b8f875} body{margin:0}"});
+  });
   await stale.goto(address,{waitUntil:"domcontentloaded"});
+  assert.ok(staleCssIntercepted,"stale CSS regression did not intercept versioned global stylesheet");
   const resilient=await stale.evaluate(()=>{
     const arcade=document.querySelector(".arcade-layout");
     const stage=document.querySelector("#sesh-stage");

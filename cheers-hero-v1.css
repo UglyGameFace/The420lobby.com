@@ -1,153 +1,124 @@
-/* The approved "After Cheers, We Play" headline is deliberately isolated from
-   the shared site and Sesh Signal styles. */
+/* One authoritative CHEERS composition. Decorative assets never affect text flow. */
 .hero-heading.hero-heading-cheers{
   font-size:clamp(85px,10.6vw,167px);
   line-height:.81;
 }
 .hero-heading-cheers > span:first-child{font-weight:500;letter-spacing:-.046em;color:#f1f5e6}
-.hero-heading-cheers .headline-highlight{font-weight:700;letter-spacing:-.056em}
+.hero-heading-cheers .headline-highlight{font-weight:700;letter-spacing:-.056em;position:relative;z-index:6}
 .hero-heading-cheers .headline-cheers{
   position:relative;
   display:block;
-  width:max-content;
-  max-width:100%;
-  margin:.065em 0 .005em;
-  padding:0 0 .1em;
+  box-sizing:border-box;
+  width:min(4.0em,100%);
+  height:1.02em;
+  margin:.035em 0 .07em;
+  padding:0;
   isolation:isolate;
-  font-family:"Cormorant Garamond",Georgia,serif;
-  font-size:.95em;
-  font-weight:600;
-  line-height:.85;
-  letter-spacing:-.092em;
-  color:#e4efdb;
-  -webkit-text-stroke:.18px rgba(240,250,232,.22);
-  text-shadow:
-    0 0 18px rgba(218,250,200,.49),
-    0 0 45px rgba(195,242,162,.34),
-    0 3px 3px rgba(3,13,9,.8);
+  line-height:1;
+  overflow:visible;
 }
 .hero-heading-cheers .cheers-word{
-  display:block;
-  position:relative;
-  z-index:1;
+  position:absolute;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+  clip-path:inset(50%);
   white-space:nowrap;
-  visibility:hidden;
 }
- .hero-heading-cheers .cheers-leaf{display:none}
 .hero-heading-cheers .cheers-art{
+  display:block;
   position:absolute;
   z-index:2;
-  top:-.04em;
-  left:-2%;
-  width:104%;
-  height:1.06em;
-  display:block;
-  pointer-events:none;
+  inset:0;
+  width:100%;
+  height:100%;
   object-fit:fill;
-  filter:drop-shadow(0 0 8px rgba(220,247,210,.29));
+  pointer-events:none;
+  filter:drop-shadow(0 0 7px rgba(220,247,210,.3));
+  animation:cheers-smoke-hover 8s ease-in-out infinite alternate;
 }
-.hero-heading-cheers .headline-cheers::before{
-  content:"CHEERS,";
+.hero-heading-cheers .cheers-leaf{
+  display:none;
   position:absolute;
   z-index:1;
-  inset:0;
-  white-space:nowrap;
-  font:inherit;
-  letter-spacing:inherit;
-  color:rgba(205,239,191,.56);
-  filter:blur(15px);
   pointer-events:none;
-  animation:cheers-haze 6.5s ease-in-out infinite alternate;
-}
-.hero-heading-cheers .headline-cheers::after{
-  content:"";
-  position:absolute;
-  z-index:5;
-  left:0;
-  right:-8%;
-  top:-.13em;
-  height:.95em;
-  pointer-events:none;
-  background:
-    radial-gradient(ellipse 32% 55% at 28% 70%,rgba(227,249,209,.23),transparent 100%),
-    radial-gradient(ellipse 28% 58% at 70% 53%,rgba(186,235,162,.17),transparent 100%);
-  filter:blur(11px);
-  mix-blend-mode:screen;
-  animation:cheers-breathe 8s ease-in-out infinite alternate;
 }
 .hero-heading-cheers .cheers-roll{
   position:absolute;
   z-index:3;
   display:block;
-  width:80%;
-  left:9%;
-  bottom:-.02em;
-  height:.52em;
+  width:85%;
+  left:12%;
+  bottom:-.25em;
+  height:.58em;
   pointer-events:none;
-  transform:rotate(-1.2deg) scaleY(1.32);
-  filter:drop-shadow(0 4px 7px rgba(0,0,0,.68));
+  transform:rotate(-1.2deg);
+  filter:drop-shadow(0 4px 7px rgba(0,0,0,.65));
 }
 .hero-heading-cheers .cheers-roll img{
   display:block;
   width:100%;
   height:100%;
   object-fit:contain;
-  object-position:center;
 }
-.hero-heading-cheers .cheers-ember{
+.hero-heading-cheers .cheers-roll::after{
+  content:"";
   position:absolute;
-  right:9.5%;
-  top:54%;
-  width:.22em;
-  height:.22em;
-  transform:translate(50%,-50%);
+  z-index:1;
+  right:9%;
+  top:40%;
+  width:.2em;
+  height:.2em;
   border-radius:50%;
-  background:radial-gradient(circle,rgba(255,244,169,.95) 0%,rgba(255,175,66,.68) 30%,rgba(251,73,29,.38) 56%,rgba(251,73,29,0) 74%);
-  filter:blur(1.5px);
-  mix-blend-mode:screen;
+  background:radial-gradient(circle,rgba(255,243,174,.95) 0%,rgba(255,165,57,.75) 36%,rgba(231,57,19,.34) 65%,transparent 100%);
+  filter:blur(1px);
   pointer-events:none;
-  animation:cheers-ember 2.6s ease-in-out infinite alternate;
+  animation:cheers-ember-pulse 2.2s ease-in-out infinite alternate;
 }
-.hero-heading-cheers .headline-highlight{
-  position:relative;
-  z-index:6;
+/* Animate the haze, not the lettering's geometry. The image must stay aligned
+   with its fixed-size line during scrolling and browser screenshot capture. */
+@keyframes cheers-smoke-hover {
+  from {opacity:.94;filter:drop-shadow(0 0 6px rgba(220,247,210,.26))}
+  to {opacity:1;filter:drop-shadow(0 0 11px rgba(220,247,210,.42))}
 }
-@keyframes cheers-haze{
-  from{opacity:.36;transform:translate3d(-.015em,.02em,0) scale(1)}
-  to{opacity:.65;transform:translate3d(.012em,-.07em,0) scale(1.015)}
-}
-@keyframes cheers-breathe{
-  from{opacity:.55;transform:translateY(.04em)}
-  to{opacity:.95;transform:translateY(-.08em)}
-}
-
-@keyframes cheers-ember{
-  from{opacity:.7;transform:translate(50%,-50%) scale(.93)}
-  to{opacity:1;transform:translate(50%,-50%) scale(1.09)}
+@keyframes cheers-ember-pulse {
+  from {opacity:.65;transform:scale(.9)}
+  to {opacity:1;transform:scale(1.18)}
 }
 @media(max-width:1130px){
   .hero-heading.hero-heading-cheers{font-size:clamp(78px,10.6vw,138px)}
 }
 @media(max-width:760px){
-  .hero-heading-cheers .cheers-leaf{display:block;position:absolute;z-index:1;left:85%;top:-.30em;width:62%;height:auto;pointer-events:none;filter:brightness(1.25) saturate(1.15) drop-shadow(0 3px 12px rgba(35,99,39,.20))}
   .hero-heading.hero-heading-cheers{font-size:clamp(61px,13.5vw,102px)}
-  .hero-heading-cheers .headline-cheers{font-size:1.02em;letter-spacing:-.087em;margin:.06em 0 .025em;padding-bottom:.14em}
-  .hero-heading-cheers .cheers-roll{bottom:-.14em}
+  .hero-heading-cheers .headline-cheers{
+    width:min(4.05em,84%);
+    height:1.02em;
+    margin:.04em 0 .10em;
+  }
+  .hero-heading-cheers .cheers-leaf{
+    display:block;
+    width:55%;
+    height:2.8em;
+    right:-15%;
+    top:-.48em;
+    object-fit:contain;
+    filter:brightness(1.2) saturate(1.12) drop-shadow(0 2px 10px rgba(38,98,39,.22));
+  }
+  .hero-heading-cheers .cheers-roll{width:89%;left:12%;bottom:-.25em}
 }
 @media(max-width:420px){
   .hero-heading.hero-heading-cheers{font-size:clamp(57px,13.1vw,78px)}
-  .hero-heading-cheers .headline-cheers{font-size:1.12em;letter-spacing:-.09em}
-  .hero-heading-cheers .cheers-roll{width:91%;left:14%;bottom:-.155em}
+  .hero-heading-cheers .headline-cheers{width:min(4.05em,84%)}
+  .hero-heading-cheers .cheers-leaf{width:55%;right:-15%;top:-.48em}
 }
 @media(max-width:360px){
   .hero-heading.hero-heading-cheers{font-size:clamp(50px,13.4vw,59px)}
-  .hero-heading-cheers .headline-cheers{font-size:1.11em}
+  .hero-heading-cheers .headline-cheers{width:min(4.05em,84%)}
+  .hero-heading-cheers .cheers-leaf{right:-11%;width:49%}
 }
 @media(prefers-reduced-motion:reduce){
-  .hero-heading-cheers .headline-cheers::before,
-  .hero-heading-cheers .headline-cheers::after,
-  .hero-heading-cheers .cheers-ember{animation:none}
+  .hero-heading-cheers .cheers-art,
+  .hero-heading-cheers .cheers-roll::after{animation:none}
 }
-html.fx-off .hero-heading-cheers .headline-cheers::before,
-html.fx-off .hero-heading-cheers .headline-cheers::after,
-html.fx-off .hero-heading-cheers .cheers-ember{animation:none}
+html.fx-off .hero-heading-cheers .cheers-art,
+html.fx-off .hero-heading-cheers .cheers-roll::after{animation:none}

@@ -37,14 +37,25 @@ test("approved Cheers hero retains actual text, independent motion and original 
   assert.match(html, /class="headline-cheers"/);
   assert.match(html, /class="cheers-word">CHEERS,/);
   assert.match(html, /src="\/assets\/cheers-joint\.svg"/);
-  assert.match(html, /href="\/cheers-hero-v1\.css"/);
+  assert.match(html, /href="\/cheers-hero-v1\.css\?v=20261016-hero3"/);
+  assert.match(html, /href="\/styles\.css\?v=20261016-hero3"/);
   assert.match(html, /The 420 Lobby \| After Cheers, We Play/);
   assert.doesNotMatch(html, /headline-hollow">DARK,/);
   assert.match(cheersCss, /\.hero-heading-cheers \.headline-cheers/);
   assert.match(html, /class="cheers-art" src="\/assets\/approved-smoke-cheers\.svg"/);
+  assert.doesNotMatch(html, /class="cheers-art"[^>]*\bheight="45"/);
   assert.match(cheersArt, /data:image\/png;base64,/);
   assert.match(html, /class="cheers-leaf" src="\/assets\/approved-leaf\.svg"/);
-  assert.match(cheersCss, /\.hero-heading-cheers \.cheers-leaf\{display:block;position:absolute;z-index:1/);
+  assert.match(cheersCss, /\.hero-heading-cheers \.cheers-leaf\{[\s\S]*?display:block;/);
+  assert.doesNotMatch(cheersCss, /content:\s*["']CHEERS,/);
+  assert.doesNotMatch(cheersCss, /\.headline-cheers::before|\.headline-cheers::after/);
+  assert.match(cheersCss, /@keyframes cheers-smoke-hover/);
+  const hazeFrames = cheersCss.match(/@keyframes cheers-smoke-hover\s*\{[\s\S]*?\n\}/)?.[0] || "";
+  assert.match(hazeFrames, /filter:drop-shadow/);
+  assert.doesNotMatch(hazeFrames, /transform:/, "smoke effects must not shift CHEERS geometry");
+  assert.match(cheersCss, /@keyframes cheers-ember-pulse/);
+  assert.match(cheersCss, /html\.fx-off \.hero-heading-cheers \.cheers-roll::after\{animation:none\}/);
+  assert.match(cheersCss, /@media\(prefers-reduced-motion:reduce\)/);
   assert.doesNotMatch(html,/class="cheers-vapor"/);
   assert.match(cheersCss, /html\.fx-off/);
   assert.match(cheersCss, /prefers-reduced-motion:reduce/);
@@ -61,6 +72,9 @@ test("approved natural leaf art replaces the old geometric foreground", () => {
   assert.match(leaf, /viewBox="0 0 130 185"/);
   assert.match(html, /src="\/assets\/approved-leaf\.svg" class="botanical-foreground/);
   assert.match(lounge, /gaming controller/i);
+  assert.match(lounge, /id="lounge-controller"[^>]*scale\(\.75\)/);
+  assert.doesNotMatch(lounge, /d="M388 777h223"/);
+  assert.doesNotMatch(lounge, /d="M435 732h134l17 44H414Z"/);
   assert.match(icon, /haunted|ghost|\/svg>/i);
 });
 
@@ -76,7 +90,7 @@ test("custom smoke 420 brand has accessible branding without the old clipped squ
   assert.match(css,/\.fx-toggle #fx-label\{display:none\}/);
   assert.match(css,/\.scene-label\{display:none\}/);
   assert.match(html, /class="logo-type logo-prefix">THE<\/span><img class="logo-smoke"[^>]+><span class="logo-type logo-suffix">LOBBY/);
-  assert.match(css,/\.logo-smoke\{position:absolute;z-index:1;left:clamp\(26px,8vw,35px\)/);
+  assert.match(css,/\.logo-smoke\{position:absolute;z-index:1;left:clamp\(16px,5vw,25px\)/);
   assert.doesNotMatch(html, /<span class="logo-type">THE 420/);
   assert.doesNotMatch(css,/\.header-shell\{height:130px/);
   assert.match(html, /ENTER THE LOBBY<\/span>/);
@@ -148,9 +162,9 @@ test("CSS has original haunted experience and mobile/performance fallbacks",()=>
 });
 
 test("static Pages hosting remains build-free", () => {
-  assert.match(html,/<link rel="stylesheet" href="\/styles\.css">/);
+  assert.match(html,/<link rel="stylesheet" href="\/styles\.css\?v=20261016-hero3">/);
   assert.match(html,/<link rel="stylesheet" href="\/sesh-signal-v3\.css">/);
-  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css">/);
+  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css\?v=20261016-hero3">/);
   assert.match(html,/<script defer src="\/script\.js"><\/script>/);
   assert.match(html,/<script defer src="\/visual-engine\.js"><\/script>/);
   assert.doesNotMatch(html,/https?:\/\/cdn\..*\/.*\.js/);
@@ -204,7 +218,7 @@ test("custom arcade styling supports touch, keyboard, and phones", () => {
 
 
 test("arcade CSS is independently versioned and not hidden in stale global styles", () => {
-  assert.match(html, /href="\/styles\.css">[\s\S]*href="\/sesh-signal-v3\.css">/);
+  assert.match(html, /href="\/styles\.css\?v=20261016-hero3">[\s\S]*href="\/sesh-signal-v3\.css">/);
   assert.match(arcadeCss,/\.sesh-arcade\{/);
   assert.match(arcadeCss,/\.sesh-stage\{/);
   assert.match(arcadeCss,/\.arcade-machine\{/);
