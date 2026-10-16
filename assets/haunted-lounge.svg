@@ -66,8 +66,7 @@
 <rect x="292" y="702" width="449" height="17" fill="#172822"/>
 <circle cx="731" cy="685" r="8" fill="#c5ff77" filter="url(#glow)"/>
 <circle cx="756" cy="685" r="6" fill="#588c62"/>
-<path d="M435 732h134l17 44H414Z" fill="#203a32"/>
-<path d="M388 777h223" stroke="#6a9572" stroke-width="18" stroke-linecap="round"/>
+<!-- The old pedestal was exposed as a floating bar after the controller was scaled back. The framed monitor is intentionally stand-free. -->
 </g>
 <!-- Gaming controller: smaller and farther back than the CRT, with room for the headline. -->
 <g id="lounge-controller" filter="url(#shadow)" transform="translate(225 245) scale(.75)" opacity=".6">
