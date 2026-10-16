@@ -44,7 +44,22 @@ html.fx-off{scroll-behavior:auto}html.fx-off *,html.fx-off *::before,html.fx-off
 @keyframes prismBreathing{to{opacity:.38;filter:blur(3px)}}
 @keyframes opticalBreathing{to{opacity:.48;box-shadow:0 0 95px rgba(60,240,159,.11),inset 0 0 85px rgba(135,239,193,.2)}}
 @media(max-width:760px){.reality-prism{width:113vw}.reality-slit{width:97vw}.experience-card:nth-child(n){clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)}}
-@media(min-width:761px) and (max-width:1050px){.logo-type{font-size:14px}.logo-smoke{width:78px;height:45px;margin-inline:0}.header-shell{gap:12px}}
+@media(min-width:761px) and (max-width:1050px){
+  /* Tablet header: do not compress five nav links into columns beside the artwork. */
+  .header-shell{height:90px;min-width:0;position:relative;justify-content:center;gap:0}
+  .logo{width:260px;justify-content:center;gap:5px}
+  .logo-type{font-size:16px}
+  .logo-smoke{width:116px;height:64px;margin:0}
+  .header-actions{display:contents}
+  .menu-toggle{position:absolute;left:0;top:50%;transform:translateY(-50%);display:flex}
+  .fx-toggle{position:absolute;right:0;top:50%;transform:translateY(-50%);height:43px}
+  .desktop-nav{display:none;position:absolute;z-index:30;left:0;right:0;top:87px;flex-direction:column;gap:0;align-items:stretch;background:rgba(9,27,20,.97);border:1px solid rgba(188,244,169,.34);padding:16px;box-shadow:0 22px 54px rgba(0,0,0,.5)}
+  .desktop-nav.open{display:flex}
+  .desktop-nav a{padding:15px 10px;font-size:11px;border-bottom:1px solid var(--line)}
+  .desktop-nav .nav-join{margin-top:11px;text-align:center}
+  .menu-toggle[aria-expanded=true] span:first-child{transform:translateY(5px) rotate(45deg)}
+  .menu-toggle[aria-expanded=true] span:last-child{transform:translateY(-4px) rotate(-45deg)}
+}
 @media(max-width:360px){.hero-scene{width:480px;right:-180px;top:0;opacity:.68;filter:brightness(.98) saturate(1.03)}.logo-smoke{width:90px;height:76px}.logo-type{font-size:11px}.menu-toggle{width:40px;height:40px}.fx-toggle{padding-inline:6px}}
 
 /* Do not let reduced-motion/effects-off restore the old centered transform on mobile. */
