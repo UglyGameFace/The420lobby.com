@@ -11,5 +11,5 @@
 <path d="M232 240h42q51 0 51 48t-51 48h-42zm22 21v54h18q28 0 28-27t-28-27z" fill="#d8f9db" fill-rule="evenodd"/>
 <path d="M368 245q-16-10-36-8-30 2-30 27 0 21 29 27 24 5 24 15 0 15-25 14-16 0-30-10v25q17 9 35 9 47 0 47-39 0-27-32-35-21-5-21-13 0-10 18-10 10 0 21 5z" fill="#7af5b0"/>
 <path d="M237 405h126l-10 32H247z" fill="#09251b" stroke="url(#metal)" stroke-width="4"/><path d="M278 405v-14a22 22 0 0 1 44 0v14" fill="none" stroke="#d8be78" stroke-width="9"/><circle cx="300" cy="420" r="5" fill="#6df6b0"/>
-<path d="M80 473q220 52 440 0l-17 68q-203 57-406 0z" fill="#091c17" stroke="url(#metal)" stroke-width="8"/><text x="300" y="519" text-anchor="middle" font-family="Arial,sans-serif" font-size="46" font-weight="900" letter-spacing="4" fill="#f6e1a1">DANK SHIELD</text>
+
 </svg>
