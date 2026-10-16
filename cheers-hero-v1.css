@@ -75,9 +75,11 @@
   pointer-events:none;
   animation:cheers-ember-pulse 2.2s ease-in-out infinite alternate;
 }
+/* Animate the haze, not the lettering's geometry. The image must stay aligned
+   with its fixed-size line during scrolling and browser screenshot capture. */
 @keyframes cheers-smoke-hover {
-  from {opacity:.94;transform:translateY(.008em) scale(1)}
-  to {opacity:1;transform:translateY(-.027em) scale(1.008)}
+  from {opacity:.94;filter:drop-shadow(0 0 6px rgba(220,247,210,.26))}
+  to {opacity:1;filter:drop-shadow(0 0 11px rgba(220,247,210,.42))}
 }
 @keyframes cheers-ember-pulse {
   from {opacity:.65;transform:scale(.9)}
