@@ -206,6 +206,11 @@ try {
     assert.equal(await page.locator(".logo").textContent(),"THELOBBY","420 is an animated image, not CSS lettering");
     assert.equal(await page.locator(".lobby-brand-banner img").getAttribute("src"),"/assets/the420lobby-neon-lounge.webp");
     assert.equal(await page.locator(".logo").getAttribute("aria-label"),"The 420 Lobby home");
+    // Previous image and hero checks scroll to lower-page sections; narrow phones
+    // can leave the non-sticky header above the viewport. Restore the real
+    // initial viewport before measuring navbar clipping and tap-target spacing.
+    await page.evaluate(() => window.scrollTo(0,0));
+    await page.waitForTimeout(80);
     const layout = await page.evaluate(() => {
       const get = selector => {
         const rect=document.querySelector(selector).getBoundingClientRect();
