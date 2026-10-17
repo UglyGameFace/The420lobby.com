@@ -194,11 +194,10 @@ try {
     assert.ok(await countPaintedPixels(page.locator("img.cheers-art"))>200,"CHEERS smoke art loaded but is invisible");
     assert.ok(await countPaintedPixels(page.locator("img.botanical-foreground"))>100,"new leaf asset loaded but is invisible");
     if(scenario.mobile) {
-      assert.ok(await page.locator("img.cheers-leaf").isVisible(),"mobile leaf artwork is hidden");
-      assert.ok(await countPaintedPixels(page.locator("img.cheers-leaf"))>100,"mobile Cheers leaf artwork paints no pixels");
+      assert.equal(await page.locator("img.cheers-leaf").count(),0,"old overlay leaf must not cover realistic CHEERS");
       assert.ok(await countPaintedPixels(page.locator("img.hero-smoke-trail"))>100,"natural left smoke image is invisible");
     }
-    assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,"approved joint art failed to load");
+    assert.equal(await page.locator(".cheers-art").evaluate(el=>el.complete && el.naturalWidth===1100),true,"realistic joint and smoke asset failed to load");
     assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,","hero slogan regressed");
     assert.equal(await page.locator(".logo-glyph").count(),0,"outdated sticky-note mark still present");
     assert.match(await page.locator(".brand-smoke-image").getAttribute("src"),/\/assets\/lobby-smoke-420-(?:still|loop)\.webp/);
@@ -254,7 +253,7 @@ try {
       };
       return {
         cheers:rect(".headline-cheers"),artwork:rect(".cheers-art"),
-        leaf:rect(".cheers-leaf"),joint:rect(".cheers-roll img"),
+        joint:rect(".cheers-art"),
         after:rect(".hero-heading-cheers > span:first-child"),
         play:rect(".hero-heading-cheers > span.headline-highlight"),
         scene:rect(".hero-scene"),hero:rect(".hero"),
@@ -283,9 +282,7 @@ try {
     if(scenario.mobile){
       assert.ok(Math.abs(cheersArt.scene.top-cheersArt.hero.top)<=15,
         "controller/CRT background must anchor at hero top: "+JSON.stringify(cheersArt));
-      assert.ok(cheersArt.leaf.left<cheersArt.cheers.right+25 &&
-        cheersArt.leaf.bottom>=cheersArt.cheers.top && cheersArt.leaf.top<=cheersArt.cheers.bottom,
-        "leaf must frame CHEERS, not float away: "+JSON.stringify(cheersArt));
+      assert.equal(await page.locator(".cheers-leaf").count(),0,"photoreal composition needs no vector leaf");
     }
     assert.ok(cheersArt.cheers.left>=0 && cheersArt.cheers.right<=scenario.size.width+2,
       "Cheers text must fit viewport: "+JSON.stringify(cheersArt));

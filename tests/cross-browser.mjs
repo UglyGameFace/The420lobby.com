@@ -122,10 +122,9 @@ try{
         if(mobile) assert.ok(Math.abs(composition.sceneTop-composition.heroTop)<=15,
           name+" displaced controller relative to hero: "+JSON.stringify(composition));
         if(mobile){
-          assert.ok(await page.locator(".cheers-leaf").isVisible(),name+" mobile leaf not visible beside Cheers");
-          assert.ok(await countPaintedPixels(page.locator(".cheers-leaf"))>100,name+" leaf artwork paints no pixels");
+          assert.equal(await page.locator(".cheers-leaf").count(),0,name+" old overlay leaf still present");
         }
-        assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed joint art load");
+        assert.equal(await page.locator(".cheers-art").evaluate(el=>el.complete && el.naturalWidth===1100),true,name+" failed realistic smoke and blunt load");
         assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,");
         assert.equal(await page.locator(".sesh-item").count(),0,"No targets before start");
         const completeLogo=await page.locator(".brand-smoke-image").boundingBox();
