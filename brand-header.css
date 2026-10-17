@@ -57,8 +57,8 @@
 @media (max-width:760px){
   .site-header .header-shell .logo.brand-lockup{
     display:flex;position:absolute;left:50%;top:50%;translate:-50% -50%;
-    transform:none;width:min(252px,calc(100vw - 140px));
-    max-width:calc(100vw - 140px);height:80px;gap:3px;padding:0;
+    transform:none;width:min(228px,calc(100vw - 166px));
+    max-width:calc(100vw - 166px);height:80px;gap:3px;padding:0;
     z-index:2;overflow:visible;flex:none;
   }
   .site-header .brand-lockup__the,.site-header .brand-lockup__lobby{
@@ -78,7 +78,7 @@
 }
 @media(max-width:360px){
   .site-header .header-shell .logo.brand-lockup{
-    width:calc(100vw - 140px);max-width:calc(100vw - 140px);
+    width:calc(100vw - 166px);max-width:calc(100vw - 166px);
   }
   .site-header .brand-lockup__smoke{width:104px;height:75px}
   .arcade-header .brand-lockup__smoke{width:83px}

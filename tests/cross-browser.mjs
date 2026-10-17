@@ -186,7 +186,7 @@ try{
           assert.ok(Math.abs((controls.logo.left+controls.logo.right)/2-(controls.header.left+controls.header.right)/2)<=2,
             name+" brand not centered: "+JSON.stringify(controls));
           assert.ok(controls.menu.right+3<=controls.logo.left,name+" menu and brand overlap");
-          assert.ok(controls.logo.right+3<=controls.fx.left,name+" brand and FX overlap");
+          assert.ok(controls.logo.right+3<=controls.fx.left,name+" brand and FX overlap: "+JSON.stringify(controls));
           assert.ok(controls.eyebrow.top-controls.header.bottom>=135 && controls.eyebrow.top-controls.header.bottom<=240,name+" hero top gap out of range");
         }
         assert.equal(await page.locator("#sesh-start").isDisabled(),true,name+" game start must require Discord login");
