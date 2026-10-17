@@ -40,7 +40,7 @@
 }
 @media (max-width:760px){
   .site-header .logo.brand-wordmark-link{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    position:absolute;left:50%;top:50%;translate:-50% -50%;transform:none;
     width:min(228px,calc(100vw - 158px));height:72px;max-width:none;
   }
   .site-header .logo.brand-wordmark-link .brand-wordmark-image{max-height:67px}
