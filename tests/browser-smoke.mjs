@@ -209,8 +209,11 @@ try {
     // Previous image and hero checks scroll to lower-page sections; narrow phones
     // can leave the non-sticky header above the viewport. Restore the real
     // initial viewport before measuring navbar clipping and tap-target spacing.
-    await page.evaluate(() => window.scrollTo(0,0));
-    await page.waitForTimeout(80);
+    await page.evaluate(() => {
+      document.documentElement.style.scrollBehavior="auto";
+      window.scrollTo(0,0);
+    });
+    await page.waitForFunction(() => window.scrollY === 0);
     const layout = await page.evaluate(() => {
       const get = selector => {
         const rect=document.querySelector(selector).getBoundingClientRect();
