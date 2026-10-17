@@ -22,6 +22,7 @@ test('Pages configuration has a public dist boundary and no placeholder D1 resou
   assert.equal(config.name,'the420lobby-com');
   assert.equal(config.pages_build_output_dir,'dist');
   assert.equal(config.vars.SITE_ORIGIN,'https://the420lobby.com');
+  assert.equal(config.env?.production?.vars?.SITE_ORIGIN,'https://the420lobby.com','Cloudflare production env vars do not inherit root vars when D1 is overridden');
   assert.equal(Object.hasOwn(config.vars,'DISCORD_CLIENT_ID'),false,'Discord client ID must come from a deployed binding, not a blank file value');
   assert.equal(Object.hasOwn(config.vars,'DISCORD_CLIENT_SECRET'),false,'Discord client secret must never be committed to Wrangler vars');
   // The production database must never be inherited by a Pages preview deployment.
@@ -35,6 +36,8 @@ test('Pages configuration has a public dist boundary and no placeholder D1 resou
   assert.match(db.database_id||'',/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i);
   assert.notEqual(db.database_id,'00000000-0000-0000-0000-000000000000');
   assert.equal(config.env?.preview?.d1_databases,undefined,'preview requires a separately provisioned D1 binding');
+  assert.equal(Object.hasOwn(config.env?.production?.vars||{},'DISCORD_CLIENT_ID'),false,'production Client ID must remain an encrypted Pages binding');
+  assert.equal(Object.hasOwn(config.env?.production?.vars||{},'DISCORD_CLIENT_SECRET'),false,'production Client Secret must remain an encrypted Pages binding');
   assert.equal(Object.hasOwn(config.vars,'DISCORD_CLIENT_ID'),false);
   assert.equal(Object.hasOwn(config.vars,'DISCORD_CLIENT_SECRET'),false);
 });
