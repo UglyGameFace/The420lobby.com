@@ -78,7 +78,7 @@
 }
 @media(max-width:360px){
   .site-header .header-shell .logo.brand-lockup{
-    width:calc(100vw - 144px);max-width:calc(100vw - 144px);
+    width:calc(100vw - 144px);max-width:calc(100vw - 144px);gap:1px;
   }
   .site-header .brand-lockup__smoke{width:104px;height:75px}
   .arcade-header .brand-lockup__smoke{width:83px}
