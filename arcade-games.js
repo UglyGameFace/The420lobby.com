@@ -87,9 +87,14 @@ export function mountGame(container, gameId, initialSession) {
 
   let engine, snapshot, session = initialSession, run, started = 0, events = [];
   let mode = "idle", raf = 0, pauseTimer = 0, disposed = false, pendingSave = null;
-  let generation = 0;
+  let generation = 0, lastWallMs = 0;
   const controller = new AbortController(), elements = new Map();
-  const wallTime = () => Math.max(0, Math.floor(performance.now() - started));
+  function wallTime() {
+    // Browser scheduling can report an earlier sample than the last input/frame.
+    // Preserve the replay protocol's monotonic wall clock at its source.
+    lastWallMs = Math.max(lastWallMs, 0, Math.floor(performance.now() - started));
+    return lastWallMs;
+  }
   const say = text => { status.textContent = text; };
   function showOverlay(title, text) {
     overlayTitle.textContent = title; overlayCopy.textContent = text; overlay.hidden = false;
@@ -225,7 +230,7 @@ export function mountGame(container, gameId, initialSession) {
   function frame() {
     if (disposed || mode !== "playing") return;
     try { snapshot = engine.advance(wallTime()); }
-    catch (error) { console.warn("Arcade timing failure", error?.code || error?.message || "unknown"); expire("This round exceeded its allowed time."); return; }
+    catch (_) { expire("This round exceeded its allowed time."); return; }
     render();
     if (snapshot.finished) finish();
     else raf = requestAnimationFrame(frame);
@@ -255,7 +260,7 @@ export function mountGame(container, gameId, initialSession) {
       if (disposed || current !== generation) return;
       session = authorized.session; run = authorized.run;
       engine = createEngine(gameId, run.seed); snapshot = engine.snapshot();
-      started = performance.now(); events = []; mode = "playing"; overlay.hidden = true;
+      started = performance.now(); lastWallMs = 0; events = []; mode = "playing"; overlay.hidden = true;
       render(); say("Round started. " + (memory ? "Find all six pairs!" : "Tap when the rings meet!"));
       if (memory) elements.get(0)?.focus({preventScroll:true}); else board.focus({preventScroll:true});
       raf = requestAnimationFrame(frame);
