@@ -1,76 +1,56 @@
 # The 420 Lobby
-**Website:** https://the420lobby.com  
-**Discord:** https://discord.gg/the420lobby  
-**Cloudflare Pages project:** `the420lobby-com`
 
-## Active task: Sesh Signal custom-accessory gameplay and responsive layout
+Website: https://the420lobby.com
+Community: https://discord.gg/the420lobby
+GitHub: https://github.com/UglyGameFace/The420lobby.com
 
-PR #3's custom smoke branding is already in production `main`. This feature adds a fully playable, standalone 42-second 420-themed arcade game as the next single active task, without modifying Dank Shield or claiming any live Discord integration.
+This upgrade preserves the existing smoke branding, community homepage, Dank Shield, Dank Cinema, Minecraft Java/Bedrock hub, and Sesh Signal. The new `/arcade.html` adds a neon green and purple game room, original illustrated cannabis accessories, Discord player profiles, ten achievements, and per-game weekly/all-time leaderboards. Minecraft details remain unpublished until verified; the original Discord invite remains the community entry point.
 
-**Rules:** Collect realistic illustrated lighter, grinder and papers items. Completing all three distinct items in a run grants +75 bonus and extra Chill Mode charge. An intact glass piece grants a rare +45. Broken bongs and broken glass pipes are negative hazards: tapping costs 20 points and resets combo and kit progress. Targets remain stationary for reliable mobile taps. Chill Mode doubles points for five seconds.
+## Games
 
-**Results:** Show round score, combo, elapsed time, personal best, player tier, and optional share/copy to Discord. The best score is stored only in this browser's localStorage and may disappear if storage is cleared. No account, analytics SDK, leaderboard backend, prize, or permission to affect Discord roles is involved.
+- **Sesh Signal:** the original 42-second gear collector, including glass hazards, kit bonuses, combos, optional sound, pause/resume, and five-second Chill Mode.
+- **Green Room Match:** find six pairs of illustrated sesh accessories in 45 seconds with touch or keyboard controls.
+- **Bong Blitz:** a 30-second timing game; hit the glass when the purple and green rings align.
 
-**Reliability:** One requestAnimationFrame loop runs only while a round is active. The round automatically pauses if the tab/app goes to the background. Personal best reads/writes are guarded for privacy modes that block storage. Optional sound is disabled by default, gameplay works without WebGL, targets are native buttons and moving targets slow down when reduced-motion or Save-Data is enabled.
+Every game requires Discord sign-in and a server-issued run. Historical localStorage scores are not imported into verified rankings.
 
-### Architecture / ownership
-- `index.html`: semantic content, internal links, verified Discord invite, no invented stats or Minecraft ports.
-- `styles.css`: sole authoritative theme and layout stylesheet. Responsive and reduced-motion designs included.
-- `script.js`: the marketing site's DOM interaction and scroll/parallax coordinator.
-- `sesh-signal.js`: independent mini-game state, set-completion bonuses, glass hazards, local scoring, one animation loop, share/copy and optional sound. No server calls.
-- `assets/sesh-gear.svg`: six original accessory illustrations used in actual game targets.
-- `sesh-signal-v3.css`: dedicated, cache-versioned responsive arcade design. Old arcade CSS must not be used.
-- `sesh-signal-v3.css`: the **sole** Sesh Signal arcade stylesheet, linked independently from the marketing site's `styles.css`. It uses a new URL to prevent stale site CSS caches from rendering arcade controls as raw text. Version its filename on future breaking visual changes.
-- `visual-engine.js`: GPU WebGL shader, owned behind `window.LobbyAtmosphere`. No Three.js download, CDNs, or build step. Shader falls back to CSS if WebGL is unavailable.
-- `assets/haunted-lounge.svg`: existing atmospheric CRT gaming illustration, retained as visual background only. Its filename is legacy; no haunted-house copy is promoted.
-- `assets/smoke-420.svg`: procedural vapor lettering formed by turbulence, displacement, feathered clouds, and translucent density, deliberately replacing the clipping-paper CSS brand mark.
-- `assets/botanical-leaf.svg`: seven individual serrated leaflets, veins, tapering and a stem, not generic blade shapes.
-- `favicon.svg`: existing icon, unchanged in this scope.
-- `tests/site.test.mjs`: static regression checks.
-- `tests/browser-smoke.mjs`: Chromium acceptance tests, including real arcade taps, score changes, pause/resume and restart on mobile sizes.
+## Architecture and hosting
 
-### Performance safeguards
-- WebGL only while the hero is onscreen and tab visible; animation loop pauses on tab visibility change.
-- GPU resolution capped and reduced for mobile, with low-power context and 25/35 FPS targets.
-- System reduced-motion and save-data preferences disable nonessential motion.
-- User effects control available when supported.
-- All critical content remains visible without JavaScript and without WebGL.
-- Assets are SVG and no large background video, heavy JS framework, WebGL dependency, database or tracking SDK is required.
+Inspection of source commit `6f45da382070a89a39fb18223a9598cd0d76a8c7`, the original README, and its validation workflow found a static, buildless Cloudflare Pages site named `the420lobby-com`, Git-linked to `main`, with the repository root as output. No existing authentication, database, or framework was present. Live HTTP inspection was unavailable because the workspace network proxy failed; hosting details come from the repository's documented configuration.
 
-### Deployment
-Existing Pages project is linked to GitHub `main`, with **no build command** and `.` output directory (repository root). Do not change that configuration for this redesign.
+The upgrade retains Cloudflare Pages. Pages Functions provide same-origin Discord OAuth2 and secure session/run endpoints; Cloudflare D1 persists profiles, scores, achievements and temporary session data. `wrangler.jsonc` intentionally leaves Discord sign-in unconfigured and does not declare a D1 binding until a real database ID exists. A placeholder database ID must never be deployed. No external infrastructure has been created or changed.
 
-1. Open/verify pull request; let GitHub Actions validate the exact head.
-2. Review Cloudflare's PR preview if enabled, and check Android browsers, desktop, effect-toggle behavior, scrolling, and Discord invite CTA before merging.
-3. Merge the PR to `main` after acceptance. Cloudflare then deploys the same static files automatically.
-4. Validate `https://the420lobby.com`, `https://www.the420lobby.com`, and email continuity. Do not modify domain DNS for visual changes.
+The proposed build command is `node scripts/build-static.mjs`, with `dist` as output. Its explicit public-asset list prevents server source and local configuration from being published. This replaces the old no-build/root-output setting for the approved upgrade; no live hosting setting has been changed.
 
-### Local tests
-With Node.js 20 or newer:
+Discord client secrets and OAuth token exchange remain entirely server-side. Browser sessions use opaque HttpOnly/Secure cookies; writes require Origin and CSRF checks. The server replays seeded input transcripts and computes scores itself, with ownership, duration, action, payload, rate, expiry and duplicate-submission checks. Valid automated play remains possible; replay validation is not a guarantee that a player is human.
+
+See [the backend and setup guide](docs/ARCADE_BACKEND.md) for the schema, complete API, private credential setup, local runtime and release steps.
+
+## Development and validation
+
+Use Node.js 24 or newer. There are no frontend runtime dependencies or framework build tools.
 
 ```sh
-node --check script.js
-node --check visual-engine.js
-node --check sesh-signal.js
-node --test tests/site.test.mjs
+node --test tests/*.test.mjs
+node scripts/build-static.mjs
 ```
 
-Runtime visual checks in multiple browsers are still necessary. WebGL shader compilation, mobile GPU drivers and battery behavior cannot be proven by a static source test.
+The test suite covers existing branding/community regressions, secure API requests, deterministic scoring and abuse rejection, actual SQLite migrations/queries/persistence, OAuth/session/CSRF behavior, and the public-asset boundary. The SQLite tests use Node's built-in SQLite module and mocked Discord responses.
 
-## Website ↔ Discord/Minecraft integration backlog (not implemented in this redesign)
+For browser QA, install Playwright and its browsers in development/CI, then run:
 
-Sesh Signal is now implemented as a **local-only mini-game**. Direct Discord/Minecraft integration remains the next task, not part of the arcade PR. Never invent member rewards, public counts or cross-service authentication. Changes to Dank Shield need separate authorization and integration tests.
+```sh
+node tests/arcade-browser.mjs
+node tests/browser-smoke.mjs
+node tests/cross-browser.mjs
+```
 
-Suggested delivery order:
+Arcade browser tests use explicit API fixtures to verify UI behavior; fixtures do not create real Discord sessions or hosted data. Existing external homepage photographs still depend on their original Wikimedia URLs. Real Discord and the Cloudflare runtime need a final integration check after private development credentials are configured.
 
-1. **Optional live Discord status**: If the server owner explicitly enables the Discord Server Widget, use Discord's `/guilds/{guild.id}/widget.json` and a rate-limited/cache-aware Cloudflare Pages Function to display a meaningful *online presence count* without exposing individual member names, channel lists or private moderation data. Use no guessed guild ID. Show "Status unavailable" when disabled. Keep private/staff channels hidden.
-2. **Bot capability highlights**: Publish only approved, aggregated, read-only nonprivate Dank Shield diagnostics through a documented authenticated bot-to-site contract with caching, no public bot token, no admin endpoints exposed.
-3. **Minecraft status**: After the new IP and protocol/port are verified, use a bounded server-side proxy or signed lightweight plugin heartbeat to surface truthful availability and Java/Bedrock compatibility. Never embed secrets in client JS and never hardcode the old address.
-4. **Events/announcements**: Public, permission-filtered Discord scheduled events and community changelog, with caching and explicit privacy review.
-5. **Member portal** (only if truly needed): Discord OAuth2 with server-side token handling, account-scoped permissions, access controls, and abuse protection. Do not build this before the read-only integration is proven stable.
+A plain static server can preview the layout but cannot authenticate players or save scores. Unconfigured or unavailable APIs keep games locked and show truthful status text. For secure local integration, follow the Wrangler/D1 instructions in the backend guide.
 
-All live data should explicitly label stale/unavailable status. Keep Cloudflare Pages lightweight and do not make Dank Shield production runtime dependent on the marketing website.
+## Approval before release
 
-## Mobile acceptance
+**Do not deploy, change production bindings, apply remote migrations, push to an auto-deploying branch, or merge without the user's approval.** Cloudflare can automatically deploy Git branches/previews, so even a draft PR may trigger a deployment. This implementation is prepared locally for review.
 
-Game controls and the playing field sit together in `.arcade-play`, with a compact visible collect/avoid key and expanded instructions in native `<details>`. The gameplay must be visible and tappable at 320, 360, 390, 412 and tablet/desktop widths. Test both useful accessory taps and broken-glass hazards and confirm reduced-motion and save-data fallbacks. No prizes or member rewards are granted.
+Before an approved release: configure a Discord application with its exact callback URL, store its client secret as an encrypted Pages runtime secret, create/bind D1, apply the reviewed migration, and update the Pages build/output settings. Keep previews isolated from the production database and Discord callback. Preserve DNS and existing domain/email configuration.

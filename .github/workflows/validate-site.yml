@@ -1,4 +1,4 @@
-name: Validate landing page
+name: Validate The 420 Lobby
 
 on:
   push:
@@ -19,27 +19,38 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
       - name: JavaScript syntax
         run: |
           node --check script.js
           node --check visual-engine.js
           node --check sesh-signal.js
-      - name: Static site regression tests
-        run: node --test tests/site.test.mjs
+          node --check sesh-loader.js
+          node --check arcade-api.js
+          node --check scripts/build-static.mjs
+          node --check arcade-app.js
+          node --check arcade-games.js
+          node --check shared/arcade-rules.mjs
+          find functions -type f \( -name '*.mjs' -o -name '*.js' \) -exec node --check {} \;
+      - name: Site, gameplay, authentication and persistence regression tests
+        run: node --test tests/*.test.mjs
+      - name: Compile Cloudflare Pages Functions without deploying
+        run: npx --yes wrangler@4 pages functions build --outdir=.wrangler/functions-build
       - name: Install browser smoke-test tooling
         run: |
           npm install --no-save playwright@1.56.1
           npx playwright install --with-deps chromium firefox webkit
       - name: Cross-browser compatibility (Chromium, Firefox, WebKit)
         run: node tests/cross-browser.mjs
-      - name: Browser smoke tests
+      - name: Arcade authentication and gameplay browser tests
+        run: node tests/arcade-browser.mjs
+      - name: Responsive browser smoke tests
         run: node tests/browser-smoke.mjs
       - name: Save browser previews
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: haunted-lobby-previews
+          name: the420lobby-previews
           path: artifacts/*.png
           if-no-files-found: ignore
           retention-days: 7

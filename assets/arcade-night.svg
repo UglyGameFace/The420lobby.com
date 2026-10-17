@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="720" viewBox="0 0 1100 720" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">The 420 Lobby neon arcade</title>
+  <desc id="desc">An illustrated violet arcade cabinet with a glowing green 420 screen, surrounded by botanical leaves, a glass water pipe, a grinder, rolling papers, and a lime lighter.</desc>
+  <defs>
+    <linearGradient id="body" x1="454" y1="99" x2="771" y2="658" gradientUnits="userSpaceOnUse"><stop stop-color="#61408c"/><stop offset=".46" stop-color="#352746"/><stop offset="1" stop-color="#211b30"/></linearGradient>
+    <linearGradient id="side" x1="786" y1="125" x2="915" y2="617" gradientUnits="userSpaceOnUse"><stop stop-color="#a875ff"/><stop offset=".45" stop-color="#63418a"/><stop offset="1" stop-color="#2a233c"/></linearGradient>
+    <linearGradient id="screen" x1="497" y1="228" x2="728" y2="427" gradientUnits="userSpaceOnUse"><stop stop-color="#172d23"/><stop offset="1" stop-color="#0a1713"/></linearGradient>
+    <linearGradient id="glass" x1="186" y1="282" x2="349" y2="606" gradientUnits="userSpaceOnUse"><stop stop-color="#caffdf" stop-opacity=".25"/><stop offset=".34" stop-color="#63a7a0" stop-opacity=".08"/><stop offset=".7" stop-color="#8cffb5" stop-opacity=".23"/><stop offset="1" stop-color="#305559" stop-opacity=".6"/></linearGradient>
+    <linearGradient id="grinder" x1="349" y1="535" x2="400" y2="661" gradientUnits="userSpaceOnUse"><stop stop-color="#b6c1b5"/><stop offset=".15" stop-color="#4d6055"/><stop offset=".48" stop-color="#75847d"/><stop offset="1" stop-color="#25372f"/></linearGradient>
+    <linearGradient id="lighter" x1="833" y1="474" x2="909" y2="615" gradientUnits="userSpaceOnUse"><stop stop-color="#d5ff9a"/><stop offset="1" stop-color="#7fc93c"/></linearGradient>
+    <linearGradient id="smoke" x1="238" y1="129" x2="555" y2="506" gradientUnits="userSpaceOnUse"><stop stop-color="#a875ff" stop-opacity="0"/><stop offset=".38" stop-color="#a875ff" stop-opacity=".34"/><stop offset="1" stop-color="#b4ff5a" stop-opacity=".08"/></linearGradient>
+    <radialGradient id="halo"><stop stop-color="#7445af" stop-opacity=".25"/><stop offset="1" stop-color="#7445af" stop-opacity="0"/></radialGradient>
+    <radialGradient id="limehalo"><stop stop-color="#b4ff5a" stop-opacity=".09"/><stop offset="1" stop-color="#b4ff5a" stop-opacity="0"/></radialGradient>
+    <pattern id="scanlines" width="4" height="6" patternUnits="userSpaceOnUse"><path d="M0 1H4" stroke="#b4ff5a" stroke-opacity=".07"/></pattern>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7"/></filter>
+    <symbol id="leaf" viewBox="0 0 160 180"><path d="M80 151C64 142 30 145 13 126C36 121 55 126 68 135C45 117 16 100 9 69C39 79 61 99 71 121C57 86 47 52 58 18C77 47 81 74 80 109C83 66 94 31 115 8C119 45 106 84 89 119C107 88 131 71 153 67C143 97 120 116 98 132C120 122 138 120 156 124C137 144 111 145 88 150L84 175H75L80 151Z" fill="currentColor"/><path d="M82 151L109 40M81 148L61 48M80 148L29 90M84 147L137 88" stroke="#0c0b10" stroke-opacity=".3" stroke-width="2.5" stroke-linecap="round"/></symbol>
+    <symbol id="spark" viewBox="0 0 30 30"><path d="M15 0L18 12L30 15L18 18L15 30L12 18L0 15L12 12Z" fill="currentColor"/></symbol>
+  </defs>
+
+  <ellipse cx="653" cy="367" rx="425" ry="351" fill="url(#halo)"/>
+  <ellipse cx="293" cy="470" rx="290" ry="240" fill="url(#limehalo)"/>
+  <ellipse cx="592" cy="655" rx="396" ry="29" fill="#030407" opacity=".7"/>
+  <path d="M149 657H1016M234 675H962" stroke="#a875ff" stroke-opacity=".12"/>
+
+  <!-- Broad curls of smoke weave behind the cabinet and the glass. -->
+  <path d="M265 503C170 435 207 371 313 319C391 281 349 241 297 218C228 187 245 116 359 85C290 126 286 166 345 192C440 234 425 301 340 346C251 394 222 440 265 503Z" fill="url(#smoke)"/>
+  <path d="M312 447C342 379 303 361 246 331C158 286 155 221 232 183C174 243 217 278 282 305C368 341 373 390 312 447Z" fill="#a875ff" opacity=".08"/>
+  <path d="M355 123C299 156 326 187 366 206" stroke="#bc96ff" stroke-opacity=".28" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Botanical silhouette behind the hero object. -->
+  <use href="#leaf" x="833" y="297" width="174" height="195" color="#314632" transform="rotate(28 920 394)"/>
+  <use href="#leaf" x="151" y="450" width="161" height="180" color="#416c37" transform="rotate(-40 232 540)"/>
+  <use href="#leaf" x="895" y="451" width="139" height="156" color="#638f45" transform="rotate(45 965 529)"/>
+
+  <!-- Purple cabinet: dimensional side, face, and lime edge lighting. -->
+  <path d="M775 91L860 131L892 270L840 427L889 493L850 652L773 638L738 472L779 408L815 260Z" fill="url(#side)" stroke="#bc8fff" stroke-width="2"/>
+  <path d="M856 140L881 270L829 431L875 496L841 630" stroke="#cfb0ff" stroke-opacity=".32" stroke-width="4"/>
+  <path d="M438 91H775L813 260L759 420L805 483L773 638H430L399 483L448 420L397 260Z" fill="url(#body)" stroke="#a875ff" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M446 101H768L801 258L749 421L792 486L763 628H440L412 486L459 421L409 259Z" stroke="#c6a6ff" stroke-opacity=".17" stroke-width="2"/>
+  <path d="M438 91H775L788 154H424Z" fill="#1b1723" stroke="#b4ff5a" stroke-width="2"/>
+  <path d="M445 105H766L774 139H436Z" fill="#b4ff5a" fill-opacity=".06"/>
+  <text x="601" y="135" text-anchor="middle" fill="#b4ff5a" font-family="Arial Black,Arial,sans-serif" font-size="35" font-weight="900" letter-spacing="15">4:20</text>
+  <path d="M463 122H499M697 122H735" stroke="#b4ff5a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M414 175H789L806 258L753 416H453L404 258Z" fill="#15111e"/>
+  <path d="M455 197Q602 184 748 197L766 256L726 387Q602 398 477 387L437 256Z" fill="#090d0d" stroke="#71647b" stroke-width="3"/>
+  <path d="M470 215Q603 201 735 215L748 257L714 371Q603 382 488 371L454 257Z" fill="url(#screen)" stroke="#b4ff5a" stroke-opacity=".65" stroke-width="2"/>
+  <path d="M470 215Q603 201 735 215L748 257L714 371Q603 382 488 371L454 257Z" fill="url(#scanlines)"/>
+  <path d="M475 222Q602 208 729 222" stroke="#e3ffcb" stroke-opacity=".17" stroke-width="3" stroke-linecap="round"/>
+  <g opacity=".3" filter="url(#glow)"><use href="#leaf" x="557" y="230" width="89" height="100" color="#b4ff5a"/></g>
+  <use href="#leaf" x="557" y="230" width="89" height="100" color="#b4ff5a"/>
+  <text x="602" y="356" text-anchor="middle" fill="#d3ff9e" font-family="Arial Black,Arial,sans-serif" font-size="23" font-weight="900" letter-spacing="7">HIGH SCORE</text>
+  <path d="M486 251H509M497 240V262M690 290H713M701 279V301" stroke="#b4ff5a" stroke-opacity=".6" stroke-width="2"/>
+  <path d="M500 308H523M511 297V319" stroke="#a875ff" stroke-opacity=".75" stroke-width="2"/>
+  <circle cx="687" cy="246" r="3" fill="#a875ff"/><circle cx="542" cy="272" r="2" fill="#b4ff5a"/>
+
+  <!-- Control deck, joystick, and three candy-colored buttons. -->
+  <path d="M448 420H759L805 483H399Z" fill="#72608a" stroke="#c5a4ff" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M459 431H748L776 471H429Z" fill="#24202e" stroke="#b4ff5a" stroke-opacity=".45"/>
+  <ellipse cx="505" cy="454" rx="28" ry="10" fill="#0c0b10" stroke="#9e79b9" stroke-width="2"/>
+  <path d="M505 452V415" stroke="#9bb0a1" stroke-width="9" stroke-linecap="round"/><path d="M503 447V418" stroke="#e1ffe6" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="505" cy="405" r="19" fill="#ad7df0" stroke="#dfc3ff" stroke-width="2"/><path d="M495 400C496 394 501 391 507 392" stroke="#e7d5ff" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="661" cy="452" rx="19" ry="9" fill="#070d0a"/><ellipse cx="661" cy="448" rx="17" ry="8" fill="#b4ff5a" stroke="#dfffbc" stroke-width="2"/>
+  <ellipse cx="709" cy="452" rx="19" ry="9" fill="#0d0816"/><ellipse cx="709" cy="448" rx="17" ry="8" fill="#aa7af6" stroke="#d8baff" stroke-width="2"/>
+  <ellipse cx="686" cy="432" rx="15" ry="7" fill="#5c476f" stroke="#9475ac" stroke-width="2"/>
+  <path d="M399 483H805L798 511H405Z" fill="#15121c" stroke="#a875ff" stroke-width="2"/>
+  <path d="M414 495H790" stroke="#b4ff5a" stroke-width="3"/>
+  <path d="M441 524H764L748 611H456Z" fill="#201b2b" stroke="#604a74" stroke-width="2"/>
+  <path d="M576 535H637V597H576Z" fill="#141119" stroke="#786287" stroke-width="2"/>
+  <path d="M588 547H624V558H588Z" fill="#080a08" stroke="#b4ff5a" stroke-opacity=".7"/>
+  <circle cx="606" cy="580" r="7" fill="#998c9f"/><circle cx="606" cy="580" r="3" fill="#2b2330"/>
+  <path d="M470 546H539M467 558H536M465 570H534M670 546H739M672 558H741M675 570H744" stroke="#0e0d12" stroke-width="5" stroke-linecap="round"/>
+  <path d="M432 640V653H477V640M726 640V653H770V640" fill="#0a090d" stroke="#584266" stroke-width="2"/>
+  <circle cx="426" cy="176" r="3" fill="#d0bdde"/><circle cx="777" cy="176" r="3" fill="#d0bdde"/>
+  <circle cx="444" cy="621" r="3" fill="#9583a1"/><circle cx="757" cy="621" r="3" fill="#9583a1"/>
+
+  <!-- Tall translucent glass water pipe, with lime water and reflected light. -->
+  <path d="M249 302H287V449C287 465 306 480 319 501C334 525 344 548 336 570C326 596 299 610 265 609C225 608 197 589 196 558C195 532 207 513 222 491C241 465 249 454 249 439Z" fill="url(#glass)" stroke="#a1d9c5" stroke-width="3"/>
+  <path d="M249 307H287V335H249Z" fill="#a875ff" fill-opacity=".4"/>
+  <ellipse cx="268" cy="302" rx="22" ry="7" fill="#647d77" stroke="#c8eadd" stroke-width="3"/><ellipse cx="268" cy="301" rx="13" ry="3" fill="#1a2827"/>
+  <path d="M205 546Q264 565 331 547C337 580 307 599 267 599C228 599 205 581 205 546Z" fill="#8dce63" fill-opacity=".2"/>
+  <path d="M205 547C229 535 306 534 331 548C307 564 231 565 205 547Z" fill="#b4ff5a" fill-opacity=".11" stroke="#b4ff5a" stroke-opacity=".38"/>
+  <path d="M259 322V445C259 469 238 486 224 514C215 531 213 544 213 552" stroke="#e2ffea" stroke-opacity=".6" stroke-width="5" stroke-linecap="round"/>
+  <path d="M277 355V447" stroke="#e0f3ed" stroke-opacity=".22" stroke-width="3" stroke-linecap="round"/>
+  <path d="M223 575C235 588 257 593 278 590" stroke="#d6ffdd" stroke-opacity=".53" stroke-width="4" stroke-linecap="round"/>
+  <path d="M300 536L331 483" stroke="#87b8a2" stroke-width="18" stroke-linecap="round"/><path d="M300 536L331 483" stroke="#e4ffdf" stroke-opacity=".36" stroke-width="10" stroke-linecap="round"/>
+  <path d="M325 468L350 482L339 496L320 484Z" fill="#383344" stroke="#c1a3dc" stroke-width="2"/>
+  <ellipse cx="337" cy="474" rx="15" ry="6" fill="#6c527e" stroke="#c1a3dc" stroke-width="2" transform="rotate(28 337 474)"/>
+  <ellipse cx="337" cy="474" rx="8" ry="3" fill="#15101c" transform="rotate(28 337 474)"/>
+  <circle cx="273" cy="565" r="6" stroke="#c1e7ab" stroke-opacity=".45" stroke-width="2"/><circle cx="289" cy="577" r="3" fill="#c1e7ab" fill-opacity=".4"/>
+  <path d="M229 611Q265 618 303 611" stroke="#b4ff5a" stroke-opacity=".26" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Heavy metal grinder in the foreground. -->
+  <path d="M325 590V631C325 650 354 664 390 664C426 664 455 650 455 631V590Z" fill="url(#grinder)" stroke="#859d8d" stroke-width="2"/>
+  <ellipse cx="390" cy="591" rx="65" ry="25" fill="#5e7362" stroke="#b5c8b5" stroke-width="2"/>
+  <ellipse cx="390" cy="588" rx="56" ry="18" fill="#35473b" stroke="#96ac95" stroke-width="2"/>
+  <use href="#leaf" x="370" y="572" width="41" height="35" color="#b4ff5a" transform="rotate(10 390 589)"/>
+  <path d="M326 612C352 635 430 637 454 612M326 634C352 657 430 659 454 634" stroke="#182a21" stroke-width="3"/>
+  <path d="M339 611V620M353 617V626M369 622V630M389 624V633M408 622V631M427 618V627M443 611V620" stroke="#bbccbe" stroke-opacity=".5" stroke-width="3"/>
+
+  <!-- Lime lighter and a small paper booklet finish the still life. -->
+  <g transform="rotate(16 870 553)">
+    <path d="M840 492H900V609C900 618 893 623 885 623H855C846 623 840 618 840 609Z" fill="url(#lighter)" stroke="#d7ffa7" stroke-width="2"/>
+    <path d="M840 492V463H877V492Z" fill="#b5c2b3" stroke="#e0e8d9" stroke-width="2"/>
+    <path d="M847 471H870V481H847Z" fill="#36423a"/>
+    <rect x="878" y="470" width="19" height="22" rx="3" fill="#5c6460" stroke="#c5ccc0" stroke-width="2"/>
+    <path d="M884 473V489M890 473V489" stroke="#b5bab2" stroke-width="2"/>
+    <path d="M849 506V596" stroke="#efffd5" stroke-opacity=".65" stroke-width="4" stroke-linecap="round"/>
+    <use href="#leaf" x="856" y="537" width="30" height="37" color="#3c5d25"/>
+  </g>
+  <path d="M776 604L904 622L877 677L748 653Z" fill="#4a3665" stroke="#aa80e0" stroke-width="2"/>
+  <path d="M785 597L913 616L893 662L765 641Z" fill="#e2d8b8" stroke="#fff0c9" stroke-width="2"/>
+  <path d="M797 610L899 625L887 648L785 631Z" fill="#cabfa0" stroke="#ad9f7a"/>
+  <path d="M785 597L814 566L939 589L913 616Z" fill="#eee7cf" stroke="#fff8df" stroke-width="2"/>
+  <path d="M796 590L905 608M802 582L911 600" stroke="#b9ac8d" stroke-opacity=".5"/>
+  <text x="845" y="635" text-anchor="middle" fill="#4d424f" font-family="Arial Black,Arial,sans-serif" font-size="16" font-weight="900" letter-spacing="4" transform="rotate(9 845 635)">420</text>
+
+  <!-- Tiny sparks keep the silhouette lively without crowding the art. -->
+  <use href="#spark" x="365" y="142" width="23" height="23" color="#b4ff5a"/>
+  <use href="#spark" x="918" y="216" width="34" height="34" color="#b4ff5a"/>
+  <use href="#spark" x="958" y="365" width="15" height="15" color="#ba94ff"/>
+  <use href="#spark" x="171" y="403" width="15" height="15" color="#b4ff5a"/>
+  <circle cx="920" cy="173" r="3" fill="#a875ff"/><circle cx="341" cy="242" r="3" fill="#a875ff"/>
+  <path d="M360 455L373 446M927 545L940 551M934 557L944 564" stroke="#a875ff" stroke-width="3" stroke-linecap="round"/>
+</svg>

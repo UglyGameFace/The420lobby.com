@@ -197,7 +197,7 @@ test("CSS has original haunted experience and mobile/performance fallbacks",()=>
   assert.equal(depth,0);
 });
 
-test("static Pages hosting remains build-free", () => {
+test("the homepage remains a build-free static shell", () => {
   assert.match(html,/<link rel="stylesheet" href="\/styles\.css\?v=20261016-shieldmobile29">/);
   assert.match(html,/<link rel="stylesheet" href="\/sesh-signal-v3\.css">/);
   assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css\?v=20261016-hero3">/);
@@ -220,25 +220,30 @@ test("Sesh Signal is an actual arcade game section, not a placeholder", () => {
   assert.match(html,/id="sesh-best"/);
   assert.match(html,/id="sesh-score"/);
   assert.match(html,/id="sesh-announcement"[^>]*role="status"/);
-  assert.match(html,/href="#sesh-signal"/);
-  assert.match(html,/src="\/sesh-signal.js"/);
+  assert.match(html,/href="\/arcade\.html"/);
+  assert.match(html,/src="\/sesh-loader.js"/);
+  assert.doesNotMatch(html, /<script[^>]*src="\/sesh-signal\.js"/);
   assert.match(html,/No real-world prizes or Discord roles/);
-  assert.match(html,/Your best score stays on your device/);
+  assert.doesNotMatch(html,/Your best score stays on your device|No account required/);
+  assert.match(html,/Discord/i);
+  assert.match(html, /id="sesh-start"[^>]*disabled/);
   assert.doesNotMatch(html,/online members:\s*\d+|discord bot token|25571|25845/i);
 });
 
-test("Sesh Signal uses timed real interaction with pause, focus, and safe local scores", () => {
-  assert.doesNotThrow(()=>new vm.Script(game, {filename:"sesh-signal.js"}));
-  for(const feature of [
-    "DURATION = 42000","requestAnimationFrame(frame)","cancelAnimationFrame",
-    "localStorage.getItem","localStorage.setItem","document.hidden",
-    "visibilitychange","pagehide","document.activeElement","prefers-reduced-motion",
-    "saveData","catchTarget","boost()","pause(","resume()","finish()",
-    "navigator.share","navigator.clipboard","aria-label","soundOn"
-  ]) assert.ok(game.includes(feature),"missing game feature: "+feature);
-  assert.doesNotMatch(game,/discord\.com\/api\/|discord\.gg\/.*token|fetch\s*\(/);
-  assert.match(game,/state\.mode\s*!==\s*"playing"/);
-  assert.match(game,/try\s*\{\s*window\.localStorage/);
+test("Sesh Signal requires an authenticated server run and records input rather than trusting client scores", () => {
+  const api = read("arcade-api.js");
+  const loader = read("sesh-loader.js");
+  for (const feature of ["/api/session", "/api/runs", "X-CSRF-Token", "csrfToken", "elapsedMs", "events"]) {
+    assert.ok(api.includes(feature), "missing secure game API feature: " + feature);
+  }
+  for (const feature of ["createEngine", "startAuthenticatedRun", "saveAuthenticatedRun"]) {
+    assert.ok(game.includes(feature), "missing verified game feature: " + feature);
+  }
+  assert.doesNotMatch(game, /localStorage|DISCORD_CLIENT_SECRET|client_secret/);
+  assert.match(loader, /if \(!session\.user\)/);
+  assert.match(loader, /start\.disabled = true/);
+  assert.match(loader, /script\.src = '\/sesh-signal\.js'/);
+  assert.match(game, /visibilitychange|document\.hidden/);
 });
 
 test("custom arcade styling supports touch, keyboard, and phones", () => {
@@ -287,18 +292,53 @@ test("Sesh accessories are custom illustrated rather than emoji placeholders", (
   assert.match(game,/querySelectorAll\("\.sesh-kit-tracker \[data-kit\]"\)/);
 });
 
-test("kit synergy, intact bonus and broken glass penalty are gameplay rules", () => {
-  assert.match(game,/SAFE_GEAR = \["lighter","grinder","papers"\]/);
-  assert.match(game,/HAZARDS = \["broken-bong","broken-pipe"\]/);
-  assert.match(game,/state\.kit\.push\(kind\)/);
-  assert.match(game,/state\.kit\.length===SAFE_GEAR\.length/);
-  assert.match(game,/kitBonus=75/);
-  assert.match(game,/kind === "clean-glass"/);
-  assert.match(game,/state\.score=Math\.max\(0,state\.score-20\)/);
-  assert.match(game,/state\.kit=\[\]/);
-  assert.match(game,/state\.combo=0/);
-  assert.match(game,/isHazard\(kind\)/);
-  assert.match(arcadeCss,/\.sesh-item--hazard::after/);
-  assert.match(arcadeCss,/\.arcade-controls\{display:grid/);
-  assert.match(arcadeCss,/\.arcade-play/);
+test("shared verified rules preserve Sesh Signal kit bonuses and glass hazards", () => {
+  const rules = read("shared/arcade-rules.mjs");
+  for (const term of ["sesh-signal", "green-room-match", "bong-blitz", "lighter", "grinder", "papers", "clean-glass", "broken-bong", "broken-pipe"]) {
+    assert.ok(rules.includes(term), "missing shared rules: " + term);
+  }
+  for (const selector of [".sesh-item--hazard::after", ".arcade-controls{display:grid", ".arcade-play"]) {
+    assert.ok(arcadeCss.includes(selector), "missing accessible game style: " + selector);
+  }
+});
+
+test("the full arcade preserves community links and provides accessible Discord gates", () => {
+  const page = read("arcade.html");
+  for (const feature of ["THE", "LOBBY", "Discord", "Sesh Signal", "Green Room", "Bong Blitz", "Minecraft", "Cinema"]) {
+    assert.ok(page.toLowerCase().includes(feature.toLowerCase()), "arcade missing " + feature);
+  }
+  for (const id of ["login-dialog", "game-dialog", "game-stage", "leaderboard-rows", "profile-content"]) {
+    assert.match(page, new RegExp('id="' + id + '"'));
+  }
+  const ids = [...page.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(ids.length, new Set(ids).size, "arcade IDs must remain unique");
+  for (const [,id] of page.matchAll(/\bhref="#([^"]+)"/g)) assert.ok(ids.includes(id), "missing arcade #" + id);
+  assert.match(page, /class="skip-link"/);
+  assert.match(page, /<dialog/);
+  assert.match(page, /href="\/auth\/discord/);
+  assert.match(page, /src="\/arcade-app\.js"/);
+  assert.match(html, /href="\/arcade\.html"/);
+});
+
+test("frontend code never contains Discord secrets or stores authentication tokens", () => {
+  for (const path of ["index.html", "arcade.html", "arcade-app.js", "arcade-api.js", "arcade-games.js", "sesh-signal.js", "sesh-loader.js", "script.js"]) {
+    const source = read(path);
+    assert.doesNotMatch(source, /DISCORD_CLIENT_SECRET|client_secret\s*[:=]|discordAccessToken|access_token\s*[:=]|refresh_token\s*[:=]/i, path + " exposes an OAuth secret or token");
+    assert.doesNotMatch(source, /(?:localStorage|sessionStorage)\.(?:setItem|getItem)\([^)]*(?:token|session|auth)/i, path + " stores browser-readable authentication state");
+  }
+});
+
+test("arcade styles support keyboard focus, reduced motion and narrow screens", () => {
+  const styles = read("arcade.css") + read("arcade-games.css");
+  assert.match(styles, /focus-visible/);
+  assert.match(styles, /prefers-reduced-motion/);
+  assert.match(styles, /@media/);
+  assert.match(styles, /touch-action/);
+  let depth = 0;
+  for (const character of styles.replace(/\/\*[\s\S]*?\*\//g, "").replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, "")) {
+    if (character === "{") depth++;
+    if (character === "}") depth--;
+    assert.ok(depth >= 0, "unmatched arcade CSS closing brace");
+  }
+  assert.equal(depth, 0, "unmatched arcade CSS opening brace");
 });

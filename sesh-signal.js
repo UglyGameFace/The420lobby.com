@@ -1,4 +1,4 @@
-/* The 420 Lobby: Sesh Signal, a local-only 42-second community arcade challenge. */
+/* The 420 Lobby: Sesh Signal. Ranked rounds require a server session. */
 (function () {
   "use strict";
   const byId = id => document.getElementById(id);
@@ -11,65 +11,73 @@
   const scoreLabel = byId("sesh-score"), comboLabel = byId("sesh-combo");
   const timeLabel = byId("sesh-time"), bestLabel = byId("sesh-best");
   const boostFill = byId("sesh-charge-fill"), boostText = byId("sesh-charge-text");
-  const announcement = byId("sesh-announcement");
-  const progress = byId("sesh-round-progress");
-  const resultText = byId("sesh-result");
+  const announcement = byId("sesh-announcement"), progress = byId("sesh-round-progress");
+  const resultText = byId("sesh-result"), authStatus = byId("sesh-auth-status");
+  const loginLink = byId("sesh-login");
   const prefersLess = window.matchMedia("(prefers-reduced-motion: reduce)");
   const saveData = !!(navigator.connection && navigator.connection.saveData);
-  const slowMotion = () => prefersLess.matches || saveData;
-  const DURATION = 42000, BEST_KEY = "the420lobby.seshsignal.best.v1";
-  let audioContext = null, soundOn = false, lastAnnouncedTime = -1;
-  const state = {
-    mode: "idle", score: 0, combo: 0, best: 0, charge: 0,
-    boostMs: 0, elapsed: 0, nextSpawn: 300, lastFrame: 0,
-    nextId: 0, raf: 0, caught: 0, avoided: 0, kit: [], targets: []
-  };
-
-  function safeBest() {
-    try {
-      const score = Number(window.localStorage.getItem(BEST_KEY));
-      return Number.isFinite(score) && score > 0 && score < 10000000 ? Math.floor(score) : 0;
-    } catch (_) { return 0; }
-  }
-  function saveBest(score) {
-    try { window.localStorage.setItem(BEST_KEY, String(score)); }
-    catch (_) { /* Private browsing or disabled storage: game still works. */ }
-  }
+  const DURATION = 42000, MAX_PAUSE = 120000;
   const SAFE_GEAR = ["lighter","grinder","papers"];
   const HAZARDS = ["broken-bong","broken-pipe"];
   const ITEM_LABELS = {
-    lighter:"Pocket lighter",grinder:"Herb grinder",papers:"Rolling papers",
+    lighter:"Pocket lighter", grinder:"Herb grinder", papers:"Rolling papers",
     "clean-glass":"Clean glass piece", "broken-bong":"Broken bong glass",
     "broken-pipe":"Broken glass pipe"
   };
+  const elements = new Map();
+  let api, rules, engine, session, run, events = [], started = 0, raf = 0;
+  let mode = "loading", best = 0, score = 0, soundOn = false, audioContext;
+  let snapshot = null, finishPayload = null, pauseTimeout = 0;
+  let generation = 0, lastAnnouncedTime = -1, savedScore = false;
   const isHazard = kind => HAZARDS.includes(kind);
-  function announce(text) { announcement.textContent = text; }
-  function updateHud() {
-    scoreLabel.textContent = String(state.score).padStart(4, "0");
-    comboLabel.textContent = "x" + String(state.combo);
-    timeLabel.textContent = String(Math.ceil(Math.max(0, DURATION - state.elapsed) / 1000)).padStart(2,"0");
-    bestLabel.textContent = String(state.best).padStart(4,"0");
-    progress.style.width = (Math.min(100, state.elapsed / DURATION * 100)).toFixed(1) + "%";
-    boostFill.style.width = (state.boostMs > 0 ? 100 : state.charge) + "%";
-    boostText.textContent = state.boostMs > 0
-      ? "CHILL MODE · " + Math.ceil(state.boostMs / 1000) + "s"
-      : state.charge >= 100 ? "CHILL MODE READY" : "CHARGE " + state.charge + "%";
-    boostButton.disabled = state.mode !== "playing" || state.charge < 100 || state.boostMs > 0;
-    boostButton.textContent = state.boostMs > 0 ? "CHILL MODE ACTIVE" : "ACTIVATE CHILL MODE";
-    stage.classList.toggle("chill-mode", state.boostMs > 0);
-    document.querySelectorAll(".sesh-kit-tracker [data-kit]").forEach(slot => {
-      const collected=state.kit.includes(slot.dataset.kit);
-      slot.classList.toggle("is-collected",collected);
-      slot.querySelector("b").textContent=collected?"✓":"○";
-    });
+  const wallTime = () => Math.max(0, Math.floor(performance.now() - started));
+  const announce = text => { announcement.textContent = text; };
+  const status = text => { if (authStatus) authStatus.textContent = text; };
+  function overlayMessage(title, text) {
+    overlay.hidden = false;
+    overlay.querySelector(".sesh-overlay-title").textContent = title;
+    overlay.querySelector(".sesh-overlay-copy").textContent = text;
   }
-  function updateControls() {
-    startButton.textContent = state.mode === "playing" || state.mode === "paused" ? "RESTART ROUND" : "START NEW ROUND";
-    pauseButton.disabled = state.mode !== "playing" && state.mode !== "paused";
-    pauseButton.textContent = state.mode === "paused" ? "RESUME" : "PAUSE";
-    shareButton.disabled = state.mode !== "finished";
-    stage.dataset.mode = state.mode;
-    updateHud();
+  function clearObjects() {
+    for (const element of elements.values()) element.remove();
+    elements.clear(); bursts.replaceChildren();
+  }
+  function stopClock() {
+    cancelAnimationFrame(raf); raf = 0; clearTimeout(pauseTimeout);
+  }
+  function controls() {
+    const busy = mode === "loading" || mode === "starting" || mode === "saving";
+    startButton.disabled = busy || (session && !session.configured);
+    startButton.textContent = busy ? (mode === "saving" ? "SAVING SCORE…" : "CONNECTING…")
+      : finishPayload ? "RETRY SAVING SCORE" : !session ? "RETRY CONNECTION"
+      : !session.configured ? "SIGN-IN AWAITS SETUP" : !session.user ? "SIGN IN WITH DISCORD"
+      : mode === "playing" || mode === "paused" ? "RESTART ROUND" : "START NEW ROUND";
+    pauseButton.disabled = mode !== "playing" && mode !== "paused";
+    pauseButton.textContent = mode === "paused" ? "RESUME" : "PAUSE";
+    shareButton.disabled = mode !== "finished" || !savedScore;
+    boostButton.disabled = mode !== "playing" || !snapshot || snapshot.charge < 100 || snapshot.boostUntil > snapshot.elapsedMs;
+    stage.dataset.mode = mode;
+    if (loginLink) loginLink.hidden = !!session?.user;
+  }
+  function updateHud() {
+    const s = snapshot;
+    scoreLabel.textContent = String(s?.score || 0).padStart(4, "0");
+    comboLabel.textContent = "x" + (s?.combo || 0);
+    timeLabel.textContent = String(Math.ceil((s?.remainingMs ?? DURATION) / 1000)).padStart(2, "0");
+    bestLabel.textContent = String(best).padStart(4, "0");
+    progress.style.width = Math.min(100, (s?.elapsedMs || 0) / DURATION * 100) + "%";
+    const boostMs = s ? Math.max(0, s.boostUntil - s.elapsedMs) : 0;
+    boostFill.style.width = (boostMs ? 100 : s?.charge || 0) + "%";
+    boostText.textContent = boostMs ? "CHILL MODE · " + Math.ceil(boostMs / 1000) + "s"
+      : s?.charge >= 100 ? "CHILL MODE READY" : "CHARGE " + (s?.charge || 0) + "%";
+    boostButton.textContent = boostMs ? "CHILL MODE ACTIVE" : "ACTIVATE CHILL MODE";
+    stage.classList.toggle("chill-mode", boostMs > 0);
+    document.querySelectorAll(".sesh-kit-tracker [data-kit]").forEach(slot => {
+      const collected = SAFE_GEAR.includes(slot.dataset.kit) && !!s?.kit?.includes(slot.dataset.kit);
+      slot.classList.toggle("is-collected", collected);
+      slot.querySelector("b").textContent = collected ? "✓" : "○";
+    });
+    controls();
   }
   function playNote(pitch, length, kind) {
     if (!soundOn) return;
@@ -81,246 +89,207 @@
       const oscillator = audioContext.createOscillator(), gain = audioContext.createGain();
       oscillator.type = kind === "static" ? "triangle" : "sine";
       oscillator.frequency.setValueAtTime(pitch, audioContext.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(Math.max(90, pitch * (kind === "static" ? 0.62 : 1.25)), audioContext.currentTime + length);
-      gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.07, audioContext.currentTime + 0.015);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + length);
+      oscillator.frequency.exponentialRampToValueAtTime(Math.max(90, pitch * (kind === "static" ? .62 : 1.25)), audioContext.currentTime + length);
+      gain.gain.setValueAtTime(.0001, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.07, audioContext.currentTime + .015);
+      gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + length);
       oscillator.connect(gain).connect(audioContext.destination);
-      oscillator.start(); oscillator.stop(audioContext.currentTime + length + 0.01);
-    } catch (_) { /* Audio is optional. */ }
+      oscillator.start(); oscillator.stop(audioContext.currentTime + length + .01);
+    } catch (_) { /* Sound is optional. */ }
   }
-  function clearObjects() {
-    state.targets.forEach(target => target.element.remove());
-    state.targets.length = 0;
-    bursts.replaceChildren();
-  }
-  function overlayMessage(title, subtitle) {
-    overlay.hidden = false;
-    overlay.querySelector(".sesh-overlay-title").textContent = title;
-    overlay.querySelector(".sesh-overlay-copy").textContent = subtitle;
-  }
-  function showBurst(x, y, text, color) {
-    if (slowMotion()) return;
+  function showBurst(target, text) {
+    if (prefersLess.matches || saveData) return;
     const mark = document.createElement("span");
-    mark.className = "sesh-burst";
-    mark.textContent = text;
-    mark.style.left = x + "%";
-    mark.style.top = y + "%";
-    mark.style.setProperty("--burst-color", color);
+    mark.className = "sesh-burst"; mark.textContent = text;
+    mark.style.left = target.x + "%"; mark.style.top = target.y + "%";
+    mark.style.setProperty("--burst-color", isHazard(target.kind) ? "var(--ember)" : "var(--lime)");
     bursts.append(mark);
     mark.addEventListener("animationend", () => mark.remove(), {once:true});
   }
-  function removeTarget(target, missed) {
-    const at = state.targets.indexOf(target);
-    if (at === -1) return;
-    state.targets.splice(at,1);
-    if (document.activeElement === target.element) stage.focus({preventScroll:true});
-    target.element.remove();
-    if (missed && !isHazard(target.kind) && state.mode === "playing") {
-      state.combo=0;
-      announce("An item drifted away. Catch the next one!");
-    } else if (missed && isHazard(target.kind)) state.avoided++;
+  function renderTargets() {
+    const active = new Set((snapshot?.targets || []).map(target => target.id));
+    for (const [id, element] of elements) if (!active.has(id)) {
+      if (document.activeElement === element) stage.focus({preventScroll:true});
+      element.remove(); elements.delete(id);
+    }
+    for (const target of snapshot?.targets || []) {
+      let element = elements.get(target.id);
+      if (!element) {
+        element = document.createElement("button"); element.type = "button";
+        element.className = "sesh-item sesh-item--" + target.kind + (isHazard(target.kind) ? " sesh-item--hazard" : "");
+        element.dataset.targetId = String(target.id);
+        element.setAttribute("aria-label", ITEM_LABELS[target.kind] + (isHazard(target.kind) ? ", avoid clicking" : ", tap to collect"));
+        element.title = ITEM_LABELS[target.kind] + (isHazard(target.kind) ? " · BROKEN · AVOID" : " · COLLECT");
+        const symbol = document.createElementNS("http://www.w3.org/2000/svg","svg");
+        symbol.setAttribute("class","sesh-item-art"); symbol.setAttribute("viewBox","0 0 100 100"); symbol.setAttribute("aria-hidden","true");
+        const use = document.createElementNS("http://www.w3.org/2000/svg","use");
+        use.setAttribute("href","/assets/sesh-gear.svg#" + target.kind);
+        symbol.append(use); element.append(symbol);
+        element.style.left = target.x + "%"; element.style.top = target.y + "%";
+        element.addEventListener("click", () => catchTarget(target));
+        elements.set(target.id, element); layer.append(element);
+      }
+      const life = Math.max(1, target.expiresAt - target.spawnAt);
+      element.style.setProperty("--wisp-opacity", Math.max(.37, Math.min(1, (target.expiresAt - snapshot.elapsedMs) / life * 1.6)).toFixed(3));
+      element.disabled = mode !== "playing";
+    }
+  }
+  function expire(text) {
+    stopClock(); mode = "expired"; finishPayload = null; clearObjects();
+    overlayMessage("ROUND EXPIRED", text);
+    resultText.textContent = text + " Start a new round to play again.";
+    announce(resultText.textContent); controls();
+  }
+  function dispatch(type, fields = {}) {
+    if (mode !== "playing" && type !== "resume") return false;
+    const event = {type, ...fields, at:wallTime()};
+    try { snapshot = engine.dispatch(event); events.push(event); return true; }
+    catch (error) {
+      if (type === "resume") expire("The two-minute pause allowance has ended.");
+      else if (error.code === "pause_limit") announce("Your pause allowance has been used. This round is still running.");
+      else if (error.code === "boost_not_ready") announce("Chill Mode is still charging. Collect more gear first.");
+      else announce("Wait for the item to settle, then tap. Your round is still running.");
+      return false;
+    }
   }
   function catchTarget(target) {
-    if (state.mode !== "playing" || !state.targets.includes(target)) return;
-    const {kind,x,y}=target;
-    if (isHazard(kind)) {
-      state.score=Math.max(0,state.score-20);
-      state.combo=0;
-      state.kit=[];
-      showBurst(x,y,"−20","var(--ember)");
-      announce("Broken glass! Combo and sesh-kit progress reset. Leave cracked glass alone.");
-      playNote(170,.15,"static");
-    } else {
-      state.combo++;
-      state.caught++;
-      const rare = kind === "clean-glass";
-      let points=(rare ? 45 : 10+Math.min(state.combo,10)*2)*(state.boostMs>0?2:1);
-      state.score+=points;
-      if(state.boostMs===0)state.charge=Math.min(100,state.charge+(rare?40:20));
-      let message=ITEM_LABELS[kind]+" collected. +"+points+".";
-      if(SAFE_GEAR.includes(kind) && !state.kit.includes(kind)){
-        state.kit.push(kind);
-        if(state.kit.length===SAFE_GEAR.length){
-          const kitBonus=75*(state.boostMs>0?2:1);
-          state.score+=kitBonus;
-          state.charge=Math.min(100,state.charge+30);
-          state.kit=[];
-          showBurst(x,y,"KIT +"+kitBonus,"var(--lime)");
-          message="Full sesh kit complete! Lighter, grinder and papers. Bonus "+kitBonus+".";
-          playNote(740,.21,"collect");
-        }
-      }
-      if(message.startsWith("Full sesh"))announce(message);
-      else {
-        showBurst(x,y,"+"+points,rare?"var(--ember)":"var(--lime)");
-        announce(message);
-        playNote(rare?640:325+Math.min(400,state.combo*32),.11,"collect");
-      }
-    }
-    removeTarget(target,false);
-    updateHud();
-  }
-  function random(min,max) { return min + Math.random()*(max-min); }
-  function spawn() {
-    const limit=slowMotion()?3:5;
-    if(state.targets.length>=limit)return;
-    const choice=Math.random();
-    const kind=choice<.12?"broken-bong":choice<.23?"broken-pipe":
-      choice<.47?"lighter":choice<.70?"grinder":
-      choice<.90?"papers":"clean-glass";
-    let x=random(16,84),y=random(17,82);
-    for(let n=0;n<10 && state.targets.some(t=>Math.hypot(t.x-x,t.y-y)<22);n++){
-      x=random(16,84);y=random(17,82);
-    }
-    const element=document.createElement("button");
-    element.type="button";
-    element.className="sesh-item sesh-item--"+kind+(isHazard(kind)?" sesh-item--hazard":"");
-    element.setAttribute("aria-label",ITEM_LABELS[kind]+(isHazard(kind)?", avoid clicking":", tap to collect"));
-    element.setAttribute("title",ITEM_LABELS[kind]+(isHazard(kind)?" · BROKEN · AVOID":" · COLLECT"));
-    const symbol=document.createElementNS("http://www.w3.org/2000/svg","svg");
-    symbol.setAttribute("class","sesh-item-art");
-    symbol.setAttribute("viewBox","0 0 100 100");
-    symbol.setAttribute("aria-hidden","true");
-    const use=document.createElementNS("http://www.w3.org/2000/svg","use");
-    use.setAttribute("href","/assets/sesh-gear.svg#"+kind);
-    symbol.append(use);
-    element.append(symbol);
-    element.style.left=x+"%";element.style.top=y+"%";
-    const life=slowMotion()?4100:Math.max(2100,3200-state.elapsed/DURATION*800);
-    const target={id:++state.nextId,kind,x,y,age:0,
-      life:state.boostMs>0?life*1.4:life,element};
-    element.addEventListener("click",()=>catchTarget(target));
-    state.targets.push(target);
-    layer.append(element);
-  }
-  function pause(reason) {
-    if (state.mode !== "playing") return;
-    state.mode="paused";
-    if (state.raf) cancelAnimationFrame(state.raf);
-    state.raf=0;state.lastFrame=0;
-    overlayMessage("PAUSED",reason||"Your round is waiting. Tap Resume when ready.");
-    updateControls();
-    announce("Round paused.");
-  }
-  function resume() {
-    if (state.mode !== "paused") return;
-    if (document.hidden) return;
-    state.mode="playing";state.lastFrame=0;overlay.hidden=true;
-    updateControls();
-    announce("Round resumed.");
-    state.raf=requestAnimationFrame(frame);
-  }
-  function finish() {
-    if (state.mode !== "playing") return;
-    state.mode="finished";state.elapsed=DURATION;
-    if(state.raf)cancelAnimationFrame(state.raf);
-    state.raf=0;clearObjects();
-    if(state.score>state.best){state.best=state.score;saveBest(state.best);}
-    const title = state.score >= 700 ? "LOBBY LEGEND" : state.score >= 400 ? "SESH MASTER"
-      : state.score >= 180 ? "CERTIFIED VIBER" : "FRESH IN THE LOBBY";
-    overlayMessage(title,"Round complete · "+state.score+" points · "+state.caught+" items collected.");
-    resultText.textContent = "You scored "+state.score+" points. "+title+". Personal best: "+state.best+".";
-    updateControls();
-    announce("Round over. "+state.score+" points. "+title+".");
-    playNote(560,.35,"collect");
-  }
-  function frame(now) {
-    state.raf=0;
-    if (state.mode !== "playing") return;
-    if (!state.lastFrame) state.lastFrame=now;
-    const dt=Math.max(0,Math.min(70,now-state.lastFrame));
-    state.lastFrame=now;
-    state.elapsed=Math.min(DURATION,state.elapsed+dt);
-    if (state.boostMs>0)state.boostMs=Math.max(0,state.boostMs-dt);
-    if (state.elapsed>=DURATION){finish();return;}
-    if(state.elapsed>=state.nextSpawn){
-      spawn();
-      const interval = (slowMotion() ? 1320 : 920) - Math.min(260,state.elapsed/DURATION*260);
-      state.nextSpawn = state.elapsed + interval*random(.78,1.17);
-    }
-    for(const target of [...state.targets]){
-      target.age+=dt;
-      if(target.age>=target.life){removeTarget(target,true);continue;}
-      // Hit targets remain stationary for touch, keyboard and browser automation.
-      const lifeLeft = Math.max(0,1-target.age/target.life);
-      // Only translucency changes; neither bounds nor click area changes.
-      target.element.style.setProperty("--wisp-opacity",Math.max(.37,Math.min(1,lifeLeft*1.6)).toFixed(3));
-    }
-    const seconds=Math.ceil((DURATION-state.elapsed)/1000);
-    if(seconds!==lastAnnouncedTime){lastAnnouncedTime=seconds;updateHud();}
-    else if (state.boostMs>0) updateHud();
-    state.raf=requestAnimationFrame(frame);
-  }
-  function start() {
-    if(state.raf)cancelAnimationFrame(state.raf);
-    state.raf=0;clearObjects();
-    Object.assign(state,{
-      mode:"playing",score:0,combo:0,charge:0,boostMs:0,elapsed:0,
-      nextSpawn:250,lastFrame:0,nextId:0,caught:0,avoided:0,kit:[]
-    });
-    lastAnnouncedTime=-1;overlay.hidden=true;resultText.textContent="";
-    updateControls();announce("Round started. Collect lighter, grinder and papers. Avoid broken glass.");
-    stage.focus({preventScroll:true});
-    // Keep the playfield immediately visible on phones when the round begins.
-    if(window.innerWidth<=900){
-      try{stage.scrollIntoView({behavior:"instant",block:"center"});}
-      catch(_){stage.scrollIntoView();}
-    }
-    state.raf=requestAnimationFrame(frame);
+    if (mode !== "playing") return;
+    const before = snapshot.score;
+    if (!dispatch("catch", {id:target.id})) return;
+    const points = snapshot.score - before;
+    showBurst(target, points < 0 ? "−" + Math.abs(points) : "+" + points);
+    announce(isHazard(target.kind) ? "Broken glass! Combo and sesh-kit progress reset. Leave cracked glass alone."
+      : ITEM_LABELS[target.kind] + " collected. +" + points + " points.");
+    playNote(isHazard(target.kind) ? 170 : target.kind === "clean-glass" ? 640 : 325 + Math.min(400, snapshot.combo * 32), .12, isHazard(target.kind) ? "static" : "collect");
+    renderTargets(); updateHud();
   }
   function boost() {
-    if(state.mode!=="playing" || state.charge<100 || state.boostMs>0) return;
-    state.charge=0;state.boostMs=5000;
+    if (!dispatch("boost")) return;
     announce("Chill Mode activated. Double points for five seconds!");
-    playNote(510,.22,"collect");
-    updateHud();
+    playNote(510,.22,"collect"); updateHud();
   }
-  function shareText() {
-    const title = state.score >= 700 ? "Lobby Legend" : state.score >= 400 ? "Sesh Master" :
-      state.score >= 180 ? "Certified Viber" : "Fresh in the Lobby";
-    return "I scored "+state.score+" on Sesh Signal ("+title+") in The 420 Lobby! Can you beat it? https://the420lobby.com/#sesh-signal";
+  function pause(reason) {
+    if (mode !== "playing" || !dispatch("pause")) return;
+    mode = "paused"; stopClock();
+    overlayMessage("PAUSED", reason || "Tap Resume when ready. Ranked rounds allow two minutes of total pause time.");
+    pauseTimeout = setTimeout(() => expire("The two-minute pause allowance has ended."), Math.max(1, MAX_PAUSE - snapshot.pausedMs));
+    updateHud(); renderTargets(); announce("Round paused. Two minutes of total pause time are available.");
+  }
+  function resume() {
+    if (mode !== "paused" || document.hidden) return;
+    if (!dispatch("resume")) return;
+    clearTimeout(pauseTimeout); mode = "playing"; overlay.hidden = true;
+    updateHud(); renderTargets(); announce("Round resumed."); raf = requestAnimationFrame(frame);
+  }
+  async function saveScore() {
+    if (!finishPayload) return;
+    mode = "saving"; controls(); status("Checking your round and saving your score…");
+    const current = generation;
+    try {
+      const saved = await api.saveAuthenticatedRun(run, session, finishPayload.events, finishPayload.elapsedMs);
+      if (current !== generation) return;
+      finishPayload = null; mode = "finished"; savedScore = true; score = saved.score; best = saved.best; snapshot.score = saved.score;
+      const title = score >= 700 ? "LOBBY LEGEND" : score >= 400 ? "SESH MASTER" : score >= 180 ? "CERTIFIED VIBER" : "FRESH IN THE LOBBY";
+      overlayMessage(title, "Round complete · " + score + " points · saved to your Discord profile.");
+      resultText.textContent = score + " points saved. Personal best: " + best + ".";
+      status("Score verified and saved to your Discord profile.");
+      announce(resultText.textContent); api.notifyScoreSaved(saved); updateHud();
+    } catch (error) {
+      if (current !== generation) return;
+      mode = "finished";
+      const invalid = error.status >= 400 && error.status < 500 && ![408,429].includes(error.status);
+      if (invalid) finishPayload = null;
+      overlayMessage(invalid ? "SCORE NOT SAVED" : "SAVE INTERRUPTED", error.message);
+      resultText.textContent = error.message + (invalid ? " Start a new round to try again." : " Use Retry Saving Score to send this same round again.");
+      status(resultText.textContent); announce(resultText.textContent); controls();
+    }
+  }
+  function finish() {
+    if (mode !== "playing") return;
+    stopClock(); clearObjects(); score = snapshot.score;
+    finishPayload = {events:events.slice(), elapsedMs:wallTime()};
+    overlayMessage("ROUND COMPLETE", "Checking your round and saving your score…");
+    playNote(560,.35,"collect"); saveScore();
+  }
+  function frame() {
+    raf = 0;
+    if (mode !== "playing") return;
+    try { engine.advance(wallTime()); snapshot = engine.snapshot(); }
+    catch (_) { expire("This round exceeded its allowed time."); return; }
+    if (snapshot.finished) { finish(); return; }
+    renderTargets();
+    const seconds = Math.ceil(snapshot.remainingMs / 1000);
+    if (seconds !== lastAnnouncedTime || snapshot.boostUntil > snapshot.elapsedMs) { lastAnnouncedTime = seconds; updateHud(); }
+    raf = requestAnimationFrame(frame);
+  }
+  async function checkSession() {
+    session = await api.arcadeRequest("/api/session");
+    status(!session.configured ? "Discord sign-in is awaiting server setup."
+      : session.user ? "Playing as " + session.user.username + ". Scores save to your Discord profile."
+      : "Sign in with Discord before playing. Your scores and achievements follow your profile.");
+    if (session.user) try {
+      const profile = await api.arcadeRequest("/api/profile");
+      best = Number(profile?.bests?.find(item => item.game === "sesh-signal")?.score || 0);
+    } catch (_) { /* Best refreshes after the first verified score. */ }
+  }
+  async function start() {
+    if (mode === "loading" || mode === "starting" || mode === "saving") return;
+    if (finishPayload) { await saveScore(); return; }
+    generation++; const current = generation;
+    stopClock(); clearObjects(); savedScore = false; mode = "starting"; controls();
+    overlayMessage("CONNECTING", "Checking your Discord session and preparing a ranked round…");
+    try {
+      if (!api || !rules) [api, rules] = await Promise.all([import("/arcade-api.js"), import("/shared/arcade-rules.mjs")]);
+      const authorized = await api.startAuthenticatedRun("sesh-signal");
+      if (current !== generation) return;
+      session = authorized.session; run = authorized.run; engine = rules.createEngine("sesh-signal", run.seed);
+      events = []; started = performance.now(); snapshot = engine.snapshot();
+      mode = "playing"; lastAnnouncedTime = -1; overlay.hidden = true; resultText.textContent = "";
+      status("Playing as " + session.user.username + ". Round active.");
+      updateHud(); announce("Round started. Collect lighter, grinder and papers. Avoid broken glass.");
+      stage.focus({preventScroll:true});
+      if (window.innerWidth <= 900) stage.scrollIntoView({behavior:"instant",block:"center"});
+      raf = requestAnimationFrame(frame);
+    } catch (error) {
+      if (current !== generation) return;
+      if (error.code === "login_required") { window.location.assign("/auth/discord"); return; }
+      mode = "idle"; session = error.code === "not_configured" ? {configured:false,user:null} : null;
+      overlayMessage("CONNECTION NEEDED", error.message || "The arcade could not connect. Please try again.");
+      status(error.message || "The arcade could not connect. Please try again."); announce(error.message || "Connection unavailable."); controls();
+    }
   }
   async function share() {
-    if(state.mode!=="finished")return;
-    const message=shareText();
-    try{
-      if(navigator.share){
-        await navigator.share({title:"The 420 Lobby · Sesh Signal",text:message});
-        announce("Score shared.");
-      } else if(navigator.clipboard?.writeText){
-        await navigator.clipboard.writeText(message);
-        announce("Score copied. Paste it into Discord!");
-      } else {
-        resultText.textContent=message;
-        announce("Score ready to copy from below.");
-      }
-    }catch(error){
-      if(error?.name!=="AbortError"){
-        resultText.textContent=message;
-        announce("Copy your score from the result below.");
-      }
-    }
+    if (mode !== "finished" || !savedScore) return;
+    const message = "I scored " + score + " on Sesh Signal in The 420 Lobby! Can you beat it? https://the420lobby.com/#sesh-signal";
+    try {
+      if (navigator.share) await navigator.share({title:"The 420 Lobby · Sesh Signal",text:message});
+      else if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(message); announce("Score copied. Paste it into Discord!"); }
+      else resultText.textContent = message;
+    } catch (error) { if (error.name !== "AbortError") resultText.textContent = message; }
   }
   startButton.addEventListener("click",start);
-  pauseButton.addEventListener("click",()=>state.mode==="paused"?resume():pause());
-  boostButton.addEventListener("click",boost);
-  shareButton.addEventListener("click",share);
-  soundButton.addEventListener("click",()=>{
-    soundOn=!soundOn;
-    soundButton.setAttribute("aria-pressed",String(soundOn));
-    soundButton.textContent=soundOn?"SOUND ON":"SOUND OFF";
-    if(soundOn)playNote(440,.12,"collect");
+  pauseButton.addEventListener("click", () => mode === "paused" ? resume() : pause());
+  boostButton.addEventListener("click",boost); shareButton.addEventListener("click",share);
+  soundButton.addEventListener("click", () => {
+    soundOn = !soundOn; soundButton.setAttribute("aria-pressed",String(soundOn));
+    soundButton.textContent = soundOn ? "SOUND ON" : "SOUND OFF";
+    if (soundOn) playNote(440,.12,"collect");
   });
-  stage.addEventListener("keydown",event=>{
-    if((event.key==="b" || event.key==="B") && state.mode==="playing") {
-      event.preventDefault();boost();
-    }
+  stage.addEventListener("keydown", event => {
+    if ((event.key === "b" || event.key === "B") && mode === "playing") { event.preventDefault(); boost(); }
   });
-  document.addEventListener("visibilitychange",()=>{
-    if(document.hidden)pause("Game paused because you switched apps. Your round is safe.");
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pause("You switched apps. Resume within the two-minute total pause allowance.");
   });
-  window.addEventListener("pagehide",()=>pause("Session paused."));
-  state.best=safeBest();
-  updateControls();
+  window.addEventListener("pagehide", () => pause("Session paused. Resume within two minutes."));
+  updateHud();
+  Promise.all([import("/arcade-api.js"), import("/shared/arcade-rules.mjs")]).then(async modules => {
+    [api, rules] = modules; await checkSession(); mode = "idle";
+    if (!session.user) overlayMessage("DISCORD REQUIRED", "Sign in securely with Discord before starting a round. Scores and achievements save to your profile.");
+    updateHud();
+  }).catch(error => {
+    mode = "idle"; session = null;
+    status(error.message || "The arcade server could not be reached. Try again to reconnect.");
+    overlayMessage("CONNECTION NEEDED", "The arcade server could not be reached. Try again to reconnect."); controls();
+  });
 })();

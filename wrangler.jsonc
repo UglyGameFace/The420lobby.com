@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "the420lobby-com",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2026-10-01",
+  // A D1 binding must be added only after the database exists. A fake ID blocks Pages deployment.
+  "vars": {
+    "SITE_ORIGIN": "https://the420lobby.com",
+    "DISCORD_CLIENT_ID": ""
+  }
+}
