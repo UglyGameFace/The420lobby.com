@@ -39,21 +39,21 @@ test("hero communicates a 420-friendly gaming community, not haunted house brand
 });
 
 test("CHEERS and the realistic lit blunt have anchored motion within photographed smoke frames",()=>{
-  assert.match(html, /<h1[^>]*aria-label="After cheers, we play\\."/);
+  assert.match(html, /<h1[^>]*aria-label="After cheers, we play\."/);
   assert.match(html, /class="cheers-word">CHEERS,/);
-  assert.match(html, /class="cheers-art" src="\\/assets\\/cheers-real-smoke-blunt\\.webp\\?v=20261017-smoke-flow4"/);
-  assert.match(html, /data-smoke-motion="\\/assets\\/cheers-real-smoke-blunt-loop\\.webp\\?v=20261017-smoke-flow4"/);
+  assert.match(html, /class="cheers-art" src="\/assets\/cheers-real-smoke-blunt\.webp\?v=20261017-smoke-flow4"/);
+  assert.match(html, /data-smoke-motion="\/assets\/cheers-real-smoke-blunt-loop\.webp\?v=20261017-smoke-flow4"/);
   assert.doesNotMatch(html,/class="cheers-roll"/);
   assert.doesNotMatch(html,/class="cheers-leaf"/);
-  assert.doesNotMatch(html,/src="\\/assets\\/approved-smoke-cheers\\.svg"/);
-  assert.match(cheersCss,/\\.hero-heading-cheers \\.headline-cheers/);
-  assert.match(cheersCss,/aspect-ratio:1100\\/367/);
-  assert.match(cheersCss,/width:min\\(5\\.85em,100%\\)/);
+  assert.doesNotMatch(html,/src="\/assets\/approved-smoke-cheers\.svg"/);
+  assert.match(cheersCss,/\.hero-heading-cheers \.headline-cheers/);
+  assert.match(cheersCss,/aspect-ratio:1100\/367/);
+  assert.match(cheersCss,/width:min\(5\.85em,100%\)/);
   assert.match(cheersCss,/object-fit:contain/);
   assert.match(cheersCss,/transform:none;translate:none;animation:none/);
-  assert.doesNotMatch(cheersCss,/@keyframes cheers-smoke-hover|@keyframes cheers-ember-pulse|translateY\\(/);
+  assert.doesNotMatch(cheersCss,/@keyframes cheers-smoke-hover|@keyframes cheers-ember-pulse|translateY\(/);
   assert.match(cheersCss,/prefers-reduced-motion:reduce/);
-  assert.match(cheersCss,/html\\.fx-off/);
+  assert.match(cheersCss,/html\.fx-off/);
   assert.doesNotMatch(html,/class="cheers-vapor"/);
   for(const width of ["max-width:760px","max-width:420px","max-width:360px"]) assert.ok(cheersCss.includes(width),width);
   const motion=fs.readFileSync(new URL("../assets/cheers-real-smoke-blunt-loop.webp",import.meta.url));
@@ -112,8 +112,8 @@ test("photo-real smoke moves in raster frames, with a clean text header and pres
   assert.ok(animated.length>100000 && animated.length<2000000,"real animation should be mobile-friendly");
   assert.ok(poster.length<100000,"reduced-motion still must be lightweight");
   assert.match(smokeLogo,/Smoke-formed 420 lettering/); // legacy source is retained, never used in header
-  assert.doesNotMatch(brandCss,/translateY\\(|animation:[^;]*bounce/);
-  assert.match(brandCss,/width:clamp\\(110px,37vw,148px\\)/);
+  assert.doesNotMatch(brandCss,/translateY\(|animation:[^;]*bounce/);
+  assert.match(brandCss,/width:clamp\(110px,37vw,148px\)/);
 });
 
 test("Dank Shield is semantic responsive content, not a stretched poster", () => {

@@ -267,7 +267,7 @@ try {
     });
     assert.equal(liveHaze.animationName,"none","CHEERS image must not pulse or bob as one object");
     assert.match(await page.locator(".cheers-art").getAttribute("data-smoke-motion"),
-      /\\/assets\\/cheers-real-smoke-blunt-loop\\.webp/,"CHEERS must run a real internal smoke-flow loop");
+      /\/assets\/cheers-real-smoke-blunt-loop\.webp/,"CHEERS must run a real internal smoke-flow loop");
     assert.equal(liveHaze.transform,"none",
       "CHEERS animation must not displace its line");
     assert.ok(cheersArt.joint.height>8,"joint must be visibly scaled");
