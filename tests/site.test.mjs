@@ -42,17 +42,19 @@ test("approved Cheers hero retains actual text, independent motion and original 
   assert.match(html, /<h1[^>]*aria-label="After cheers, we play\."/);
   assert.match(html, /class="headline-cheers"/);
   assert.match(html, /class="cheers-word">CHEERS,/);
-  assert.match(html, /src="\/assets\/cheers-joint\.svg"/);
-  assert.match(html, /href="\/cheers-hero-v1\.css\?v=20261016-hero3"/);
+  assert.match(html, /src="\/assets\/cheers-real-smoke-blunt\.webp"/);
+  assert.match(html, /href="\/cheers-hero-v1\.css\?v=20261017-real-smoke1"/);
   assert.match(html, /href="\/styles\.css\?v=20261016-shieldmobile29"/);
   assert.match(html, /The 420 Lobby \| After Cheers, We Play/);
   assert.doesNotMatch(html, /headline-hollow">DARK,/);
   assert.match(cheersCss, /\.hero-heading-cheers \.headline-cheers/);
-  assert.match(html, /class="cheers-art" src="\/assets\/approved-smoke-cheers\.svg"/);
+  assert.match(html, /class="cheers-art" src="\/assets\/cheers-real-smoke-blunt\.webp"/);
+  assert.doesNotMatch(html, /class="cheers-roll"/);
+  assert.doesNotMatch(html, /src="\/assets\/approved-smoke-cheers\.svg"/);
   assert.doesNotMatch(html, /class="cheers-art"[^>]*\bheight="45"/);
   assert.match(cheersArt, /data:image\/png;base64,/);
-  assert.match(html, /class="cheers-leaf" src="\/assets\/approved-leaf\.svg"/);
-  assert.match(cheersCss, /\.hero-heading-cheers \.cheers-leaf\{[\s\S]*?display:block;/);
+  assert.doesNotMatch(html, /class="cheers-leaf"/);
+  assert.match(cheersCss, /object-fit:contain/);
   assert.doesNotMatch(cheersCss, /content:\s*["']CHEERS,/);
   assert.doesNotMatch(cheersCss, /\.headline-cheers::before|\.headline-cheers::after/);
   assert.match(cheersCss, /@keyframes cheers-smoke-hover/);
@@ -205,7 +207,7 @@ test("CSS has original haunted experience and mobile/performance fallbacks",()=>
 test("the homepage remains a build-free static shell", () => {
   assert.match(html,/<link rel="stylesheet" href="\/styles\.css\?v=20261016-shieldmobile29">/);
   assert.match(html,/<link rel="stylesheet" href="\/sesh-signal-v3\.css">/);
-  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css\?v=20261016-hero3">/);
+  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css\?v=20261017-real-smoke1">/);
   assert.match(html,/<script defer src="\/script\.js"><\/script>/);
   assert.match(html,/<script defer src="\/visual-engine\.js"><\/script>/);
   assert.doesNotMatch(html,/https?:\/\/cdn\..*\/.*\.js/);

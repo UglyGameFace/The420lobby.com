@@ -122,3 +122,22 @@
 }
 html.fx-off .hero-heading-cheers .cheers-art,
 html.fx-off .hero-heading-cheers .cheers-roll::after{animation:none}
+
+
+/* Approved photoreal CHEERS smoke and lit blunt are one transparent
+   raster composition. No fake vector joint or leaf overlays. */
+.hero-heading-cheers .headline-cheers{
+  width:min(4.0em,100%);height:1.23em;margin:.015em 0 .035em;overflow:visible;
+}
+.hero-heading-cheers .cheers-art{
+  inset:0;width:100%;height:100%;object-fit:contain;object-position:center;
+}
+@media(max-width:760px){
+  .hero-heading-cheers .headline-cheers{width:min(4.05em,89%);height:1.24em;margin:.015em 0 .04em}
+}
+@media(max-width:420px){
+  .hero-heading-cheers .headline-cheers{width:min(4.05em,89%)}
+}
+@media(max-width:360px){
+  .hero-heading-cheers .headline-cheers{width:min(4.05em,89%)}
+}
