@@ -218,7 +218,7 @@ try {
     if(scenario.mobile){
       assert.ok(layout.mark.top >= 0,"smoke 420 image must not crop above the viewport");
       const imgBounds=await page.locator(".brand-smoke-image").boundingBox();
-      assert.ok(imgBounds.width>=65,"real smoke numeral compressed beyond legibility: "+JSON.stringify(imgBounds));
+      assert.ok(imgBounds.width>=82,"real smoke numeral compressed beyond legibility: "+JSON.stringify(imgBounds));
       assert.ok(layout.mark.bottom <= layout.header.bottom+5,"smoke 420 image must fit inside the header");
       assert.ok(layout.logo.left >= layout.header.left-2 && layout.logo.right <= layout.header.right+2,
         "full brand must fit inside the header");
@@ -265,8 +265,9 @@ try {
       const st=getComputedStyle(el);
       return {animationName:st.animationName,transform:st.transform};
     });
-    assert.ok(liveHaze.animationName.includes("cheers-smoke-hover"),
-      "smoky CHEERS motion disappeared");
+    assert.equal(liveHaze.animationName,"none","CHEERS image must not pulse or bob as one object");
+    assert.match(await page.locator(".cheers-art").getAttribute("data-smoke-motion"),
+      /\\/assets\\/cheers-real-smoke-blunt-loop\\.webp/,"CHEERS must run a real internal smoke-flow loop");
     assert.equal(liveHaze.transform,"none",
       "CHEERS animation must not displace its line");
     assert.ok(cheersArt.joint.height>8,"joint must be visibly scaled");
