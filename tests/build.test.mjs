@@ -9,11 +9,17 @@ function walk(path) {
 test('production assets retain all games and branding while excluding private source and configuration',async()=>{
   await import('../scripts/build-static.mjs');
   const files=walk(join(root,'dist'));
-  for(const name of ['index.html','arcade.html','sesh-signal.js','arcade-games.js','arcade-api.js','shared/arcade-rules.mjs','assets/arcade-night.svg','assets/dank-shield-logo.avif','_routes.json','_headers']) assert.ok(files.includes(name),name);
+  for(const name of ['index.html','arcade.html','sesh-signal.js','arcade-games.js','arcade-api.js','shared/arcade-rules.mjs','assets/arcade-night.svg','assets/dank-shield-logo.avif','assets/the420lobby-neon-lounge.webp','assets/the420lobby-wordmark.webp','brand-header.css','_routes.json','_headers']) assert.ok(files.includes(name),name);
   for(const path of files) assert.doesNotMatch(path,/(?:^|\/)(?:functions|tests|migrations|scripts|node_modules|docs|\.git|\.env|\.dev\.vars|wrangler|README)/);
   const routes=JSON.parse(readFileSync(join(root,'dist/_routes.json'),'utf8'));
   for(const name of ['/sesh-signal.js','/arcade-games.js','/api/*','/auth/*']) assert.ok(routes.include.includes(name),'missing auth route '+name);
   assert.doesNotMatch(readFileSync(join(root,'dist/arcade-app.js'),'utf8'),/DISCORD_CLIENT_SECRET/);
+  for (const name of ['the420lobby-neon-lounge.webp','the420lobby-wordmark.webp']) {
+    const data=readFileSync(join(root,'dist/assets',name));
+    assert.equal(data.toString('ascii',0,4),'RIFF');
+    assert.equal(data.toString('ascii',8,12),'WEBP');
+    assert.ok(data.length>20000 && data.length<600000,'brand image must be real, optimized and present');
+  }
 });
 
 test('Pages configuration has a public dist boundary and no placeholder D1 resource',()=>{
