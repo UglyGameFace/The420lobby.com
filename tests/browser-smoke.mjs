@@ -6,7 +6,7 @@ const { chromium } = createRequire(import.meta.url)("playwright");
 import assert from "node:assert/strict";
 
 const root = resolve(import.meta.dirname, "..");
-const types = {".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".mjs":"text/javascript; charset=utf-8",".svg":"image/svg+xml"};
+const types = {".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".mjs":"text/javascript; charset=utf-8",".svg":"image/svg+xml",".webp":"image/webp"};
 let unauthenticatedRunRequests = 0;
 const server = createServer(async(req,res)=>{
   try {
@@ -177,7 +177,7 @@ try {
         "unretouched controller photo must remain hidden until a clean licensed cutout is integrated: "+JSON.stringify(controller));
     }
     assert.equal(await page.locator("img.botanical-foreground").evaluate(el=>el.complete && el.naturalWidth>0),true,"leaf illustration failed");
-    assert.equal(await page.locator("img.logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");
+    assert.equal(await page.locator("img.brand-wordmark-image").evaluate(el=>el.complete && el.naturalWidth>0),true,"smoke 420 logo failed");
     const countPaintedPixels = async locator => locator.evaluate(img => {
           const c=document.createElement("canvas");
           c.width=img.naturalWidth;
@@ -189,7 +189,7 @@ try {
           for(let i=3;i<px.length;i+=4) if(px[i]>24) painted++;
           return painted;
         });
-    assert.ok(await countPaintedPixels(page.locator("img.logo-smoke"))>200,"smoke logo SVG loaded but is invisible");
+    assert.ok(await countPaintedPixels(page.locator("img.brand-wordmark-image"))>200,"rendered wordmark loaded but is invisible");
     assert.ok(await countPaintedPixels(page.locator("img.cheers-art"))>200,"CHEERS smoke art loaded but is invisible");
     assert.ok(await countPaintedPixels(page.locator("img.botanical-foreground"))>100,"new leaf asset loaded but is invisible");
     if(scenario.mobile) {
@@ -200,27 +200,22 @@ try {
     assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,"approved joint art failed to load");
     assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,","hero slogan regressed");
     assert.equal(await page.locator(".logo-glyph").count(),0,"outdated sticky-note mark still present");
-    assert.equal(await page.locator(".logo-prefix").textContent(),"THE");
-    assert.equal(await page.locator(".logo-suffix").textContent(),"LOBBY");
-    assert.equal(await page.locator(".logo").textContent(),"THELOBBY","smoky 420 must be an image between words, not duplicated text");
+    assert.equal(await page.locator(".brand-wordmark-image").getAttribute("src"),"/assets/the420lobby-wordmark.webp");
+    assert.equal(await page.locator(".lobby-brand-banner img").getAttribute("src"),"/assets/the420lobby-neon-lounge.webp");
+    assert.equal(await page.locator(".logo").getAttribute("aria-label"),"The 420 Lobby home");
     const layout = await page.evaluate(() => {
       const get = selector => {
         const rect=document.querySelector(selector).getBoundingClientRect();
         return {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom,width:rect.width,height:rect.height};
       };
       return {viewport:window.innerWidth,header:get(".header-shell"),logo:get(".logo"),
-        mark:get(".logo-smoke"),fx:get("#fx-toggle"),menu:get("#menu-toggle"),
+        mark:get(".brand-wordmark-image"),fx:get("#fx-toggle"),menu:get("#menu-toggle"),
         heading:get("#hero-heading"),eyebrow:get(".hero-copy-block .eyebrow"),smokeLabel:get(".scene-label")};
     });
     if(scenario.mobile){
       assert.ok(layout.mark.top >= 0,"smoke 420 image must not crop above the viewport");
-      const parts=await page.evaluate(()=>{
-        const get=s=>{const r=document.querySelector(s).getBoundingClientRect();return {left:r.left,right:r.right,width:r.width}};
-        return {prefix:get(".logo-prefix"),smoke:get(".logo-smoke"),suffix:get(".logo-suffix")};
-      });
-      assert.ok(parts.prefix.right+1<=parts.smoke.left && parts.smoke.right+1<=parts.suffix.left,
-        "THE 420 LOBBY must have zero overlap between words and smoke image: "+JSON.stringify(parts));
-      assert.ok(parts.smoke.width>=65,"smoky 420 is too small: "+JSON.stringify(parts));
+      const imgBounds=await page.locator(".brand-wordmark-image").boundingBox();
+      assert.ok(imgBounds.width>=110,"full wordmark compressed beyond legibility: "+JSON.stringify(imgBounds));
       assert.ok(layout.mark.bottom <= layout.header.bottom+5,"smoke 420 image must fit inside the header");
       assert.ok(layout.logo.left >= layout.header.left-2 && layout.logo.right <= layout.header.right+2,
         "full brand must fit inside the header");
@@ -240,22 +235,13 @@ try {
       assert.equal(await page.locator("#fx-label").evaluate(el=>getComputedStyle(el).display),"none",
         "wide effects label must collapse on mobile");
     }
-    const smokeMargins = await page.locator(".logo-smoke").evaluate(image => {
-      const canvas=document.createElement("canvas");
-      canvas.width=476;canvas.height=260;
-      const context=canvas.getContext("2d",{willReadFrequently:true});
-      context.drawImage(image,0,0,476,260);
-      const pixels=context.getImageData(0,0,476,260).data;
-      let total=0,edge=0;
-      for(let y=0;y<260;y++)for(let x=0;x<476;x++){
-        const a=pixels[(y*476+x)*4+3];
-        if(a>60){ total++; if(x<2||x>473||y<2||y>257)edge++; }
-      }
-      return {total,edge};
-    });
-    assert.ok(smokeMargins.total>250,"420 smoke logo is absent or invisible");
-    assert.ok(smokeMargins.edge < Math.max(4,smokeMargins.total*.005),
-      "smoke numerals bleed past their artwork boundaries");
+    const logoPixels=await page.locator(".brand-wordmark-image").evaluate(image=>({
+      width:image.naturalWidth,height:image.naturalHeight,complete:image.complete
+    }));
+    assert.ok(logoPixels.complete && logoPixels.width>=1600 && logoPixels.height>=450,
+      "The actual commissioned wordmark must load at full resolution: "+JSON.stringify(logoPixels));
+    assert.equal(await page.locator(".lobby-brand-banner img").evaluate(img=>img.complete && img.naturalWidth===2172),true,
+      "The full original lounge artwork must be present, not a redraw");
     assert.equal(await page.locator(".reality-prism").count(),1,"optical prism missing");
     const cheersArt=await page.evaluate(()=>{
       const rect=s=>{

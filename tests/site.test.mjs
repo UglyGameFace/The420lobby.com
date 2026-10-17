@@ -15,6 +15,8 @@ const leaf = read("assets/approved-leaf.svg");
 const lounge = read("assets/haunted-lounge.svg");
 const icon = read("favicon.svg");
 const smokeLogo = read("assets/approved-smoke-420.svg");
+const arcadePage=read("arcade.html");
+const brandCss=read("brand-header.css");
 const cheersArt = read("assets/approved-smoke-cheers.svg");
 const game = read("sesh-signal.js");
 const gear = read("assets/sesh-gear.svg");
@@ -26,7 +28,7 @@ test("hero communicates a 420-friendly gaming community, not haunted house brand
   assert.match(html,/id="hero-heading"/);
   assert.match(html,/src="\/assets\/haunted-lounge\.svg"/);
   assert.match(html,/src="\/assets\/approved-leaf\.svg"/);
-  assert.match(html,/src="\/assets\/approved-smoke-420\.svg\?v=20261016-fullzero"/);
+  assert.match(html,/src="\/assets\/the420lobby-wordmark\.webp"/);
   assert.match(smokeLogo,/viewBox="0 0 245 116"/);
   assert.match(smokeLogo,/id="smoke-zero"/);
   assert.match(smokeLogo,/id="complete-numerals"/);
@@ -91,32 +93,33 @@ test("approved natural leaf art replaces the old geometric foreground", () => {
   assert.match(icon, /haunted|ghost|\/svg>/i);
 });
 
-test("custom smoke 420 brand has accessible branding without the old clipped square", () => {
-  assert.match(html, /<img class="logo-smoke"[^>]*src="\/assets\/approved-smoke-420\.svg\?v=20261016-fullzero"/);
-  assert.match(html, /class="logo"[^>]+aria-label="The 420 Lobby home"/);
-  assert.match(smokeLogo, /Smoke-formed 420 lettering/);
-  assert.match(smokeLogo, /data:image\/png;base64,/);
-  assert.match(smokeLogo, /viewBox="0 0 245 116"/);
-  assert.match(smokeLogo, /id="smoke-zero"/);
-  assert.match(smokeLogo, /fill-rule="evenodd"/);
-  assert.match(smokeLogo, /id="complete-numerals"/);
+test("real rendered wordmark and lounge banner replace the former pieced-together site header", () => {
+  assert.match(html, /class="logo brand-wordmark-link"/);
+  assert.match(html, /class="brand-wordmark-image" src="\/assets\/the420lobby-wordmark\.webp"/);
+  assert.match(html, /class="lobby-brand-banner"/);
+  assert.match(html, /src="\/assets\/the420lobby-neon-lounge\.webp"/);
+  assert.match(arcadePage, /class="brand brand-image"/);
+  assert.match(arcadePage, /src="\/assets\/the420lobby-wordmark\.webp"/);
+  assert.match(html, /aria-label="The 420 Lobby home"/);
+  assert.doesNotMatch(html, /class="logo-smoke"/);
+  assert.doesNotMatch(html, /class="logo-type logo-prefix"/);
+  assert.match(brandCss, /\.site-header \.logo\.brand-wordmark-link/);
+  assert.match(brandCss, /\.lobby-brand-banner-frame img/);
+  assert.match(brandCss, /@media \(max-width:760px\)/);
   assert.match(css, /@media\(min-width:761px\) and \(max-width:1050px\)\{/);
   assert.match(css, /\.desktop-nav\.open\{display:flex\}/);
-  assert.match(smokeLogo, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
-  assert.doesNotMatch(html,/class="logo-glyph"/);
-  assert.doesNotMatch(css,/\.logo-glyph/);
-  assert.match(css,/\.fx-toggle #fx-label\{display:none\}/);
-  assert.match(css,/\.scene-label\{display:none\}/);
-  assert.match(html, /class="logo-type logo-prefix">THE<\/span><img class="logo-smoke"[^>]+><span class="logo-type logo-suffix">LOBBY/);
-  assert.match(css,/\.logo\{display:flex;align-items:center;justify-content:center;gap:4px;flex:none;width:min\(234px,calc\(100vw - 150px\)\)/);
-  assert.match(css,/\.logo-smoke\{position:static;z-index:1;translate:none;flex:1 1 auto/);
-  assert.doesNotMatch(html,/class="logo-dot"/);
-  assert.doesNotMatch(html, /<span class="logo-type">THE 420/);
-  assert.doesNotMatch(css,/\.header-shell\{height:130px/);
+  assert.doesNotMatch(html, /class="logo-glyph"/);
   assert.match(html, /ENTER THE LOBBY<\/span>/);
   assert.match(html, /class="hero-smoke-trail" src="\/assets\/approved-left-smoke\.svg"/);
-  assert.match(css, /\.hero-smoke-trail\{display:block/);
   assert.match(html, /class="fx-switch"/);
+  // Keep the earlier approved smoke SVG in the repository, but do not fake the new header with it.
+  assert.match(smokeLogo, /Smoke-formed 420 lettering/);
+  for(const name of ["assets/the420lobby-neon-lounge.webp","assets/the420lobby-wordmark.webp"]){
+    const data=fs.readFileSync(new URL("../"+name,import.meta.url));
+    assert.equal(data.toString("ascii",0,4),"RIFF");
+    assert.equal(data.toString("ascii",8,12),"WEBP");
+    assert.ok(data.byteLength>20000);
+  }
 });
 
 test("Dank Shield is semantic responsive content, not a stretched poster", () => {

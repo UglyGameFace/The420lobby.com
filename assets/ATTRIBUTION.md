@@ -6,3 +6,5 @@ The Xbox Series controller shown in the hero is a photograph of the genuine Carb
 
 
 Barlow Condensed ExtraBold by Jeremy Tribby, obtained from google/fonts (ofl/barlowcondensed), is bundled for reliable arcade headings under the SIL Open Font License 1.1. See BarlowCondensed-OFL.txt.
+
+The 420 Lobby neon lounge banner and matching header wordmark are original generated artwork supplied for the website. Both shipped WebP files derive from the **same** rendered image (the wordmark is a tighter crop). The original pixels are not redrawn with SVG or CSS; CSS handles only proportional layout and responsive sizing.

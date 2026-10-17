@@ -6,7 +6,7 @@ const { chromium, firefox, webkit } = createRequire(import.meta.url)("playwright
 import assert from "node:assert/strict";
 
 const root = resolve(import.meta.dirname, "..");
-const fileTypes = {".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".mjs":"text/javascript; charset=utf-8",".svg":"image/svg+xml"};
+const fileTypes = {".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".mjs":"text/javascript; charset=utf-8",".svg":"image/svg+xml",".webp":"image/webp"};
 let unauthenticatedRunRequests = 0;
 const server = createServer(async(req,res)=>{
   try{
@@ -68,7 +68,7 @@ try{
           throw new Error(name+"/"+width+" failed to load stylesheets: "+JSON.stringify({detail,cssFailures})+" "+String(error));
         }
         await page.locator("#hero-heading").waitFor({state:"visible"});
-        assert.equal(await page.locator(".logo-smoke").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed smoke logo load");
+        assert.equal(await page.locator(".brand-wordmark-image").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed smoke logo load");
         const countPaintedPixels = async locator => locator.evaluate(img => {
           const c=document.createElement("canvas");
           c.width=img.naturalWidth;
@@ -80,17 +80,12 @@ try{
           for(let i=3;i<px.length;i+=4) if(px[i]>24) painted++;
           return painted;
         });
-        assert.ok(await countPaintedPixels(page.locator(".logo-smoke"))>200,name+" smoke logo paints no pixels");
-        const zeroPixels=await page.locator(".logo-smoke").evaluate(img=>{
-          const c=document.createElement("canvas");c.width=245;c.height=116;
-          const context=c.getContext("2d");context.drawImage(img,0,0,245,116);
-          const bytes=context.getImageData(0,0,245,116).data;
-          let lit=0;
-          for(let y=14;y<105;y++)for(let x=180;x<236;x++)
-            if(bytes[(y*245+x)*4+3]>90)lit++;
-          return lit;
-        });
-        assert.ok(zeroPixels>350,name+" right-hand zero is missing from painted SVG: "+zeroPixels);
+        assert.ok(await countPaintedPixels(page.locator(".brand-wordmark-image"))>200,name+" wordmark image paints no pixels");
+        const renderedMark=await page.locator(".brand-wordmark-image").evaluate(img=>({
+          width:img.naturalWidth,height:img.naturalHeight
+        }));
+        assert.ok(renderedMark.width>=1600 && renderedMark.height>=450,
+          name+" wordmark source is incomplete: "+JSON.stringify(renderedMark));
         assert.ok(await countPaintedPixels(page.locator(".cheers-art"))>200,name+" photographic Cheers art paints no pixels");
         const composition=await page.evaluate(()=>{
           const rect=s=>document.querySelector(s).getBoundingClientRect();
@@ -132,14 +127,8 @@ try{
         assert.equal(await page.locator(".cheers-roll img").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed joint art load");
         assert.equal(await page.locator(".cheers-word").textContent(),"CHEERS,");
         assert.equal(await page.locator(".sesh-item").count(),0,"No targets before start");
-        const completeLogo=await page.evaluate(()=>{
-          const rect=q=>{const r=document.querySelector(q).getBoundingClientRect();return {left:r.left,right:r.right,width:r.width}};
-          return {prefix:rect(".logo-prefix"),image:rect(".logo-smoke"),suffix:rect(".logo-suffix")};
-        });
-        assert.ok(completeLogo.prefix.right<=completeLogo.image.left+.5,
-          name+" THE overlaps smoky 4: "+JSON.stringify(completeLogo));
-        assert.ok(completeLogo.image.right<=completeLogo.suffix.left+.5,
-          name+" smoky zero overlaps LOBBY: "+JSON.stringify(completeLogo));
+        const completeLogo=await page.locator(".brand-wordmark-image").boundingBox();
+        assert.ok(completeLogo && completeLogo.width>110,name+" real wordmark is too small or missing");
         if(width>760&&width<=1050){
           assert.ok(await page.locator("#menu-toggle").isVisible(),name+" tablet menu toggle hidden");
           assert.equal(await page.locator("#primary-nav").isVisible(),false,name+" desktop links should collapse on tablet");
@@ -148,9 +137,9 @@ try{
           await page.locator("#menu-toggle").click();
           assert.equal(await page.locator("#primary-nav").isVisible(),false,name+" tablet menu failed to close");
         }
-        const logoBounds=await page.locator(".logo-smoke").boundingBox();
+        const logoBounds=await page.locator(".brand-wordmark-image").boundingBox();
         if(mobile){
-          assert.ok(logoBounds && logoBounds.width<=Math.min(165,width*.45),"Mobile smoke logo width exceeds available space: "+JSON.stringify(logoBounds));
+          assert.ok(logoBounds && logoBounds.width<=Math.min(240,width*.6),"Mobile brand exceeds available space: "+JSON.stringify(logoBounds));
         }
         const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
         if(overflow>2) {
@@ -163,7 +152,7 @@ try{
                 overflow:style.overflowX,display:style.display};
             }).filter(x=>x.right>innerWidth+2||x.left< -2)
               .sort((a,b)=>b.right-a.right).slice(0,35);
-            const headerElements=["html","body",".header-shell",".logo",".logo-smoke",".logo-type",".header-actions","#fx-toggle","#menu-toggle",".desktop-nav"].map(selector=>{
+            const headerElements=["html","body",".header-shell",".logo",".brand-wordmark-image",".logo-type",".header-actions","#fx-toggle","#menu-toggle",".desktop-nav"].map(selector=>{
               const node=document.querySelector(selector);
               if(!node)return {selector,missing:true};
               const r=node.getBoundingClientRect(),computed=getComputedStyle(node);
@@ -187,18 +176,9 @@ try{
           assert.equal(await page.locator("#menu-toggle").getAttribute("aria-expanded"),"false");
           const controls=await page.evaluate(()=>{
             const rect=selector=>document.querySelector(selector).getBoundingClientRect();
-            return {logo:rect(".logo"),mark:rect(".logo-smoke"),fx:rect("#fx-toggle"),menu:rect("#menu-toggle"),header:rect(".header-shell"),eyebrow:rect(".hero-copy-block .eyebrow")};
+            return {logo:rect(".logo"),mark:rect(".brand-wordmark-image"),fx:rect("#fx-toggle"),menu:rect("#menu-toggle"),header:rect(".header-shell"),eyebrow:rect(".hero-copy-block .eyebrow")};
           });
-          const brandParts=await page.evaluate(()=>{
-            const rect=q=>{const r=document.querySelector(q).getBoundingClientRect();return {left:r.left,right:r.right,width:r.width}};
-            return {prefix:rect(".logo-prefix"),image:rect(".logo-smoke"),suffix:rect(".logo-suffix")};
-          });
-          assert.ok(brandParts.prefix.right+1<=brandParts.image.left,
-            name+" THE overlaps smoky 420: "+JSON.stringify(brandParts));
-          assert.ok(brandParts.image.right+1<=brandParts.suffix.left,
-            name+" zero is obscured by LOBBY: "+JSON.stringify(brandParts));
-          assert.ok(brandParts.image.width>=65,
-            name+" 420 compressed beyond legibility: "+JSON.stringify(brandParts));
+          assert.ok(controls.mark.width>=110,name+" mobile wordmark is too small: "+JSON.stringify(controls.mark));
           assert.ok(controls.mark.bottom<=controls.header.bottom+5,name+" smoke artwork outside header");
           assert.ok(controls.logo.left>=controls.header.left-2 && controls.logo.right<=controls.header.right+2,name+" full brand outside header");
           assert.ok(controls.menu.left>=controls.header.left-2 && controls.fx.right<=controls.header.right+2,name+" header controls outside bounds");
