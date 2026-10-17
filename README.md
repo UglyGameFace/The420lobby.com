@@ -24,7 +24,7 @@ The proposed build command is `node scripts/build-static.mjs`, with `dist` as ou
 
 Discord client secrets and OAuth token exchange remain entirely server-side. Browser sessions use opaque HttpOnly/Secure cookies; writes require Origin and CSRF checks. The server replays seeded input transcripts and computes scores itself, with ownership, duration, action, payload, rate, expiry and duplicate-submission checks. Valid automated play remains possible; replay validation is not a guarantee that a player is human.
 
-See [the backend and setup guide](docs/ARCADE_BACKEND.md) for the schema, complete API, private credential setup, local runtime and release steps.
+See [the backend and setup guide](docs/ARCADE_BACKEND.md) for the schema and API, and the [Discord website connection checklist](docs/DISCORD_WEBSITE_CONNECT.md) for the current Cloudflare Pages/D1/Discord activation steps. Discord client ID and secret are intentionally absent from repository configuration; add them as encrypted Pages bindings.
 
 ## Development and validation
 
