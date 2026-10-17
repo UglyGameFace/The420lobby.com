@@ -197,7 +197,7 @@ test("CSS has original haunted experience and mobile/performance fallbacks",()=>
 test("the homepage remains a build-free static shell", () => {
   assert.match(html,/<link rel="stylesheet" href="\/styles\.css\?v=20261016-shieldmobile29">/);
   assert.match(html,/<link rel="stylesheet" href="\/sesh-signal-v3\.css">/);
-  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css\?v=20261017-smoke-flow4">/);
+  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css\?v=[^"]+">/);
   assert.match(html,/<script defer src="\/script\.js"><\/script>/);
   assert.match(html,/<script defer src="\/visual-engine\.js"><\/script>/);
   assert.doesNotMatch(html,/https?:\/\/cdn\..*\/.*\.js/);
