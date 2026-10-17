@@ -1,5 +1,6 @@
-/* Pre-rendered photograph-derived smoke loop, never an SVG or canvas effect.
-   Render stills when users request reduced motion, save data or disable effects. */
+/* Pre-rendered photographic smoke-flow frames: no bobbing, element movement,
+   synthetic vector, or opacity-only animation. Both CHEERS and 420 use this
+   same still/motion controller, respecting reduced motion, saveData and FX off. */
 (function(){
   "use strict";
   const root=document.documentElement;

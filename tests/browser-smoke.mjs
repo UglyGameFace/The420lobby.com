@@ -206,6 +206,14 @@ try {
     assert.equal(await page.locator(".logo").textContent(),"THELOBBY","420 is an animated image, not CSS lettering");
     assert.equal(await page.locator(".lobby-brand-banner img").getAttribute("src"),"/assets/the420lobby-neon-lounge.webp");
     assert.equal(await page.locator(".logo").getAttribute("aria-label"),"The 420 Lobby home");
+    // Previous image and hero checks scroll to lower-page sections; narrow phones
+    // can leave the non-sticky header above the viewport. Restore the real
+    // initial viewport before measuring navbar clipping and tap-target spacing.
+    await page.evaluate(() => {
+      document.documentElement.style.scrollBehavior="auto";
+      window.scrollTo(0,0);
+    });
+    await page.waitForFunction(() => window.scrollY === 0);
     const layout = await page.evaluate(() => {
       const get = selector => {
         const rect=document.querySelector(selector).getBoundingClientRect();
@@ -213,12 +221,17 @@ try {
       };
       return {viewport:window.innerWidth,header:get(".header-shell"),logo:get(".logo"),
         mark:get(".brand-smoke-image"),fx:get("#fx-toggle"),menu:get("#menu-toggle"),
-        heading:get("#hero-heading"),eyebrow:get(".hero-copy-block .eyebrow"),smokeLabel:get(".scene-label")};
+        heading:get("#hero-heading"),eyebrow:get(".hero-copy-block .eyebrow"),smokeLabel:get(".scene-label"),
+         labels:{the:parseFloat(getComputedStyle(document.querySelector(".brand-lockup__the")).fontSize),
+           lobby:parseFloat(getComputedStyle(document.querySelector(".brand-lockup__lobby")).fontSize)}};
     });
+    assert.ok(layout.labels.the >= (scenario.size.width < 350 ? 13 : scenario.mobile ? 15 : 18) &&
+      layout.labels.lobby >= (scenario.size.width < 350 ? 13 : scenario.mobile ? 15 : 18),
+      "THE and LOBBY must be readable beside the animated 420: "+JSON.stringify(layout.labels));
     if(scenario.mobile){
       assert.ok(layout.mark.top >= 0,"smoke 420 image must not crop above the viewport");
       const imgBounds=await page.locator(".brand-smoke-image").boundingBox();
-      assert.ok(imgBounds.width>=65,"real smoke numeral compressed beyond legibility: "+JSON.stringify(imgBounds));
+      assert.ok(imgBounds.width>=82,"real smoke numeral compressed beyond legibility: "+JSON.stringify(imgBounds));
       assert.ok(layout.mark.bottom <= layout.header.bottom+5,"smoke 420 image must fit inside the header");
       assert.ok(layout.logo.left >= layout.header.left-2 && layout.logo.right <= layout.header.right+2,
         "full brand must fit inside the header");
@@ -265,8 +278,9 @@ try {
       const st=getComputedStyle(el);
       return {animationName:st.animationName,transform:st.transform};
     });
-    assert.ok(liveHaze.animationName.includes("cheers-smoke-hover"),
-      "smoky CHEERS motion disappeared");
+    assert.equal(liveHaze.animationName,"none","CHEERS image must not pulse or bob as one object");
+    assert.match(await page.locator(".cheers-art").getAttribute("data-smoke-motion"),
+      /\/assets\/cheers-real-smoke-blunt-loop\.webp/,"CHEERS must run a real internal smoke-flow loop");
     assert.equal(liveHaze.transform,"none",
       "CHEERS animation must not displace its line");
     assert.ok(cheersArt.joint.height>8,"joint must be visibly scaled");
@@ -284,6 +298,9 @@ try {
         "controller/CRT background must anchor at hero top: "+JSON.stringify(cheersArt));
       assert.equal(await page.locator(".cheers-leaf").count(),0,"photoreal composition needs no vector leaf");
     }
+    assert.ok(cheersArt.artwork.left < cheersArt.after.left-3 &&
+      cheersArt.after.left-cheersArt.artwork.left < cheersArt.artwork.width*.06,
+      "CHEERS needs a small left optical correction without moving the joint separately: "+JSON.stringify(cheersArt));
     assert.ok(cheersArt.cheers.left>=0 && cheersArt.cheers.right<=scenario.size.width+2,
       "Cheers text must fit viewport: "+JSON.stringify(cheersArt));
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);

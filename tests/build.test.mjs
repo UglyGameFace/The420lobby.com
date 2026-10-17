@@ -9,7 +9,7 @@ function walk(path) {
 test('production assets retain all games and branding while excluding private source and configuration',async()=>{
   await import('../scripts/build-static.mjs');
   const files=walk(join(root,'dist'));
-  for(const name of ['index.html','arcade.html','sesh-signal.js','arcade-games.js','arcade-api.js','shared/arcade-rules.mjs','assets/arcade-night.svg','assets/dank-shield-logo.avif','assets/the420lobby-neon-lounge.webp','assets/lobby-smoke-420-loop.webp','assets/lobby-smoke-420-still.webp','assets/cheers-real-smoke-blunt.webp','smoke-brand.js','brand-header.css','_routes.json','_headers']) assert.ok(files.includes(name),name);
+  for(const name of ['index.html','arcade.html','sesh-signal.js','arcade-games.js','arcade-api.js','shared/arcade-rules.mjs','assets/arcade-night.svg','assets/dank-shield-logo.avif','assets/the420lobby-neon-lounge.webp','assets/lobby-smoke-420-loop.webp','assets/lobby-smoke-420-still.webp','assets/cheers-real-smoke-blunt.webp','assets/cheers-real-smoke-blunt-loop.webp','smoke-brand.js','brand-header.css','_routes.json','_headers']) assert.ok(files.includes(name),name);
   for(const path of files) assert.doesNotMatch(path,/(?:^|\/)(?:functions|tests|migrations|scripts|node_modules|docs|\.git|\.env|\.dev\.vars|wrangler|README)/);
   const routes=JSON.parse(readFileSync(join(root,'dist/_routes.json'),'utf8'));
   for(const name of ['/sesh-signal.js','/arcade-games.js','/api/*','/auth/*']) assert.ok(routes.include.includes(name),'missing auth route '+name);
@@ -26,6 +26,10 @@ test('production assets retain all games and branding while excluding private so
   assert.ok(motion.indexOf(Buffer.from('ANIM'))>0 && motion.indexOf(Buffer.from('ANMF'))>0,'real animation must contain frames');
   assert.ok(motion.length<2000000,'transparent motion asset should be under 2 MB');
   assert.ok(still.length<100000,'reduced-motion frame must be lightweight');
+  const cheersMotion=readFileSync(join(root,'dist/assets/cheers-real-smoke-blunt-loop.webp'));
+  assert.equal(cheersMotion.toString('ascii',8,12),'WEBP');
+  assert.ok((cheersMotion.toString('latin1').match(/ANMF/g)||[]).length>=20,'CHEERS needs actual smoke deformation frames');
+  assert.ok(cheersMotion.length<3500000,'CHEERS motion must be under 3.5 MB on mobile');
   assert.match(readFileSync(join(root,'dist/smoke-brand.js'),'utf8'),/prefers-reduced-motion/);
 });
 
