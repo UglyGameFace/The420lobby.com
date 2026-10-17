@@ -10,26 +10,16 @@ This is the **website's Discord OAuth sign-in**, not a Discord server migration 
 - `node scripts/build-static.mjs` creates `dist`, the required Cloudflare Pages output.
 - **No bot token or Discord guild membership permission is required** for sign-in. Login does not automatically add members to your server or copy Dank Shield data.
 
-## 1. Create D1 in Cloudflare
+## 1. Connect the created production D1 database
 
-Open [Cloudflare dashboard](https://dash.cloudflare.com/) → **Storage & databases → D1 SQL Database** (wording may vary) → **Create database**.
+The owner supplied the existing D1 database ID `7821b56b-0e32-4798-afa8-bf29220d70b1`. This is a **database identifier, not a password**. The website's `wrangler.jsonc` now declares it under `env.production.d1_databases` with the required `DB` binding and name `the420lobby-arcade`.
 
-Suggested production name: `the420lobby-arcade`. The database ID is a UUID displayed by Cloudflare; it is **not** a password. Create a separate database for any preview that will process actual test logins.
+- No fake UUIDs or Discord credentials were added to GitHub.
+- The production D1 binding is **not** inherited by preview branches. Previews must use an independently provisioned database and test credentials if interactive preview sign-in is required.
+- The repository records the **binding**, not proof that the actual Cloudflare D1 schema exists. Verify the tables in step 2 before activating the Discord application.
+- Verify in Cloudflare's D1 dashboard that this database ID corresponds to the database named `the420lobby-arcade`. If its actual database name differs, update the Wrangler `database_name` field to match before merging.
 
-**Important:** Cloudflare treats the committed `wrangler.jsonc` as the source of truth for Pages Functions. A D1 binding in the dashboard may not survive the next Git-linked deployment if it is absent from the file. Once the real database exists, add this configuration to **`wrangler.jsonc`** and redeploy:
-
-```json
-"d1_databases": [
-  {
-    "binding": "DB",
-    "database_name": "the420lobby-arcade",
-    "database_id": "YOUR_REAL_D1_UUID",
-    "migrations_dir": "migrations"
-  }
-]
-```
-
-This is a **sample**, not a valid value to paste unchanged; replace the UUID first and preserve the other existing configuration properties. Never add a fake or all-zero UUID. Do not point preview/test traffic at production D1.
+Changes to Wrangler bindings are deployed with the next production deployment when this PR merges; they do not alter D1 table contents.
 
 ## 2. Apply the database schema
 

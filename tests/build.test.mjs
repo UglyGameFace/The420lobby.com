@@ -24,9 +24,17 @@ test('Pages configuration has a public dist boundary and no placeholder D1 resou
   assert.equal(config.vars.SITE_ORIGIN,'https://the420lobby.com');
   assert.equal(Object.hasOwn(config.vars,'DISCORD_CLIENT_ID'),false,'Discord client ID must come from a deployed binding, not a blank file value');
   assert.equal(Object.hasOwn(config.vars,'DISCORD_CLIENT_SECRET'),false,'Discord client secret must never be committed to Wrangler vars');
-  for(const db of config.d1_databases||[]){
-    assert.equal(db.binding,'DB');
-    assert.match(db.database_id||'',/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i);
-    assert.notEqual(db.database_id,'00000000-0000-0000-0000-000000000000');
-  }
+  // The production database must never be inherited by a Pages preview deployment.
+  assert.equal(config.d1_databases,undefined,'a top-level D1 binding would leak production storage into preview');
+  const production = config.env?.production?.d1_databases || [];
+  assert.equal(production.length,1,'expected exactly one production arcade D1 binding');
+  const db=production[0];
+  assert.equal(db.binding,'DB');
+  assert.equal(db.database_name,'the420lobby-arcade');
+  assert.equal(db.migrations_dir,'migrations');
+  assert.match(db.database_id||'',/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i);
+  assert.notEqual(db.database_id,'00000000-0000-0000-0000-000000000000');
+  assert.equal(config.env?.preview?.d1_databases,undefined,'preview requires a separately provisioned D1 binding');
+  assert.equal(Object.hasOwn(config.vars,'DISCORD_CLIENT_ID'),false);
+  assert.equal(Object.hasOwn(config.vars,'DISCORD_CLIENT_SECRET'),false);
 });
