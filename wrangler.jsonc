@@ -3,10 +3,22 @@
   "name": "the420lobby-com",
   "pages_build_output_dir": "dist",
   "compatibility_date": "2026-10-01",
-  // A D1 binding must be added only after the database exists. A fake ID blocks Pages deployment.
+  // Production D1 is isolated from previews. The UUID identifies a database, not a secret.
   // Set DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET as Cloudflare Pages encrypted secrets.
   // Do not commit an empty Discord application ID that shadows the deployed value.
   "vars": {
     "SITE_ORIGIN": "https://the420lobby.com"
+  },
+  "env": {
+    "production": {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "the420lobby-arcade",
+          "database_id": "7821b56b-0e32-4798-afa8-bf29220d70b1",
+          "migrations_dir": "migrations"
+        }
+      ]
+    }
   }
 }
