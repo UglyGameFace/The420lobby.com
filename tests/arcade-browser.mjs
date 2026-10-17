@@ -123,7 +123,17 @@ try {
     const indices = deck.flatMap((card, index) => card === kind ? [index] : []);
     for (const index of indices) {
       await page.clock.runFor(150);
-      await page.locator('.mini-card[data-card-index="' + index + '"]').evaluate(button => button.click());
+      const card = page.locator('.mini-card[data-card-index="' + index + '"]');
+      if (await card.count() !== 1) {
+        const diagnostics = await page.evaluate(() => ({
+          mode:document.querySelector(".mini-game")?.dataset.mode,
+          status:document.querySelector(".mini-status")?.textContent,
+          timer:document.querySelector(".mini-timer")?.textContent,
+          cards:document.querySelectorAll(".mini-card").length
+        }));
+        throw new Error("Memory card " + index + " disappeared: " + JSON.stringify(diagnostics));
+      }
+      await card.evaluate(button => button.click());
     }
   }
   await page.waitForFunction(() => document.querySelector(".mini-game")?.dataset.mode === "finished");
