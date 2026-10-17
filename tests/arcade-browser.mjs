@@ -153,7 +153,19 @@ try {
   await page.locator('.mini-target[data-target-id="' + target.id + '"]').evaluate(button => button.click());
   assert.ok(Number(await page.locator(".mini-score").textContent()) > 0, "timed tap should award points");
   await page.clock.runFor(31000);
-  await page.waitForFunction(() => document.querySelector(".mini-game")?.dataset.mode === "finished");
+  // Locator waits observe DOM mutations without requiring the page's mocked rAF
+  // clock to keep ticking after runFor returns.
+  try {
+    await page.locator('.mini-game[data-mode="finished"]').waitFor({state:"attached",timeout:5000});
+  } catch (error) {
+    const diagnostics = await page.evaluate(() => ({
+      mode:document.querySelector(".mini-game")?.dataset.mode,
+      status:document.querySelector(".mini-status")?.textContent,
+      timer:document.querySelector(".mini-timer")?.textContent,
+      buttons:document.querySelectorAll(".mini-target").length
+    }));
+    throw new Error("Bong Blitz did not finish: " + JSON.stringify({...diagnostics,submissions:state.submissions.length}) + "; " + error.message);
+  }
   assert.equal(state.submissions.length, 2);
   assert.ok(state.submissions[1].events.some(event => event.type === "hit"));
   await page.locator('[data-close="game-dialog"]').click();
