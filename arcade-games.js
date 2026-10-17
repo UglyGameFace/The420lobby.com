@@ -225,7 +225,7 @@ export function mountGame(container, gameId, initialSession) {
   function frame() {
     if (disposed || mode !== "playing") return;
     try { snapshot = engine.advance(wallTime()); }
-    catch (_) { expire("This round exceeded its allowed time."); return; }
+    catch (error) { console.warn("Arcade timing failure", error?.code || error?.message || "unknown"); expire("This round exceeded its allowed time."); return; }
     render();
     if (snapshot.finished) finish();
     else raf = requestAnimationFrame(frame);

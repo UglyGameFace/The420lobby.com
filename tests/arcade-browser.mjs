@@ -101,6 +101,7 @@ try {
   const page = await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
+  page.on("console", message => { if (message.type() === "warning" && message.text().includes("Arcade timing failure")) console.log(message.text()); });
   await page.clock.install();
   const state = await fixture(page, true);
   await page.goto(address + "/arcade.html", {waitUntil:"domcontentloaded"});
