@@ -4,8 +4,9 @@
   "pages_build_output_dir": "dist",
   "compatibility_date": "2026-10-01",
   // A D1 binding must be added only after the database exists. A fake ID blocks Pages deployment.
+  // Set DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET as Cloudflare Pages encrypted secrets.
+  // Do not commit an empty Discord application ID that shadows the deployed value.
   "vars": {
-    "SITE_ORIGIN": "https://the420lobby.com",
-    "DISCORD_CLIENT_ID": ""
+    "SITE_ORIGIN": "https://the420lobby.com"
   }
 }
