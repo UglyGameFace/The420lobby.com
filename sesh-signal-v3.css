@@ -139,7 +139,7 @@ html.fx-off .sesh-smoke-halo,html.fx-off .arcade-pulse,html.fx-off .sesh-item::b
  .arcade-controls{grid-template-columns:minmax(0,1.5fr) minmax(0,.8fr) minmax(0,.8fr)}
  .arcade-btn,.arcade-btn-primary{min-height:45px;padding-inline:8px;font-size:9px}
  .arcade-rules-strip{font-size:9px;gap:5px}
- .arcade-play{gap:10px}
+ .arcade-play{gap:7px}
  .arcade-auth-bar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0}
  .arcade-auth-bar .arcade-btn{min-width:0;justify-content:center;text-align:center;white-space:normal;line-height:1.2;padding:8px 5px}
  .arcade-machine{padding:9px}

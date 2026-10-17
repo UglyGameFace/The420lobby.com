@@ -152,7 +152,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   .shield-feature-copy h3{font-size:clamp(45px,10vw,78px);margin:22px 0 14px}
   .shield-feature-copy p{font-size:14px;line-height:1.5;margin-bottom:16px}
   .shield-art-label{font-size:8px;bottom:14px;left:12px}
-  .arcade-layout{grid-template-columns:1fr;gap:28px}
+  .arcade-layout{grid-template-columns:1fr;gap:12px}
   .arcade-heading{font-size:clamp(64px,14vw,92px)}
   .reality-section{min-height:620px}
   .reality-title{font-size:clamp(53px,11vw,84px)}
