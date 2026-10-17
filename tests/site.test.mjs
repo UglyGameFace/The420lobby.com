@@ -95,8 +95,8 @@ test("approved natural leaf art replaces the old geometric foreground", () => {
 
 test("photo-real smoke moves in raster frames, with a clean text header and preserved lower banner", () => {
   assert.match(html,/class="logo brand-lockup"/);
-  assert.match(html,/class="brand-lockup__the">THE<\/span>/);
-  assert.match(html,/class="brand-lockup__lobby">LOBBY<\/span>/);
+  assert.match(html,/class="[^"]*brand-lockup__the">THE<\/span>/);
+  assert.match(html,/class="[^"]*brand-lockup__lobby">LOBBY<\/span>/);
   assert.match(html,/class="brand-smoke-image" src="\/assets\/lobby-smoke-420-still\.webp"/);
   assert.match(html,/data-smoke-motion="\/assets\/lobby-smoke-420-loop\.webp"/);
   assert.match(html,/src="\/smoke-brand\.js"/);
