@@ -80,6 +80,7 @@ try {
     await page.locator('[data-filter="all"]').click();
     assert.equal(await page.locator(".game-card:visible").count(), 3);
     await page.locator('[data-game="bong-blitz"]').click();
+    await page.locator("#login-dialog").waitFor({state:"visible"});
     assert.equal(await page.locator("#login-dialog").evaluate(dialog => dialog.open), true, "guests must see the Discord gate");
     assert.equal(state.runs.length, 0, "a guest created a run");
     assert.equal(await page.locator("#game-stage").locator("button").count(), 0, "guest can access playable game controls");
