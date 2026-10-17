@@ -28,7 +28,7 @@ test("hero communicates a 420-friendly gaming community, not haunted house brand
   assert.match(html,/id="hero-heading"/);
   assert.match(html,/src="\/assets\/haunted-lounge\.svg"/);
   assert.match(html,/src="\/assets\/approved-leaf\.svg"/);
-  assert.match(html,/src="\/assets\/lobby-smoke-420-still\.webp"/);
+  assert.match(html,/src="\/assets\/lobby-smoke-420-still\\.webp\\?v=20261017-smoke-flow4"/);
   assert.match(smokeLogo,/viewBox="0 0 245 116"/);
   assert.match(smokeLogo,/id="smoke-zero"/);
   assert.match(smokeLogo,/id="complete-numerals"/);
@@ -87,11 +87,11 @@ test("photo-real smoke moves in raster frames, with a clean text header and pres
   assert.match(html,/class="logo brand-lockup"/);
   assert.match(html,/class="[^"]*brand-lockup__the">THE<\/span>/);
   assert.match(html,/class="[^"]*brand-lockup__lobby">LOBBY<\/span>/);
-  assert.match(html,/class="brand-smoke-image" src="\/assets\/lobby-smoke-420-still\.webp"/);
-  assert.match(html,/data-smoke-motion="\/assets\/lobby-smoke-420-loop\.webp"/);
+  assert.match(html,/class="brand-smoke-image" src="\/assets\/lobby-smoke-420-still\\.webp\\?v=20261017-smoke-flow4"/);
+  assert.match(html,/data-smoke-motion="\/assets\/lobby-smoke-420-loop\\.webp\\?v=20261017-smoke-flow4"/);
   assert.match(html,/src="\/smoke-brand\.js"/);
   assert.match(arcadePage,/class="brand brand-lockup brand-lockup--arcade"/);
-  assert.match(arcadePage,/data-smoke-motion="\/assets\/lobby-smoke-420-loop\.webp"/);
+  assert.match(arcadePage,/data-smoke-motion="\/assets\/lobby-smoke-420-loop\\.webp\\?v=20261017-smoke-flow4"/);
   assert.doesNotMatch(html,/class="brand-wordmark-image"/);
   assert.doesNotMatch(arcadePage,/class="brand brand-image"/);
   assert.match(brandCss,/\.brand-lockup__smoke/);
@@ -197,7 +197,7 @@ test("CSS has original haunted experience and mobile/performance fallbacks",()=>
 test("the homepage remains a build-free static shell", () => {
   assert.match(html,/<link rel="stylesheet" href="\/styles\.css\?v=20261016-shieldmobile29">/);
   assert.match(html,/<link rel="stylesheet" href="\/sesh-signal-v3\.css">/);
-  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css\?v=20261017-real-smoke1">/);
+  assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\\.css\\?v=20261017-smoke-flow4">/);
   assert.match(html,/<script defer src="\/script\.js"><\/script>/);
   assert.match(html,/<script defer src="\/visual-engine\.js"><\/script>/);
   assert.doesNotMatch(html,/https?:\/\/cdn\..*\/.*\.js/);
