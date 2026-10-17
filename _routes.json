@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "include": ["/api/*", "/auth/*", "/games/*", "/sesh-signal.js", "/arcade-games.js"],
+  "exclude": []
+}

@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="/lobby-redesign.css?v=20261016-rebuild1">
 <script defer src="/visual-engine.js"></script>
 <script defer src="/script.js"></script>
-<script defer src="/sesh-signal.js"></script>
+<script defer src="/sesh-loader.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -32,7 +32,7 @@
   <div class="header-shell shell">
     <a class="logo" href="#top" aria-label="The 420 Lobby home"><span class="logo-type logo-prefix">THE</span><img class="logo-smoke" src="/assets/approved-smoke-420.svg?v=20261016-fullzero" alt="" width="245" height="116" fetchpriority="high"><span class="logo-type logo-suffix">LOBBY</span></a>
     <nav class="desktop-nav" id="primary-nav" aria-label="Main navigation">
-      <a href="#vibe">THE VIBE</a><a href="#experiences">WHAT WE DO</a><a href="#sesh-signal">PLAY THE ARCADE</a><a href="#after-dark">AFTER DARK</a>
+      <a href="#vibe">THE VIBE</a><a href="#experiences">WHAT WE DO</a><a href="/arcade.html">PLAY THE ARCADE</a><a href="#after-dark">AFTER DARK</a>
       <a class="nav-join" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer">JOIN THE SERVER <span aria-hidden="true">↗</span></a>
     </nav>
     <div class="header-actions">
@@ -149,17 +149,19 @@
 
   <section class="sesh-arcade section-space" id="sesh-signal" aria-labelledby="sesh-heading">
     <div class="shell arcade-shell">
-      <div class="section-kicker"><span>03 / THE LOBBY ARCADE</span><span>42 SECONDS. YOUR BEST VIBE.</span></div>
+      <div class="section-kicker"><span>03 / THE LOBBY ARCADE</span><span>YOUR CREW. YOUR NEXT HIGH SCORE.</span></div>
       <div class="arcade-layout">
         <div class="arcade-copy">
-          <div class="arcade-side-label"><span class="arcade-pulse" aria-hidden="true"></span> BUILT FOR THE CREW <span aria-hidden="true">✳</span> NO LOGIN</div>
+          <div class="arcade-side-label"><span class="arcade-pulse" aria-hidden="true"></span> BUILT FOR THE CREW <span aria-hidden="true">✳</span> DISCORD MEMBERS</div>
           <h2 id="sesh-heading" class="arcade-heading">SESH<br><em>SIGNAL.</em></h2>
           <p class="arcade-subhead">The late-night kit challenge. Grab the lighter, grinder and papers. Complete a set for bonus points. Just don't touch the broken glass.</p>
           <p class="arcade-quick-note">42-SECOND ROUND <span aria-hidden="true">·</span> ONE TAP TO COLLECT <span aria-hidden="true">·</span> NO REAL MONEY OR REWARDS</p>
         </div>
         <div class="arcade-play">
+          <p class="arcade-auth-bar"><a class="arcade-btn" href="/arcade.html">EXPLORE ALL 3 GAMES ↗</a> <a class="arcade-btn" id="sesh-login" href="/auth/discord">SIGN IN WITH DISCORD ↗</a></p>
+          <p id="sesh-auth-status" class="arcade-result-note" role="status">Checking Discord sign-in…</p>
           <div class="arcade-controls" aria-label="Arcade controls">
-            <button type="button" class="arcade-btn arcade-btn-primary" id="sesh-start">START NEW ROUND <span aria-hidden="true">↗</span></button>
+            <button type="button" class="arcade-btn arcade-btn-primary" id="sesh-start" disabled>START NEW ROUND <span aria-hidden="true">↗</span></button>
             <button type="button" class="arcade-btn" id="sesh-pause" disabled>PAUSE</button>
             <button type="button" class="arcade-btn arcade-sound" id="sesh-sound" aria-pressed="false">SOUND OFF</button>
           </div>
@@ -212,11 +214,11 @@
             <p class="arcade-keyboard-hint">Tap items, or use Tab + Enter. When the charge fills, activate Chill Mode below the board for five seconds of double points. Press <kbd>B</kbd> while focused on the playfield.</p>
           </details>
           <div class="arcade-result-row">
-            <div class="arcade-personal-best"><small>PERSONAL BEST · THIS DEVICE</small><strong id="sesh-best">0000</strong></div>
+            <div class="arcade-personal-best"><small>PERSONAL BEST · YOUR PROFILE</small><strong id="sesh-best">0000</strong></div>
             <button type="button" class="arcade-btn arcade-share" id="sesh-share" disabled>SHARE YOUR SCORE <span aria-hidden="true">↗</span></button>
           </div>
           <p id="sesh-result" class="arcade-result-note" aria-live="polite"></p>
-          <p class="arcade-disclaimer">Just for fun. No real-world prizes or Discord roles. Your best score stays on your device, not our servers.</p>
+          <p class="arcade-disclaimer">Just for fun. No real-world prizes or Discord roles. Discord sign-in is required. Verified scores are saved to your profile. <a href="/arcade.html#leaderboard">VIEW LEADERBOARDS ↗</a></p>
         </div>
       </div>
       <p id="sesh-announcement" class="arcade-screenreader" role="status" aria-live="polite">Game ready.</p>

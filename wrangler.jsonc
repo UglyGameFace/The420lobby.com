@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "the420lobby-com",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2026-10-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "the420lobby-arcade",
+      // Replace this local placeholder with a newly created D1 database ID before deployment.
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "SITE_ORIGIN": "https://the420lobby.com",
+    "DISCORD_CLIENT_ID": ""
+  }
+}

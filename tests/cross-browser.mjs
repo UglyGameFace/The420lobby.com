@@ -1,14 +1,26 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { resolve, sep } from "node:path";
-import { chromium, firefox, webkit } from "playwright";
+import { createRequire } from "node:module";
+const { chromium, firefox, webkit } = createRequire(import.meta.url)("playwright");
 import assert from "node:assert/strict";
 
 const root = resolve(import.meta.dirname, "..");
-const fileTypes = {".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".svg":"image/svg+xml"};
+const fileTypes = {".html":"text/html; charset=utf-8",".css":"text/css; charset=utf-8",".js":"text/javascript; charset=utf-8",".mjs":"text/javascript; charset=utf-8",".svg":"image/svg+xml"};
+let unauthenticatedRunRequests = 0;
 const server = createServer(async(req,res)=>{
   try{
     const path = new URL(req.url,"http://localhost").pathname;
+    // An explicit unauthenticated API fixture: these tests never perform Discord login.
+    if (path.startsWith("/api/")) {
+      if (req.method === "POST" && path.startsWith("/api/runs")) unauthenticatedRunRequests++;
+      const payload = path === "/api/session"
+        ? {user:null, configured:true, csrfToken:null}
+        : {error:"Discord sign-in required"};
+      res.writeHead(path === "/api/session" ? 200 : 401, {"Content-Type":"application/json", "Cache-Control":"no-store"});
+      res.end(JSON.stringify(payload));
+      return;
+    }
     const file = resolve(root,"."+decodeURIComponent(path==="/" ? "/index.html" : path));
     if(!file.startsWith(root+sep)){res.writeHead(403);res.end();return;}
     const content = await readFile(file);
@@ -18,12 +30,14 @@ const server = createServer(async(req,res)=>{
 });
 await new Promise(done=>server.listen(0,"127.0.0.1",done));
 const url = "http://127.0.0.1:"+server.address().port;
-const engines = {chromium,firefox,webkit};
+const availableEngines = {chromium,firefox,webkit};
+const engines = Object.fromEntries(Object.entries(availableEngines).filter(([name]) => !process.env.BROWSER_ENGINES || process.env.BROWSER_ENGINES.split(",").includes(name)));
+assert.ok(Object.keys(engines).length > 0, "No requested browser engines are supported");
 try{
   for(const [name,engine] of Object.entries(engines)){
     let browser;
     try{
-      browser=await engine.launch({headless:true});
+      browser=await engine.launch({headless:true,executablePath:name === "chromium" ? process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined : undefined});
       for(const width of [390,1440]){
         const mobile=width===390;
         const page=await browser.newPage({viewport:{width,height:mobile?844:900},reducedMotion:"reduce"});
@@ -195,21 +209,14 @@ try{
           assert.ok(controls.logo.right+3<=controls.fx.left,name+" brand and FX overlap");
           assert.ok(controls.eyebrow.top-controls.header.bottom>=135 && controls.eyebrow.top-controls.header.bottom<=240,name+" hero top gap out of range");
         }
-        await page.evaluate(()=>{Math.random=()=>0.5;});
-        await page.locator("#sesh-start").click();
-        const wisp=page.locator(".sesh-item--grinder").first();
-        await wisp.waitFor({state:"visible",timeout:6000});
-        await wisp.click({timeout:3500});
-        assert.ok(Number(await page.locator("#sesh-score").textContent())>0,name+" tap did not award points");
-        await page.locator("#sesh-pause").click();
-        assert.equal(await page.locator("#sesh-stage").getAttribute("data-mode"),"paused");
-        await page.locator("#sesh-pause").click();
-        assert.equal(await page.locator("#sesh-stage").getAttribute("data-mode"),"playing");
-        await page.locator("#sesh-start").click();
-        assert.equal(await page.locator("#sesh-score").textContent(),"0000",name+" restart didn't reset");
+        assert.equal(await page.locator("#sesh-start").isDisabled(),true,name+" game start must require Discord login");
+        await page.locator("#sesh-start").evaluate(button => button.dispatchEvent(new MouseEvent("click",{bubbles:true})));
+        await page.waitForTimeout(100);
+        assert.equal(await page.locator(".sesh-item").count(),0,name+" unauthenticated visitor started a round");
+        assert.equal(unauthenticatedRunRequests,0,name+" unauthenticated client attempted a run");
         assert.deepEqual(errors,[],name+" had browser JS errors");
         await page.close();
-        console.log("PASS "+name+" "+width+"px responsive hero, safe header, controls, game interactions");
+        console.log("PASS "+name+" "+width+"px responsive hero, safe header, controls, Discord play gate");
       }
     }finally{
       if(browser)await browser.close();
