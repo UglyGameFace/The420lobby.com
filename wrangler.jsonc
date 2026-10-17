@@ -11,6 +11,11 @@
   },
   "env": {
     "production": {
+      // Both vars and d1_databases are non-inheritable Cloudflare Pages bindings.
+      // SITE_ORIGIN must be restated here or production OAuth fails closed.
+      "vars": {
+        "SITE_ORIGIN": "https://the420lobby.com"
+      },
       "d1_databases": [
         {
           "binding": "DB",

@@ -12,7 +12,7 @@ This is the **website's Discord OAuth sign-in**, not a Discord server migration 
 
 ## 1. Connect the created production D1 database
 
-The owner supplied the existing D1 database ID `7821b56b-0e32-4798-afa8-bf29220d70b1`. This is a **database identifier, not a password**. The website's `wrangler.jsonc` now declares it under `env.production.d1_databases` with the required `DB` binding and name `the420lobby-arcade`.
+The owner supplied the existing D1 database ID `7821b56b-0e32-4798-afa8-bf29220d70b1`. This is a **database identifier, not a password**. The website's `wrangler.jsonc` declares it under `env.production.d1_databases` with the required `DB` binding and name `the420lobby-arcade`. Both `d1_databases` and `vars` are non-inheritable in Pages: the production block also explicitly supplies `env.production.vars.SITE_ORIGIN`. Leaving SITE_ORIGIN only in top-level `vars` can cause `/api/session` to report `configured:false`.
 
 - No fake UUIDs or Discord credentials were added to GitHub.
 - The production D1 binding is **not** inherited by preview branches. Previews must use an independently provisioned database and test credentials if interactive preview sign-in is required.
