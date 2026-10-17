@@ -34,6 +34,8 @@ jobs:
           find functions -type f \( -name '*.mjs' -o -name '*.js' \) -exec node --check {} \;
       - name: Site, gameplay, authentication and persistence regression tests
         run: node --test tests/*.test.mjs
+      - name: Compile Cloudflare Pages Functions without deploying
+        run: npx --yes wrangler@4 pages functions build --outdir=.wrangler/functions-build
       - name: Install browser smoke-test tooling
         run: |
           npm install --no-save playwright@1.56.1

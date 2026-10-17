@@ -15,3 +15,15 @@ test('production assets retain all games and branding while excluding private so
   for(const name of ['/sesh-signal.js','/arcade-games.js','/api/*','/auth/*']) assert.ok(routes.include.includes(name),'missing auth route '+name);
   assert.doesNotMatch(readFileSync(join(root,'dist/arcade-app.js'),'utf8'),/DISCORD_CLIENT_SECRET/);
 });
+
+test('Pages configuration has a public dist boundary and no placeholder D1 resource',()=>{
+  const configText=readFileSync(join(root,'wrangler.jsonc'),'utf8').replace(/^\s*\/\/.*$/gm,'');
+  const config=JSON.parse(configText);
+  assert.equal(config.name,'the420lobby-com');
+  assert.equal(config.pages_build_output_dir,'dist');
+  for(const db of config.d1_databases||[]){
+    assert.equal(db.binding,'DB');
+    assert.match(db.database_id||'',/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i);
+    assert.notEqual(db.database_id,'00000000-0000-0000-0000-000000000000');
+  }
+});

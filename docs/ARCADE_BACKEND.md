@@ -8,7 +8,7 @@ The existing repository is a static site, served by the Git-linked Cloudflare Pa
 
 The proposed release changes the build command to `node scripts/build-static.mjs` and the static output directory to `dist`. The build copies an explicit list of browser assets; backend source, database migrations, tests, documentation, local variables, and secrets never enter the static output. This isolation is necessary now that server configuration and credentials coexist with the original static site. `.gitignore` alone is not a publication boundary. No live hosting configuration has been changed.
 
-No hosting settings, production bindings, Discord applications, DNS records, or deployments have been changed by this implementation. The all-zero D1 ID and empty Discord application ID are intentional setup placeholders. The backend fails closed until configured.
+No hosting settings, production bindings, Discord applications, DNS records, or deployments have been changed by this implementation. The deployment configuration intentionally omits the D1 binding and leaves the Discord application ID empty until real Cloudflare/Discord resources are configured. The backend fails closed until configured; a dummy D1 ID must not enter a deployed Wrangler configuration.
 
 ## Discord and session security
 
@@ -52,7 +52,7 @@ Use Node 24 or newer for the SQLite-backed tests. Wrangler v4 supplies a local D
 
 1. Create a Discord developer application for local development and register **exactly** `http://localhost:8788/auth/callback` in its OAuth2 redirect list.
 2. Copy `.dev.vars.example` to `.dev.vars`, set that application's client ID/secret, and keep `SITE_ORIGIN=http://localhost:8788`. `.dev.vars` is ignored by Git. Never put a secret in JavaScript, HTML, `wrangler.jsonc`, a build variable exposed to clients, or a committed file.
-3. Apply only the local migration and start Pages:
+3. First configure a real D1 database ID with the `DB` binding in your **local** Wrangler configuration (or provision a dedicated development database), then apply only the local migration and start Pages:
 
    ```sh
    npx wrangler@4 d1 migrations apply the420lobby-arcade --local
@@ -75,9 +75,9 @@ The backend suite uses SQLite with the actual migration and SQL statements, and 
 
 **Do not deploy, push to an auto-deploying branch, merge, apply remote migrations, or change the live Pages project without the user's approval.** The following are reviewable setup steps for the approved release, not actions already performed:
 
-1. Create a D1 database named `the420lobby-arcade`; replace the all-zero `database_id` in `wrangler.jsonc` with its real ID. Keep the binding name `DB`. Review the schema, then apply `migrations/0001_arcade.sql` to that database.
+1. Create a D1 database named `the420lobby-arcade`; add a `d1_databases` entry to `wrangler.jsonc` with `binding: "DB"`, `database_name: "the420lobby-arcade"`, `database_id` set to the **real** ID, and `migrations_dir: "migrations"`. Review the schema, then apply `migrations/0001_arcade.sql` to that database. Never commit an all-zero or invented ID.
 2. Set `SITE_ORIGIN` to the exact canonical website origin, currently `https://the420lobby.com`, and set `DISCORD_CLIENT_ID` to the production Discord application's public ID. Register **exactly** `https://the420lobby.com/auth/callback` in Discord. Use a dedicated production application if local/preview development has different operators.
-3. Add `DISCORD_CLIENT_SECRET` as an **encrypted Pages Functions secret** for production. It is never a frontend build setting and must never be committed. Ensure the Pages D1 binding resolves to the intended production database. Change the approved Pages build command to `node scripts/build-static.mjs` and output directory to `dist`, matching `wrangler.jsonc`. Publish only the build's explicitly staged assets; never upload the working directory or a directory containing `.dev.vars`, `.env`, backend source, or secret-bearing files.
+3. Add `DISCORD_CLIENT_SECRET` as an **encrypted Pages Functions secret** for production. It is never a frontend build setting and must never be committed. Ensure the Pages D1 binding resolves to the intended production database. Change the approved Pages build command to `node scripts/build-static.mjs` and output directory to `dist`, matching `wrangler.jsonc`. The existing build-free/root-output Pages project does not obtain a build command from Wrangler; configure this in Cloudflare Pages settings. Without it, `dist` will not exist at deployment time. Publish only the build's explicitly staged assets; never upload the working directory or a directory containing `.dev.vars`, `.env`, backend source, or secret-bearing files.
 4. Use an isolated D1 database, Discord application/redirect, and server secret for preview environments. Configure Wrangler's `env.preview` bindings/vars for a stable preview branch origin before enabling authenticated previews. Do not reuse production data or credentials in branch previews; unconfigured previews must remain signed out and fail closed.
 5. Review the exact commit and run CI, local runtime checks, and desktop/mobile acceptance. After explicit deployment approval, release the approved commit through the existing Git-linked Pages workflow. No DNS change is required.
 6. Verify the real callback, profile avatar/name, logout, refresh persistence, all three games, leaderboard rejection paths, and anonymous direct game-script access. If setup is incomplete, the UI should say sign-in is being connected and leave play disabled.

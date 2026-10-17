@@ -18,7 +18,7 @@ Every game requires Discord sign-in and a server-issued run. Historical localSto
 
 Inspection of source commit `6f45da382070a89a39fb18223a9598cd0d76a8c7`, the original README, and its validation workflow found a static, buildless Cloudflare Pages site named `the420lobby-com`, Git-linked to `main`, with the repository root as output. No existing authentication, database, or framework was present. Live HTTP inspection was unavailable because the workspace network proxy failed; hosting details come from the repository's documented configuration.
 
-The upgrade retains Cloudflare Pages. Pages Functions provide same-origin Discord OAuth2 and secure session/run endpoints; Cloudflare D1 persists profiles, scores, achievements and temporary session data. `wrangler.jsonc` describes the proposed configuration with an intentionally empty Discord application ID and placeholder database ID. No external infrastructure has been created or changed.
+The upgrade retains Cloudflare Pages. Pages Functions provide same-origin Discord OAuth2 and secure session/run endpoints; Cloudflare D1 persists profiles, scores, achievements and temporary session data. `wrangler.jsonc` intentionally leaves Discord sign-in unconfigured and does not declare a D1 binding until a real database ID exists. A placeholder database ID must never be deployed. No external infrastructure has been created or changed.
 
 The proposed build command is `node scripts/build-static.mjs`, with `dist` as output. Its explicit public-asset list prevents server source and local configuration from being published. This replaces the old no-build/root-output setting for the approved upgrade; no live hosting setting has been changed.
 
