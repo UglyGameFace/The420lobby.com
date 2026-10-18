@@ -123,7 +123,7 @@ test("Dank Shield is semantic responsive content, not a stretched poster", () =>
   assert.ok(html.includes('class="shield-feature-art"'));
   assert.ok(html.includes('class="shield-feature-copy"'));
   assert.ok(html.includes('id="shield-title"'));
-  assert.ok(html.includes('class="card-link shield-card-link" href="https://github.com/UglyGameFace/Dank-Shield"'));
+  assert.ok(html.includes('class="card-link shield-card-link" href="https://discord.gg/the420lobby"'));
   assert.ok(html.includes('href="/lobby-redesign.css?v=20261017-real-cards1"'));
   for (const rule of [".experience-grid>.shield-card{display:flex!important",
     ".hero-content", ".arcade-layout", ".community-proof .proof-grid",
@@ -138,7 +138,7 @@ test("experience cards use real licensed media and a unified design",()=>{
   assert.doesNotMatch(html,/class="film-reel"|class="voxel-scape"|class="cinema-beam"/);
   assert.match(redesign,/\.experience-card \.card-visual,\.experience-grid>\.shield-card \.shield-feature-art\{/);
   assert.match(redesign,/\.experience-card \.card-body h3,\.shield-feature-copy h3\{/);
-  for(const text of ["PLAN A MOVIE NIGHT","GET SERVER UPDATES","MEET DANK SHIELD"])assert.ok(html.includes(text));
+  for(const text of ["PLAN A MOVIE NIGHT","GET SERVER UPDATES","SEE DANK SHIELD IN THE LOBBY"])assert.ok(html.includes(text));
   assert.doesNotMatch(css,/Approved Dank Shield poster/);
 });
 
@@ -156,14 +156,14 @@ test("internal anchors resolve and IDs are unique", () => {
   for(const [,id] of html.matchAll(/\bhref="#([^"]+)"/g)) assert.ok(ids.includes(id),"missing #"+id);
 });
 
-test("external links use only approved Discord and Dank Shield destinations", () => {
+test("website outbound links use only the official Discord invitation, never the source repository", () => {
   const outgoing=[...html.matchAll(/<a\b[^>]*\bhref="(https?:[^"]+)"[^>]*>/g)];
   const urls=outgoing.map(([,url])=>url);
-  assert.equal(urls.filter(url=>url==="https://discord.gg/the420lobby").length,6);
-  assert.equal(urls.filter(url=>url==="https://github.com/UglyGameFace/Dank-Shield").length,1);
+  assert.equal(urls.filter(url=>url==="https://discord.gg/the420lobby").length,7);
+  assert.doesNotMatch(html,/https:\/\/github\.com\//i,"source repository must not appear on the public website");
   assert.equal(urls.length,7,"unexpected external destination");
   for(const [tag,url] of outgoing){
-    assert.ok(["https://discord.gg/the420lobby","https://github.com/UglyGameFace/Dank-Shield"].includes(url),url);
+    assert.equal(url,"https://discord.gg/the420lobby");
     assert.match(tag,/target="_blank"/);
     assert.match(tag,/rel="noopener noreferrer"/);
   }
