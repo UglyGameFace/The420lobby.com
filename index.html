@@ -20,9 +20,11 @@
 <link rel="stylesheet" href="/sesh-signal-v3.css">
 <link rel="stylesheet" href="/lobby-redesign.css?v=20261018-weedtech-card2">
 <link rel="stylesheet" href="/brand-header.css?v=20261017-lockup-align7">
+<link rel="stylesheet" href="/lounge.css?v=20261017-lounge1">
 <script defer src="/visual-engine.js"></script>
 <script defer src="/script.js"></script>
 <script defer src="/smoke-brand.js"></script>
+<script defer src="/lounge.js"></script>
 <script defer src="/sesh-loader.js"></script>
 </head>
 <body>
@@ -149,6 +151,52 @@
           <div class="card-info"><div class="card-topline"><span>04 // BUILD YOUR WORLD</span><span>↗</span></div><div class="card-body"><h3>THE 420<br>SERVER.</h3><p>A Minecraft cross-play adventure for Java and Bedrock players. Build, explore, and make the world your own.</p><a href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer" class="card-link">GET SERVER UPDATES <span aria-hidden="true">↗</span></a></div></div>
         </article>
       </div>
+    </div>
+  </section>
+
+
+  <section class="lounge-lab section-space" id="interactive-lounge" aria-labelledby="lounge-heading">
+    <div class="shell">
+      <div class="section-kicker"><span>03 / THE INTERACTIVE LOUNGE</span><span>REAL EXPERIENCES. NO FAKE ACTIVITY.</span></div>
+      <div class="lounge-intro">
+        <div><p class="lounge-eyebrow">WELCOME TO YOUR CORNER OF THE INTERNET</p><h2 class="big-type" id="lounge-heading">MAKE THE<br><em>LOBBY YOURS.</em></h2></div>
+        <p>Set the mood, explore the rooms, and drop into a shared CHEERS. Your games and Discord identity travel with you. No downloads needed.</p>
+      </div>
+      <div class="lounge-layout">
+        <div class="lounge-room" aria-label="Explore The 420 Lobby">
+          <div class="lounge-room-heading"><span><span class="lamp" aria-hidden="true"></span> THE 420 LOBBY / OPEN ROOMS</span></div>
+          <div class="lounge-doors">
+            <a class="lounge-door" href="/arcade.html"><span class="lounge-door-index">01 / THE ARCADE</span><strong>PLAY A GAME</strong><small>Three games. Verified high scores.</small><span class="arrow" aria-hidden="true">↗</span></a>
+            <a class="lounge-door" href="#after-dark"><span class="lounge-door-index">02 / THE SCREEN</span><strong>MOVIE NIGHTS</strong><small>Find your next watch party.</small><span class="arrow" aria-hidden="true">↗</span></a>
+            <a class="lounge-door" href="/arcade.html#profile"><span class="lounge-door-index">03 / YOUR CORNER</span><strong>MY PROFILE</strong><small>Discord identity and achievements.</small><span class="arrow" aria-hidden="true">↗</span></a>
+            <a class="lounge-door" href="#join"><span class="lounge-door-index">04 / THE CREW</span><strong>FIND YOUR PEOPLE</strong><small>Game nights, voice chat and community.</small><span class="arrow" aria-hidden="true">↗</span></a>
+          </div>
+          <div class="lounge-room-footer"><span>TIP: THE LOBBY HAS SECRETS</span><button type="button" class="lounge-secret" id="lounge-secret" aria-label="Inspect the secret lounge emblem" title="Something is hidden here">✳</button></div>
+          <p class="lounge-secret-message" id="lounge-secret-message" role="status" aria-live="polite"></p>
+        </div>
+        <div class="lounge-side">
+          <div class="lounge-moods" role="group" aria-labelledby="lounge-mood-label">
+            <div class="lounge-control-head"><h3 id="lounge-mood-label">SET THE ATMOSPHERE</h3><span>YOUR DEVICE, YOUR CHOICE</span></div>
+            <div class="lounge-mood-options">
+              <button type="button" data-lounge-theme="lounge" aria-pressed="true"><span class="mood-dot mood-lounge"></span>SMOKY LOUNGE</button>
+              <button type="button" data-lounge-theme="midnight" aria-pressed="false"><span class="mood-dot mood-midnight"></span>MIDNIGHT</button>
+              <button type="button" data-lounge-theme="halloween" aria-pressed="false"><span class="mood-dot mood-halloween"></span>AFTER DARK</button>
+            </div>
+            <p id="lounge-mood-status" class="lounge-fineprint" role="status">Atmosphere choice stays on this device. Animation follows your Effects setting.</p>
+          </div>
+          <div class="lounge-cheers" aria-labelledby="lounge-cheers-title">
+            <div class="lounge-control-head"><h3 id="lounge-cheers-title">CHEERS WITH THE CREW</h3><span>SHARED / 42 SECONDS</span></div>
+            <img class="lounge-cheers-art" src="/assets/cheers-real-smoke-blunt.webp?v=20261017-smoke-flow4" data-smoke-motion="/assets/cheers-real-smoke-blunt-loop.webp?v=20261017-smoke-flow4" data-smoke-still="/assets/cheers-real-smoke-blunt.webp?v=20261017-smoke-flow4" alt="Realistic lit blunt, CHEERS lettering, and rising smoke" width="1100" height="367" loading="lazy" decoding="async">
+            <div class="lounge-cheers-stats"><div><small>IN THIS ROUND</small><strong id="lounge-cheers-participants">—</strong></div><div><small>TIME LEFT</small><strong id="lounge-cheers-clock">—</strong></div></div>
+            <div class="lounge-cheers-progress" aria-hidden="true"><span id="lounge-cheers-progress"></span></div>
+            <p id="lounge-cheers-status" role="status" aria-live="polite">Connecting to the shared lounge…</p>
+            <button type="button" id="lounge-cheers-join" class="lounge-cheers-button" disabled>CONNECTING…</button>
+            <a href="/auth/discord" class="lounge-signin" id="lounge-cheers-signin" hidden>SIGN IN WITH DISCORD ↗</a>
+            <p class="lounge-fineprint">Free community countdown. One join per round. No real-world rewards. Your Discord name is not published here.</p>
+          </div>
+        </div>
+      </div>
+      <noscript><p class="lounge-fineprint">JavaScript is needed for shared Cheers and atmosphere controls. The arcade and community links still work.</p></noscript>
     </div>
   </section>
 
