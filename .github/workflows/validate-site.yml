@@ -46,6 +46,8 @@ jobs:
         run: node tests/cross-browser.mjs
       - name: Arcade authentication and gameplay browser tests
         run: node tests/arcade-browser.mjs
+      - name: Spark Relay browser gameplay
+        run: node tests/spark-relay-browser.mjs
       - name: Responsive browser smoke tests
         run: node tests/browser-smoke.mjs
       - name: Save browser previews
