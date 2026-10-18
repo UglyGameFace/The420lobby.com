@@ -68,7 +68,7 @@ let browser;
 try {
   browser = await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,args:["--no-sandbox"]});
   await mkdir("artifacts", {recursive:true});
-  for (const width of [320,390,820,1440]) {
+  for (const width of [320,390,560,820,950,960,1051,1440]) {
     const page = await browser.newPage({viewport:{width,height:width < 800 ? 844 : 1000},reducedMotion:"reduce"});
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
