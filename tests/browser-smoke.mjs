@@ -76,7 +76,7 @@ try {
     if(scenario.name==="desktop"){
       await loungeImage.evaluate(img=>img.decode());
       await page.waitForFunction(()=>document.querySelector("#lounge-scene-photo").dataset.photoState==="ready",
-        {timeout:10000});
+        null,{timeout:10000});
       assert.equal(await loungeImage.getAttribute("data-photo-state"),"ready",
         "cinema scene never becomes visible after loading");
     }
