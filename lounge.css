@@ -55,3 +55,11 @@ html[data-lounge-theme="halloween"] .lounge-lab{--room-accent:#ffbd74;--room-glo
 @media(max-width:360px){.lounge-doors{grid-template-columns:1fr}.lounge-door{min-height:94px}.lounge-room-heading{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.lounge-door,.lounge-cheers-progress span{transition:none}.lounge-door:hover{transform:none}}
 html.fx-off .lounge-door{transition:none}
+
+/* Atmospheres tint the full homepage. The real 420/CHEERS imagery never gets filters or cheap movement. */
+html[data-lounge-theme="midnight"]{--leaf:#b7c8fa;--mint:#a1c4ec;--stroke:rgba(174,199,254,.24)}
+html[data-lounge-theme="halloween"]{--leaf:#ffbd74;--mint:#f4ab88;--stroke:rgba(255,190,140,.25)}
+html[data-lounge-theme="midnight"] .hero{background:radial-gradient(ellipse at 78% 32%,#283554,transparent 52%),linear-gradient(140deg,#131c2a,#090e1a 66%)}
+html[data-lounge-theme="halloween"] .hero{background:radial-gradient(ellipse at 78% 32%,#55301d,transparent 52%),linear-gradient(140deg,#211913,#0e1010 66%)}
+html[data-lounge-theme="midnight"] .experiences{background:linear-gradient(180deg,#111b2a,#131e32 65%,#0c1321)}
+html[data-lounge-theme="halloween"] .experiences{background:linear-gradient(180deg,#241b16,#282018 65%,#151510)}
