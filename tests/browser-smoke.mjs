@@ -63,7 +63,16 @@ try {
     assert.equal(await page.locator(".experience-card").count(),4);
 
     assert.equal(await page.locator("#interactive-lounge").count(),1,"interactive lounge missing");
-    assert.equal(await page.locator(".lounge-door").count(),4,"lounge destinations missing");
+    assert.equal(await page.locator(".lounge-hotspot").count(),4,"lounge destinations missing");
+    await page.locator(".lounge-hotspot--cinema").click();
+    assert.equal(await page.locator("#lounge-preview-title").textContent(),"MOVIE NIGHTS");
+    assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"#after-dark");
+    await page.locator(".lounge-hotspot--cinema").press("ArrowRight");
+    assert.equal(await page.locator("#lounge-preview-title").textContent(),"YOUR PLAYER CORNER");
+    assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"/arcade.html#profile");
+    assert.equal(await page.locator(".lounge-hotspot--profile").getAttribute("aria-pressed"),"true");
+    await page.locator(".lounge-hotspot--arcade").click();
+    assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"/arcade.html");
     const loungeBox=await page.locator(".lounge-layout").boundingBox();
     assert.ok(loungeBox && loungeBox.x>=-2 && loungeBox.x+loungeBox.width<=scenario.size.width+2,
       "interactive lounge overflows "+scenario.name+": "+JSON.stringify(loungeBox));
