@@ -67,9 +67,9 @@ try {
     const loungeBox=await page.locator(".lounge-layout").boundingBox();
     assert.ok(loungeBox && loungeBox.x>=-2 && loungeBox.x+loungeBox.width<=scenario.size.width+2,
       "interactive lounge overflows "+scenario.name+": "+JSON.stringify(loungeBox));
-    await page.locator('[data-lounge-theme="midnight"]').click();
+    await page.locator('button[data-lounge-theme="midnight"]').click();
     assert.equal(await page.locator('html').getAttribute("data-lounge-theme"),"midnight");
-    assert.equal(await page.locator('[data-lounge-theme="midnight"]').getAttribute("aria-pressed"),"true");
+    assert.equal(await page.locator('button[data-lounge-theme="midnight"]').getAttribute("aria-pressed"),"true");
     assert.equal(await page.evaluate(()=>localStorage.getItem("lobby:theme:v1")),"midnight");
     await page.locator("#lounge-secret").click({clickCount:4});
     assert.equal(await page.locator('html').getAttribute("data-lounge-theme"),"halloween");
