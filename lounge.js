@@ -33,6 +33,33 @@
    if(taps<4){secretMessage.textContent=["Something is hidden…","Two more taps.","Almost there…"][taps-1];return;}
    taps=0;setTheme("halloween");secretMessage.textContent="Secret found: After Dark atmosphere activated. ✳";
  });
+ /* One authoritative set of hotspot metadata lives on the existing room controls. */
+ const spots=Array.from(section.querySelectorAll(".lounge-hotspot"));
+ const roomTitle=document.getElementById("lounge-preview-title");
+ const roomCopy=document.getElementById("lounge-preview-description");
+ const roomLink=document.getElementById("lounge-preview-link");
+ function selectSpot(button){
+   if(!spots.includes(button))return;
+   spots.forEach(item=>item.setAttribute("aria-pressed",String(item===button)));
+   roomTitle.textContent=button.dataset.roomTitle;
+   roomCopy.textContent=button.dataset.roomCopy;
+   roomLink.setAttribute("href",button.dataset.roomHref);
+ }
+ spots.forEach((button,index)=>{
+   button.addEventListener("click",()=>selectSpot(button));
+   button.addEventListener("keydown",event=>{
+     let next=null;
+     if(event.key==="ArrowRight"||event.key==="ArrowDown")next=spots[(index+1)%spots.length];
+     if(event.key==="ArrowLeft"||event.key==="ArrowUp")next=spots[(index+spots.length-1)%spots.length];
+     if(event.key==="Home")next=spots[0];
+     if(event.key==="End")next=spots[spots.length-1];
+     if(!next)return;
+     event.preventDefault();
+     selectSpot(next);
+     next.focus();
+   });
+ });
+ if(spots.length)selectSpot(spots[0]);
  let api=null,session=null,active=null,serverOffset=0,available=false,pending=false;
  function render(){
    const remaining=active?Math.max(0,Math.ceil((active.endsAt-Date.now()-serverOffset)/1000)):0;
