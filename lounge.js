@@ -100,11 +100,15 @@
    record:document.getElementById("spark-record")
  };
  const steps=Array.from(document.querySelectorAll("#spark-round-track .spark-step"));
+ const onlineCount=document.getElementById("spark-online");
+ const lookingCount=document.getElementById("spark-looking");
+ const onlineToggle=document.getElementById("spark-presence-toggle");
  const calls=["LIGHT THE SPARK","PASS THE GLOW","KEEP IT LIT","FAN THE FLAME","DON'T BREAK THE CHAIN",
    "PASS IT FORWARD","LIGHTNING HANDS","KEEP THE COMBO","ONE MORE SPARK","CHEERS TO THE CREW"];
- const defaultRules={durationMs:42000,firstBeatMs:3000,beatIntervalMs:3800,hitWindowMs:950,beatCount:10};
+ const defaultRules={durationMs:42000,firstBeatMs:3000,beatIntervalMs:3800,beatOffsetsMs:[3000,6800,9500,12400,14950,17850,20400,24200,27800,32500],hitWindowMs:550,beatCount:10};
  let rules=defaultRules,api=null,session=null,active=null,serverOffset=0;
  let available=false,pending=false,playing=false,bestScore=0,joinedRound=null,lastRefresh=0;
+ let online=false,looking=false,heartbeatBusy=false,lastHeartbeat=0;
  const restored=(()=>{
    try{return Number(sessionStorage.getItem("lobby:spark-round:v1"))||null;}
    catch(_){return null;}
@@ -124,10 +128,13 @@
  }
  function currentBeat(now){
    if(!active)return null;
-   const approx=Math.round((now-active.startedAt-rules.firstBeatMs)/rules.beatIntervalMs);
-   if(approx<0||approx>=rules.beatCount)return null;
-   const target=active.startedAt+rules.firstBeatMs+approx*rules.beatIntervalMs;
-   return {beat:approx,target,delta:now-target};
+   const beats=rules.beatOffsetsMs||defaultRules.beatOffsetsMs;
+   let nearest=null;
+   for(let i=0;i<beats.length;i++){
+     const target=active.startedAt+beats[i],delta=now-target;
+     if(!nearest||Math.abs(delta)<Math.abs(nearest.delta))nearest={beat:i,target,delta};
+   }
+   return nearest;
  }
  function changePhase(phase,label){
    arena.dataset.phase=phase;
@@ -161,11 +168,12 @@
      return;
    }
    const caught=new Set((active.hits||[]).map(x=>x.beat));
+   if(playing){changePhase("verifying","VERIFYING TAP");sparkButton.disabled=true;return;}
    const timing=currentBeat(now);
    const live=timing&&Math.abs(timing.delta)<=rules.hitWindowMs;
    const claimable=live&&!caught.has(timing.beat);
    steps.forEach((step,i)=>{
-     const target=active.startedAt+rules.firstBeatMs+i*rules.beatIntervalMs;
+     const target=active.startedAt+(rules.beatOffsetsMs||defaultRules.beatOffsetsMs)[i];
      step.dataset.state=caught.has(i)?"caught":target+rules.hitWindowMs<now?"missed":timing&&timing.beat===i?"current":"waiting";
    });
    sparkButton.disabled=!joined||!claimable||playing;
@@ -182,7 +190,7 @@
      sparkLabel.textContent=joined?"WATCH THE EMBER":"JOIN TO PLAY";
      sparkButton.setAttribute("aria-label","Wait for the next timed spark");
      const next=Array.from({length:rules.beatCount},(_,i)=>({i,
-       time:active.startedAt+rules.firstBeatMs+i*rules.beatIntervalMs}))
+       time:active.startedAt+(rules.beatOffsetsMs||defaultRules.beatOffsetsMs)[i]}))
        .find(x=>x.time+rules.hitWindowMs>=now);
      sparkCountdown.textContent=next?Math.max(0,(next.time-now)/1000).toFixed(1)+"s":"ROUND ENDING";
      showCue(next?(joined?"Wait for the glow, then tap. Timing matters more than speed.":"Join the relay to help build the crew score."):"Great run. The next round is coming up.");
@@ -193,6 +201,10 @@
    active=data.round;
    rules=data.rules||defaultRules;
    bestScore=data.bestScore||0;
+   onlineCount.textContent=String(data.onlinePlayers||0);
+   lookingCount.textContent=String(data.lookingPlayers||0);
+   onlineToggle.disabled=false;
+   onlineToggle.textContent=online?(looking?"LEAVE LOOKING LIST":"GO OFFLINE"):"JOIN ONLINE LOBBY";
    available=true;
    if(active?.id!==joinedRound&&joinedRound&&!active)setJoinedRound(null);
    signIn.hidden=true;
@@ -240,6 +252,30 @@
    }
    return session;
  }
+ async function publishPresence(isOnline,isLooking){
+   if(heartbeatBusy)return;
+   heartbeatBusy=true;
+   try {
+     const auth=await authenticated();
+     if(!auth)return;
+     const data=await api.arcadeRequest("/api/cheers/presence",{
+       body:{online:isOnline,looking:isOnline&&isLooking},csrfToken:auth.csrfToken
+     });
+     online=isOnline;looking=isOnline&&isLooking;lastHeartbeat=Date.now();
+     applyStatus(data);
+     cheerStatus.textContent=isOnline?
+       isLooking?"You're visible in the live looking-for-players lobby.":"You're online in the live lounge.":
+       "You're no longer listed as online.";
+   }catch(error){
+     cheerStatus.textContent=error.message||"Couldn't update live lobby. Retry.";
+   }finally{heartbeatBusy=false;}
+ }
+ onlineToggle.addEventListener("click",async()=>{
+   if(heartbeatBusy)return;
+   onlineToggle.disabled=true;
+   await publishPresence(!online,!online);
+   onlineToggle.disabled=false;
+ });
  joinButton.addEventListener("click",async()=>{
    if(pending||!available)return;
    pending=true;joinButton.disabled=true;joinButton.textContent="JOINING THE CREW…";
@@ -250,6 +286,7 @@
      const data=await api.arcadeRequest("/api/cheers",{body:{},csrfToken:auth.csrfToken});
      if(data.round)setJoinedRound(data.round.id);
      applyStatus(data,sentAt);
+     if(!online)void publishPresence(true,false);
      cheerStatus.textContent=data.joined?"You're in! Catch the ember when it glows.":"You're already in this round. Catch the next spark!";
    }catch(error){
      if(["invalid_csrf","sign_in_required"].includes(error.code))session=null;
@@ -262,7 +299,9 @@
    if(!timing||Math.abs(timing.delta)>rules.hitWindowMs||
      (active.hits||[]).some(h=>h.beat===timing.beat))return;
    const roundId=active.id,beat=timing.beat;
-   playing=true;sparkButton.disabled=true;sparkLabel.textContent="PASSING…";
+   playing=true;sparkButton.disabled=true;
+   changePhase("verifying","VERIFYING TAP");sparkLabel.textContent="GOOD TAP · CHECKING";
+   showCue("Tap registered instantly. Checking the server timing and crew score…");
    try{
      const auth=await authenticated();
      if(!auth)return;
@@ -283,8 +322,15 @@
  });
  // Only animate the countdown during a live round; idle pages should not
  // repaint ten markers eight times a second on low-power tablets.
- setInterval(()=>{if(active&&!document.hidden)render();},180);
+ setInterval(()=>{if(active&&!document.hidden)render();},60);
  setInterval(()=>refresh(),1000);
+ setInterval(()=>{
+   if(online&&!document.hidden&&!heartbeatBusy&&Date.now()-lastHeartbeat>=17000)
+     void publishPresence(true,looking);
+ },5000);
+ document.addEventListener("visibilitychange",()=>{
+   if(!document.hidden&&online)void publishPresence(true,looking);
+ });
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh(true);});
  refresh(true);
 })();
