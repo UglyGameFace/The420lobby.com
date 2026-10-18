@@ -345,7 +345,7 @@ test("the full arcade preserves community links and provides accessible Discord 
   assert.match(page, /class="skip-link"/);
   assert.match(page, /<dialog/);
   assert.match(page, /href="\/auth\/discord/);
-  assert.match(page, /src="\/arcade-app\.js"/);
+  assert.match(page, /src="\/arcade-app\.js\?v=20261018-arcade-upgrade2"/);
   assert.match(html, /href="\/arcade\.html"/);
 });
 
@@ -405,4 +405,22 @@ test("tablet nav cannot appear open by CSS alone or remain open on browser resto
   assert.match(reset,/document\.addEventListener\("pointerdown"/);
   assert.match(html,/src="\/script\.js\?v=20261018-tablet-nav3"/);
   assert.match(html,/lobby-redesign\.css\?v=20261018-tablet-nav3/);
+});
+
+test("Green Room's six pair photos are visually unique, including glass pipe vs bong",async()=>{
+  const {ITEM_PHOTOS}=await import("../shared/arcade-media.mjs");
+  const kinds=["lighter","grinder","papers","clean-glass","leaf","bong"];
+  for(const kind of kinds)assert.ok(ITEM_PHOTOS[kind]?.startsWith("https://"),kind+" missing real photo");
+  assert.equal(new Set(kinds.map(kind=>ITEM_PHOTOS[kind])).size,6,
+    "Memory pairs must never share the same visual asset");
+  assert.match(ITEM_PHOTOS["clean-glass"],/Small_blown_glass_pipe/);
+  assert.match(ITEM_PHOTOS.bong,/Glassbonggreen/);
+  const mini=read("arcade-games.js"),css=read("arcade-premium.css");
+  assert.match(mini,/Blue glass hand pipe/);
+  assert.match(mini,/Green glass bong/);
+  for(const id of ["mini-progress","mini-action-strip","mini-sound"])assert.ok(mini.includes(id));
+  assert.match(css,/mini-card\[data-kind="clean-glass"\]/);
+  assert.match(css,/mini-card\[data-kind="bong"\]/);
+  assert.match(read("sesh-photo.css"),/sesh-pickup-feedback/);
+  assert.match(read("sesh-signal.js"),/displayPickup/);
 });
