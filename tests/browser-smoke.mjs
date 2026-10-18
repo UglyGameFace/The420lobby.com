@@ -66,7 +66,7 @@ try {
     assert.equal(await page.locator(".lounge-hotspot").count(),4,"lounge destinations missing");
     const loungeImage=page.locator("#lounge-scene-photo");
     const arcadeImage=await loungeImage.getAttribute("src");
-    const expectedImages=new Set([...await page.locator(".lounge-hotspot").evaluateAll(buttons=>buttons.map(button=>button.dataset.roomImage))]);
+    const expectedImages=new Set(await page.locator(".lounge-hotspot").evaluateAll(buttons=>buttons.map(button=>button.dataset.roomImage)));
     assert.equal(expectedImages.size,4,"each lounge room needs a distinct picture");
     await page.locator(".lounge-hotspot--cinema").click();
     const cinemaImage=await loungeImage.getAttribute("src");
@@ -75,6 +75,8 @@ try {
     assert.match(await loungeImage.getAttribute("alt"),/movie theater/i);
     if(scenario.name==="desktop"){
       await loungeImage.evaluate(img=>img.decode());
+      await page.waitForFunction(()=>document.querySelector("#lounge-scene-photo").dataset.photoState==="ready",
+        {timeout:10000});
       assert.equal(await loungeImage.getAttribute("data-photo-state"),"ready",
         "cinema scene never becomes visible after loading");
     }
