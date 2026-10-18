@@ -87,6 +87,16 @@ try {
     assert.equal(await page.locator(".experience-card").count(),4);
 
     assert.equal(await page.locator("#interactive-lounge").count(),1,"interactive lounge missing");
+
+    assert.equal(await page.locator("#spark-relay").count(),1,"Spark Relay game missing");
+    assert.equal(await page.locator(".spark-step").count(),10,"shared round must have ten visible beats");
+    assert.equal(await page.locator("#lounge-spark-button").isDisabled(),true,
+      "public visitors cannot submit authenticated sparks without joining");
+    const sparkBounds=await page.locator("#spark-arena").boundingBox();
+    assert.ok(sparkBounds&&sparkBounds.width>=190&&sparkBounds.height>=230&&
+      sparkBounds.x>=-1&&sparkBounds.x+sparkBounds.width<=scenario.size.width+2,
+      "Spark Relay stage clips on "+scenario.name+": "+JSON.stringify(sparkBounds));
+
     assert.equal(await page.locator(".lounge-hotspot").count(),4,"lounge destinations missing");
     const loungeImage=page.locator("#lounge-scene-photo");
     const arcadeImage=await loungeImage.getAttribute("src");
