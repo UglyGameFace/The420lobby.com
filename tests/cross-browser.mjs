@@ -75,6 +75,15 @@ try{
           name+"/"+width+" initial aria-expanded must be false");
 
         assert.equal(await page.locator(".lounge-hotspot").count(),4,name+" missing four game room markers");
+
+        assert.equal(await page.locator(".spark-step").count(),10,
+          name+"/"+width+" Spark Relay must present ten distinct beat markers");
+        const arena=await page.locator("#spark-arena").boundingBox();
+        assert.ok(arena&&arena.width>=190&&arena.x>=-1&&arena.x+arena.width<=width+2,
+          name+"/"+width+" Spark Relay stage overflows: "+JSON.stringify(arena));
+        assert.equal(await page.locator("#lounge-spark-button").isDisabled(),true,
+          name+"/"+width+" guest must not score the cooperative game");
+
         const roomImage=page.locator("#lounge-scene-photo");
         const originalRoomImage=await roomImage.getAttribute("src");
         await page.locator(".lounge-hotspot--profile").click();
