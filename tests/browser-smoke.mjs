@@ -74,7 +74,7 @@ try {
       await menuButton.click();
       assert.equal(await nav.isVisible(),true,scenario.name+" menu should open on tap");
       assert.equal(await menuButton.getAttribute("aria-expanded"),"true");
-      await page.locator("h1#hero-heading").click({force:true});
+      await page.locator(".logo").click();
       assert.equal(await nav.isVisible(),false,scenario.name+" outside tap should dismiss nav");
       await menuButton.click();
       await page.evaluate(()=>window.dispatchEvent(new Event("pageshow")));
