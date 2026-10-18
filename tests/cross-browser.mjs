@@ -174,7 +174,15 @@ try{
           await page.locator("#menu-toggle").click();
           assert.equal(await page.locator("#primary-nav").isVisible(),true,name+" tablet menu failed to open");
           await page.locator("#menu-toggle").click();
-          assert.equal(await page.locator("#primary-nav").isVisible(),false,name+" tablet menu failed to close");
+          const menuState=await page.evaluate(()=>{
+            const nav=document.querySelector("#primary-nav"),button=document.querySelector("#menu-toggle");
+            const style=getComputedStyle(nav),rect=nav.getBoundingClientRect();
+            return {expanded:button.getAttribute("aria-expanded"),className:nav.className,
+              width:innerWidth,tabletMatch:matchMedia("(min-width:761px) and (max-width:1050px)").matches,
+              display:style.display,visibility:style.visibility,rect:{width:rect.width,height:rect.height}};
+          });
+          assert.equal(await page.locator("#primary-nav").isVisible(),false,
+            name+" tablet menu failed to close: "+JSON.stringify(menuState));
         }
         const logoBounds=await page.locator(".brand-smoke-image").boundingBox();
         if(mobile){
