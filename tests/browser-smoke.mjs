@@ -113,7 +113,7 @@ try {
     assert.equal(arcadePresentation.machineBorder,"1px","cabinet framing not styled");
     assert.ok(arcadePresentation.machineHeight>450,"arcade cabinet missing");
 
-    assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),4);
+    assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),7);
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
     await page.locator(".leaf-seal").scrollIntoViewIfNeeded();
     await page.locator(".leaf-seal img.seal-cannabis-photo").evaluate(img => img.decode());
@@ -149,17 +149,27 @@ try {
       "Shield title collapsed: "+JSON.stringify(shieldGeometry));
     assert.ok(shieldGeometry.cta.height>=30,
       "Shield CTA not tappable: "+JSON.stringify(shieldGeometry));
-    if (scenario.size.width<=460) {
-      assert.ok(shieldGeometry.art.bottom<=shieldGeometry.copy.top+3,
-        "phone layout must stack artwork over content: "+JSON.stringify(shieldGeometry));
-    } else {
-      assert.ok(shieldGeometry.art.right<=shieldGeometry.copy.left+3,
-        "tablet/desktop layout must use side-by-side media and copy: "+JSON.stringify(shieldGeometry));
-    }
+    assert.ok(shieldGeometry.art.bottom<=shieldGeometry.copy.top+3,
+      "Shield visual should stack above copy like the other three cards: "+JSON.stringify(shieldGeometry));
     await page.locator(".shield-card").screenshot({
       path:"artifacts/"+scenario.name+"-shield-card.png",
       animations:"disabled",
     });
+    const featureMedia = await page.evaluate(() => {
+      const rect = selector => document.querySelector(selector).getBoundingClientRect();
+      return [".hangout-card .card-visual",".shield-card .shield-feature-art",
+        ".cinema-card .card-visual",".minecraft-card .card-visual"]
+        .map(selector => ({height:rect(selector).height,width:rect(selector).width}));
+    });
+    assert.ok(Math.max(...featureMedia.map(r=>r.height))-Math.min(...featureMedia.map(r=>r.height))<=3,
+      "all four cards require matching media panel heights: "+JSON.stringify(featureMedia));
+    for (const selector of [".cinema-card .cinema-photo",".minecraft-card .minecraft-photo"]) {
+      const photo=page.locator(selector);
+      await photo.scrollIntoViewIfNeeded();
+      await photo.evaluate(img=>img.decode());
+      assert.ok(await photo.evaluate(img=>img.complete&&img.naturalWidth>=500),
+        "the licensed photo/gameplay image is unavailable: "+selector);
+    }
     await page.locator(".hangout-card").scrollIntoViewIfNeeded();
     await page.locator("img.card-foliage-photo").evaluate(img=>img.decode());
     assert.ok(await page.locator("img.card-foliage-photo").evaluate(img=>img.naturalWidth>0),

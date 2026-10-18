@@ -46,31 +46,83 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .experiences-heading{display:flex;align-items:end;justify-content:space-between;gap:clamp(24px,5vw,70px);margin-bottom:45px}
 .experiences-heading>p{max-width:370px;font-size:clamp(15px,1.4vw,18px);line-height:1.6}
 .experience-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(17px,2.4vw,31px);align-items:stretch}
-.experience-card:nth-child(n),.experience-grid>.experience-card:nth-child(n){grid-column:auto;min-height:0;margin:0;transform:none;clip-path:none;border:1px solid var(--stroke);border-radius:19px;overflow:hidden;display:flex;flex-direction:column;isolation:isolate;background:#13271e;box-shadow:0 20px 48px rgba(0,0,0,.12)}
-.experience-grid>.experience-card .card-info{min-height:0;flex:1;padding:clamp(24px,4vw,44px);display:flex;flex-direction:column}
-.experience-card .card-visual{position:relative;flex:0 0 auto;min-height:clamp(190px,20vw,285px);height:clamp(190px,20vw,285px);overflow:hidden}
-.experience-card .card-topline{display:flex;align-items:center;justify-content:space-between;gap:15px;color:var(--mint);font-size:clamp(10px,.85vw,12px);letter-spacing:.13em}
-.experience-card .card-body{display:flex;flex-direction:column;flex:1;margin-top:20px}
-.experience-card .card-body h3{font-size:clamp(58px,6vw,98px);line-height:.87;letter-spacing:-.035em;margin:0 0 17px}
-.experience-card .card-body p{max-width:46ch;font-size:clamp(14px,1.2vw,17px);line-height:1.6;color:var(--muted);margin:0 0 28px}
-.experience-card .card-link{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:18px;border-top:1px solid var(--stroke);font-size:clamp(10px,.92vw,12px);text-decoration:none;color:var(--paper);letter-spacing:.1em;min-height:46px}
-.experience-card .card-link span{font-size:22px;color:var(--leaf)}
-.experience-card .card-glow{opacity:.28;pointer-events:none}
-.experience-card .card-visual-stamp{transform:none;top:auto;bottom:17px;left:20px}
-.experience-card .film-reel{width:min(45%,230px);height:auto;aspect-ratio:1.65}
-.experience-card .voxel-scape{scale:.77;transform-origin:50% 10%}
-.experience-grid>.shield-card{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:clamp(360px,31vw,470px)!important;aspect-ratio:auto!important;background:radial-gradient(ellipse at 28% 42%,rgba(71,126,82,.34),transparent 55%),#0f241b!important;clip-path:none!important}
-.experience-grid>.shield-card .shield-feature-art{position:relative;min-width:0;min-height:100%;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at center,rgba(87,174,107,.24),transparent 65%)}
-.shield-feature-art::before{content:"";position:absolute;width:80%;aspect-ratio:1;border:1px solid rgba(160,226,165,.12);border-radius:50%;box-shadow:0 0 0 24px rgba(132,220,146,.025),0 0 0 59px rgba(132,220,146,.022)}
-.shield-feature-art .shield-orbit{position:absolute;border-radius:50%;border:1px solid rgba(135,227,147,.15);width:56%;aspect-ratio:1;transform:rotateX(64deg) rotate(-18deg)}
-.shield-feature-art .shield-orbit-two{transform:rotateY(65deg) rotate(32deg);width:68%}
-.experience-grid>.shield-card .dank-shield-brand-art{position:relative!important;inset:auto!important;z-index:2;width:min(73%,245px)!important;height:auto!important;aspect-ratio:1;object-fit:contain!important;transform:none!important;animation:none!important;filter:drop-shadow(0 25px 25px rgba(0,0,0,.4)) drop-shadow(0 0 22px rgba(101,235,105,.17))!important;max-height:none!important}
-.shield-art-label{position:absolute;bottom:19px;left:20px;right:15px;color:var(--mint);font:700 10px "DM Sans",sans-serif;letter-spacing:.12em}
-.experience-grid>.shield-card .shield-feature-copy{position:relative;min-width:0;padding:clamp(21px,2.5vw,36px);display:flex;flex-direction:column;justify-content:center;background:linear-gradient(90deg,transparent,rgba(5,18,13,.18))}
-.shield-feature-copy h3{font-family:"Barlow Condensed",sans-serif;font-size:clamp(58px,6vw,101px);font-weight:900;line-height:.84;letter-spacing:-.025em;margin:clamp(18px,3vw,32px) 0 18px}
+/* The four experience cards share a single real-media composition. */
+.experience-card:nth-child(n),.experience-grid>.experience-card:nth-child(n){
+  grid-column:auto;min-height:0;margin:0;transform:none;clip-path:none;
+  border:1px solid var(--stroke);border-radius:19px;overflow:hidden;
+  display:flex;flex-direction:column;isolation:isolate;
+  background:#10241b;box-shadow:0 20px 48px rgba(0,0,0,.15)
+}
+.experience-grid>.shield-card{display:flex!important;flex-direction:column;aspect-ratio:auto!important}
+.experience-card .card-visual,.experience-grid>.shield-card .shield-feature-art{
+  position:relative;flex:0 0 auto;height:clamp(210px,23vw,285px);min-height:0;
+  overflow:hidden;isolation:isolate
+}
+.experience-card .card-visual::after{
+  content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(7,18,12,.06) 20%,rgba(7,18,12,.15) 59%,rgba(7,18,12,.68) 100%)
+}
+.experience-card .card-foliage-photo,
+.experience-card .cinema-photo,.experience-card .minecraft-photo{
+  position:absolute;inset:0;width:100%;height:100%;max-width:none;
+  display:block;object-fit:cover;opacity:1;mask-image:none;
+  filter:saturate(.83) contrast(1.07) brightness(.84)
+}
+.experience-card .card-foliage-photo{object-position:center 40%;filter:saturate(.82) contrast(1.09) brightness(.76)}
+.experience-card .cinema-photo{object-position:50% 55%;filter:saturate(.88) contrast(1.07) brightness(.82)}
+.experience-card .minecraft-photo{object-position:center 50%;filter:saturate(.88) contrast(1.05) brightness(.87)}
+.experience-card .card-visual-stamp,.experience-grid>.shield-card .shield-art-label{
+  position:absolute;z-index:3;top:auto;right:auto;bottom:16px;left:20px;
+  transform:none;padding:8px 11px;border:1px solid rgba(183,245,159,.25);
+  border-radius:5px;background:rgba(6,19,14,.77);color:#e0f4d8;
+  font:700 clamp(9px,.82vw,11px)/1.3 "DM Sans",sans-serif;letter-spacing:.1em
+}
+.experience-grid>.experience-card .card-info,
+.experience-grid>.shield-card .shield-feature-copy{
+  min-width:0;min-height:0;flex:1;padding:clamp(24px,3vw,37px);
+  display:flex;flex-direction:column;justify-content:flex-start;
+  background:linear-gradient(155deg,rgba(24,49,35,.55),#0c1d16 82%)
+}
+.experience-card .card-topline{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  color:var(--mint);font-size:clamp(10px,.88vw,12px);letter-spacing:.12em
+}
+.experience-card .card-body{display:flex;flex-direction:column;flex:1;margin-top:18px;padding-top:0}
+.experience-card .card-body::before{content:none}
+.experience-card .card-body h3,.shield-feature-copy h3{
+  font-family:"Barlow Condensed",Impact,sans-serif;font-weight:900;font-style:normal;
+  font-size:clamp(62px,6.4vw,94px);line-height:.88;letter-spacing:-.028em;margin:0 0 17px
+}
+.shield-feature-copy h3{margin-top:18px}
 .shield-feature-copy h3 em{color:var(--leaf);font-style:normal}
-.shield-feature-copy p{max-width:34ch;color:var(--muted);font-size:clamp(14px,1.2vw,17px);line-height:1.56;margin:0 0 24px}
-.shield-feature-copy .card-link{margin-top:auto}
+.experience-card .card-body p,.shield-feature-copy p{
+  max-width:44ch;color:var(--muted);font-size:clamp(14px,1.2vw,17px);
+  line-height:1.6;margin:0 0 28px
+}
+.experience-card .card-link{
+  position:relative;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-top:auto;padding-top:18px;border-top:1px solid var(--stroke);
+  font-size:clamp(10px,.92vw,12px);text-decoration:none;color:var(--paper);
+  letter-spacing:.09em;min-height:46px
+}
+.experience-card .card-link span{font-size:22px;color:var(--leaf)}
+.experience-card .card-glow{opacity:.22;pointer-events:none}
+.experience-grid>.shield-card .shield-feature-art{
+  display:grid;place-items:center;
+  background:radial-gradient(ellipse at 50% 50%,rgba(62,160,82,.24),transparent 70%),#0b2317
+}
+.experience-grid>.shield-card .shield-feature-art::before{
+  content:"";position:absolute;inset:0;width:auto;aspect-ratio:auto;
+  border:0;border-radius:0;box-shadow:none;
+  background:radial-gradient(circle at center,rgba(130,251,129,.17),transparent 62%)
+}
+.experience-grid>.shield-card .dank-shield-brand-art{
+  position:relative!important;inset:auto!important;z-index:2;
+  width:min(76%,246px)!important;height:auto!important;max-height:91%!important;
+  aspect-ratio:1;object-fit:contain!important;opacity:1;
+  transform:none!important;animation:none!important;
+  filter:drop-shadow(0 15px 24px rgba(0,0,0,.45)) drop-shadow(0 0 18px rgba(84,222,89,.15))!important
+}
 .experience-card .card-info h3,.shield-feature-copy h3{overflow-wrap:normal;word-break:normal}
 .arcade-layout{display:grid;grid-template-columns:minmax(0,.68fr) minmax(0,1.32fr);align-items:start;gap:clamp(32px,5vw,78px)}
 .arcade-copy,.arcade-play{min-width:0}
@@ -91,8 +143,6 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   .header-shell{gap:15px}
   .hero-copy-block{width:65%}
   .hero-scene{width:64%;right:-14%}
-  .experience-grid>.shield-card{grid-template-columns:45% 55%}
-  .shield-feature-copy h3{font-size:clamp(54px,7vw,81px)}
   .arcade-layout{grid-template-columns:1fr}
   .arcade-copy{max-width:640px}
 }
@@ -140,18 +190,18 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   .experiences-heading{display:block;margin-bottom:30px}
   .experiences-heading>p{margin-top:22px}
   .experience-grid{grid-template-columns:1fr;gap:17px}
-  .experience-card:nth-child(n),.experience-grid>.experience-card:nth-child(n){min-height:0!important;grid-column:1!important}
-  .experience-card .card-visual{height:clamp(185px,48vw,270px);min-height:0}
-  .experience-grid>.experience-card .card-info{padding:24px;min-height:0!important}
-  .experience-card .card-body h3{font-size:clamp(59px,15vw,90px)}
-  .experience-card .card-body{margin-top:15px}
-  .experience-grid>.shield-card{grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0!important}
-  .experience-grid>.shield-card .shield-feature-art{min-height:300px}
-  .experience-grid>.shield-card .dank-shield-brand-art{width:min(76%,200px)!important}
-  .experience-grid>.shield-card .shield-feature-copy{padding:22px}
-  .shield-feature-copy h3{font-size:clamp(45px,10vw,78px);margin:22px 0 14px}
-  .shield-feature-copy p{font-size:14px;line-height:1.5;margin-bottom:16px}
-  .shield-art-label{font-size:8px;bottom:14px;left:12px}
+  .experience-card:nth-child(n),.experience-grid>.experience-card:nth-child(n){
+    min-height:0!important;grid-column:1!important
+  }
+  .experience-card .card-visual,.experience-grid>.shield-card .shield-feature-art{
+    height:clamp(190px,42vw,260px)
+  }
+  .experience-grid>.experience-card .card-info,
+  .experience-grid>.shield-card .shield-feature-copy{padding:clamp(23px,5vw,31px)}
+  .experience-card .card-body h3,.shield-feature-copy h3{font-size:clamp(61px,11vw,84px)}
+  .experience-card .card-body{margin-top:17px}
+  .shield-feature-copy h3{margin-top:17px}
+  .experience-grid>.shield-card .dank-shield-brand-art{width:min(73%,245px)!important}
   .arcade-layout{grid-template-columns:1fr;gap:12px}
   .arcade-heading{font-size:clamp(64px,14vw,92px)}
   .reality-section{min-height:620px}
@@ -165,17 +215,17 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   .hero-content{padding-top:clamp(190px,28svh,235px);padding-bottom:50px}
   .hero-heading,.hero-heading-cheers{font-size:clamp(48px,12vw,66px)}
   .hero-scene{width:110vw;right:-19vw;height:390px}
-  .experience-grid>.shield-card{grid-template-columns:1fr;display:flex!important;flex-direction:column}
-  .experience-grid>.shield-card .shield-feature-art{min-height:0;height:clamp(185px,56vw,265px);flex:0 0 auto}
-  .experience-grid>.shield-card .dank-shield-brand-art{width:clamp(116px,40%,180px)!important}
-  .experience-grid>.shield-card .shield-feature-copy{padding:22px 24px 25px;min-height:0}
-  .shield-feature-copy h3{font-size:clamp(65px,18vw,88px);margin:16px 0 11px}
-  .shield-feature-copy p{font-size:14px}
+  .experience-card .card-visual,.experience-grid>.shield-card .shield-feature-art{
+    height:clamp(190px,54vw,245px)
+  }
+  .experience-card .card-body h3,.shield-feature-copy h3{
+    font-size:clamp(62px,16vw,78px)
+  }
+  .experience-grid>.shield-card .dank-shield-brand-art{width:min(78%,215px)!important}
   .experience-card .card-link{padding-top:13px}
-  .shield-art-label{left:16px;bottom:12px}
   .arcade-machine{border-radius:12px}
   .section-kicker span:last-child{display:none}
 }
 @media(prefers-reduced-motion:reduce){
-  .shield-orbit,.shield-feature-art::before{animation:none}
+  .shield-feature-art::before{animation:none}
 }

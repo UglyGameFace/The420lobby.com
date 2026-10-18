@@ -26,3 +26,17 @@ Do not replace genuine photos with drawn polygons merely to avoid third-party as
 - **Original**: https://upload.wikimedia.org/wikipedia/commons/f/ff/Potleaf.jpg
 - **Use**: single seven-leaflet photographed cannabis leaf, masked and color graded inside circular Good Stuff badge, with original label preserved. It is a real leaf, not a cultivar-specific claim.
 - **Current delivery**: remote Commons original, must be localized/optimized and visually approved before production readiness.
+
+## Cinema watch-party card
+
+- **Photograph**: [Empty Movie Theater (54280927025).jpg](https://commons.wikimedia.org/wiki/File:Empty_Movie_Theater_(54280927025).jpg), by Eden, Janine and Jim.
+- **License**: [Creative Commons Attribution 2.0](https://creativecommons.org/licenses/by/2.0/).
+- **Usage**: Real cinema auditorium image cropped and color-graded in CSS. This is not a representation of an actual Dank Cinema venue.
+- **Delivery limitation**: Wikimedia 960px thumbnail, externally served until it can be bundled and optimized locally.
+
+## Minecraft cross-play card
+
+- **Screenshot**: [Minecraft Beta 1.8.1 Gameplay Screenshot](https://commons.wikimedia.org/wiki/File:Minecraft_Beta_1.8.1_Gameplay_Screenshot.png), from an official Xbox México CC-licensed video.
+- **License**: [Creative Commons Attribution 3.0](https://creativecommons.org/licenses/by/3.0/). Attribution to Xbox México.
+- **Usage**: Genuine gameplay landscape screenshot, cropped and graded in CSS. It does not depict The 420 Server's actual world.
+- **Delivery limitation**: Wikimedia 960px thumbnail. It remains an external dependency until the file is optimized and bundled.
