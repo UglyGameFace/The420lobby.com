@@ -98,8 +98,19 @@ try {
     await page.keyboard.press("Escape");
     assert.equal(await page.locator("#login-dialog").evaluate(dialog => dialog.open), false);
     assert.equal(await page.locator(".hero-art img").evaluate(image => image.complete && image.naturalWidth > 0), true);
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
-    assert.ok(overflow <= 2, width + "px arcade has horizontal overflow: " + overflow);
+    const overflowDiagnostic = await page.evaluate(() => {
+      const viewport=innerWidth;
+      const overflow=document.documentElement.scrollWidth-viewport;
+      const out=[...document.querySelectorAll("body *")].map(element=>{
+        const rect=element.getBoundingClientRect();
+        return {selector:element.tagName.toLowerCase()+(element.id?"#"+element.id:"")+
+          (typeof element.className==="string"?"."+element.className.trim().split(/\\s+/).slice(0,2).join("."):""),
+          left:Math.round(rect.left),right:Math.round(rect.right),width:Math.round(rect.width)};
+      }).filter(r=>r.right>viewport+2||r.left< -2).sort((a,b)=>b.right-a.right).slice(0,15);
+      return {overflow,out};
+    });
+    if(width===820)await page.screenshot({path:"artifacts/arcade-debug-820.png",fullPage:true,animations:"disabled"});
+    assert.ok(overflowDiagnostic.overflow <= 2, width + "px arcade has horizontal overflow: "+JSON.stringify(overflowDiagnostic));
     assert.equal(await page.locator('.community-card[href="/#experiences"]').count(), 1);
     assert.equal(await page.locator('.community-card[href="/#after-dark"]').count(), 1);
     await page.screenshot({path:"artifacts/arcade-guest-" + width + ".png",fullPage:true,animations:"disabled"});
