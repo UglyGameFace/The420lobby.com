@@ -38,12 +38,37 @@
  const roomTitle=document.getElementById("lounge-preview-title");
  const roomCopy=document.getElementById("lounge-preview-description");
  const roomLink=document.getElementById("lounge-preview-link");
+ const scene=section.querySelector(".lounge-scene");
+ const sceneImage=document.getElementById("lounge-scene-photo");
+ const photoStatus=document.getElementById("lounge-photo-status");
+ function showPhoto(){
+   sceneImage.dataset.photoState="ready";
+   photoStatus.hidden=true;
+   photoStatus.textContent="";
+ }
+ sceneImage.addEventListener("load",showPhoto);
+ sceneImage.addEventListener("error",()=>{
+   sceneImage.dataset.photoState="error";
+   photoStatus.textContent="The selected room photo couldn't load. Try another room or check your connection.";
+   photoStatus.hidden=false;
+ });
+ if(sceneImage.complete&&sceneImage.naturalWidth>0)showPhoto();
  function selectSpot(button){
    if(!spots.includes(button))return;
    spots.forEach(item=>item.setAttribute("aria-pressed",String(item===button)));
    roomTitle.textContent=button.dataset.roomTitle;
    roomCopy.textContent=button.dataset.roomCopy;
    roomLink.setAttribute("href",button.dataset.roomHref);
+   scene.dataset.activeRoom=button.dataset.roomKey;
+   const nextImage=button.dataset.roomImage;
+   if(sceneImage.getAttribute("src")!==nextImage){
+     sceneImage.dataset.photoState="loading";
+     photoStatus.hidden=true;
+     photoStatus.textContent="";
+     sceneImage.alt=button.dataset.roomAlt;
+     sceneImage.setAttribute("src",nextImage);
+     if(sceneImage.complete&&sceneImage.naturalWidth>0)showPhoto();
+   }
  }
  spots.forEach((button,index)=>{
    button.addEventListener("click",()=>selectSpot(button));
