@@ -1,6 +1,7 @@
 import {allowMethod, errorResponse, HttpError, json} from "./http.mjs";
 import {beginDiscord, completeDiscord, getSession, isConfigured, logout, requireSession} from "./auth.mjs";
 import {finishRun, leaderboards, profile, startRun} from "./arcade.mjs";
+import {getCheers, joinCheers} from "./cheers.mjs";
 
 export async function handleRequest(context, options = {}) {
   const {request, env} = context;
@@ -17,6 +18,9 @@ export async function handleRequest(context, options = {}) {
       allowMethod(request, ["GET"]); response = await completeDiscord(request, env, options.fetcher);
     } else if (path === "/auth/logout") {
       allowMethod(request, ["POST"]); response = await logout(request, env, await requireSession(request, env));
+    } else if (path === "/api/cheers") {
+      allowMethod(request, ["GET", "POST"]);
+      response = request.method === "GET" ? await getCheers(request, env) : await joinCheers(request, env);
     } else if (path === "/api/profile") {
       allowMethod(request, ["GET"]); response = await profile(request, env);
     } else if (path === "/api/leaderboards") {
