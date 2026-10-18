@@ -424,3 +424,16 @@ test("Green Room's six pair photos are visually unique, including glass pipe vs 
   assert.match(read("sesh-photo.css"),/sesh-pickup-feedback/);
   assert.match(read("sesh-signal.js"),/displayPickup/);
 });
+
+
+test("Arcade artwork preserves complete source proportions on every device",()=>{
+  const page=read("arcade.html"),visual=read("arcade-premium.css");
+  assert.match(page,/href="\/arcade-premium\.css\?v=20261018-full-artwork3"/);
+  assert.match(visual,/\.hero-art img\{[^}]*height:auto;[^}]*object-fit:contain/);
+  assert.match(visual,/\.arcade-hero \.hero-art img\{[^}]*height:auto;object-fit:contain/);
+  assert.match(visual,/\.game-art \.game-card-photo\{[^}]*object-fit:contain/);
+  assert.match(visual,/@media\(max-width:560px\)\{[^}]*\.hero-art\{[^}]*aspect-ratio:auto/);
+  assert.match(visual,/@media\(min-width:561px\) and \(max-width:950px\)\{[^}]*\.arcade-hero \.hero-art\{[^}]*aspect-ratio:auto/);
+  assert.doesNotMatch(visual,/\.hero-art(?: img)?\{[^}]*aspect-ratio:1\.(?:33|65|7)/);
+  assert.doesNotMatch(visual,/\.game-art \.game-card-photo\{[^}]*object-fit:cover/);
+});
