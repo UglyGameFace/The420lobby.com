@@ -227,3 +227,20 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 @media(prefers-reduced-motion:reduce){
   .shield-feature-art::before{animation:none}
 }
+
+/* Tablet menu contract. The base .desktop-nav display:flex loaded later than
+   styles.css used to override its 761-1050px display:none media rule. Keep the
+   panel closed until the actual hamburger button is activated. */
+@media (min-width:761px) and (max-width:1050px){
+  .site-header .header-shell .desktop-nav:not(.open){display:none}
+  .site-header .header-shell .desktop-nav.open{
+    display:flex;position:absolute;top:100%;left:0;right:0;z-index:30;
+    flex-direction:column;align-items:stretch;gap:0;
+    padding:14px clamp(20px,3vw,34px) 22px;
+    background:#0b1b14;border:1px solid var(--stroke);
+    box-shadow:0 20px 40px #0009;
+  }
+  .site-header .header-shell .desktop-nav a{
+    display:block;min-height:44px;padding:14px 10px;font-size:12px;
+  }
+}
