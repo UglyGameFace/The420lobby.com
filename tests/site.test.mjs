@@ -433,9 +433,9 @@ test("Arcade artwork preserves complete source proportions on every device",()=>
   assert.match(visual,/\.arcade-hero \.hero-art img\{[^}]*height:auto;object-fit:contain/);
   assert.match(visual,/\.game-art \.game-card-photo\{[^}]*object-fit:contain/);
   const mobileCss=visual.split("@media(max-width:560px)")[1]?.split("@media(prefers-reduced-motion")[0];
-  assert.match(mobileCss,/\\.hero-art\\{[^}]*aspect-ratio:auto/);
+  assert.match(mobileCss,/\.hero-art\{[^}]*aspect-ratio:auto/);
   const tabletCss=visual.split("@media(min-width:561px) and (max-width:950px)")[1]?.split("@media(min-width:951px)")[0];
-  assert.match(tabletCss,/\\.arcade-hero \\.hero-art\\{[^}]*aspect-ratio:auto/);
+  assert.match(tabletCss,/\.arcade-hero \.hero-art\{[^}]*aspect-ratio:auto/);
   assert.doesNotMatch(visual,/\.hero-art(?: img)?\{[^}]*aspect-ratio:1\.(?:33|65|7)/);
   assert.doesNotMatch(visual,/\.game-art \.game-card-photo\{[^}]*object-fit:cover/);
 });
