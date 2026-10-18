@@ -78,11 +78,13 @@ try {
     assert.equal(await page.locator(".game-card-photo").count(),3,
       width+"px landing game cards must use photographs instead of SVG collages");
     assert.equal(await page.locator(".hero-art img").getAttribute("src"),"/assets/the420lobby-neon-lounge.webp");
-    const artSizing=await page.locator(".game-card-photo").evaluateAll(images=>images.map(img=>({
-      width:img.getBoundingClientRect().width,height:img.getBoundingClientRect().height
-    })));
-    assert.ok(artSizing.every(size=>size.width>=150&&size.height>=120),
-      width+"px photographed game card collapsed: "+JSON.stringify(artSizing));
+    const artSizing=await page.locator(".game-card .game-art").evaluateAll(wells=>wells.map(well=>{
+      const rect=well.getBoundingClientRect(), img=well.querySelector(".game-card-photo");
+      return {width:rect.width,height:rect.height,source:img?.getAttribute("src"),
+        hasLocalFallback:getComputedStyle(well).backgroundImage.includes("the420lobby-neon-lounge.webp")};
+    }));
+    assert.ok(artSizing.every(x=>x.width>=150&&x.height>=120&&x.hasLocalFallback),
+      width+"px game card must remain visible with or without third-party photo: "+JSON.stringify(artSizing));
     await page.locator('[data-filter="memory"]').click();
     assert.equal(await page.locator(".game-card:visible").count(), 1, "memory filter must show one game");
     await page.locator('[data-filter="all"]').click();
