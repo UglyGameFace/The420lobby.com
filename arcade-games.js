@@ -1,6 +1,6 @@
 import {createEngine, GAME_CONFIG, LIMITS} from "/shared/arcade-rules.mjs";
 import {startAuthenticatedRun, saveAuthenticatedRun, notifyScoreSaved} from "/arcade-api.js";
-import {createPhoto} from "/shared/arcade-media.mjs";
+import {createPhoto} from "/shared/arcade-media.mjs?v=20261018-distinct-glass2";
 
 const LABELS = {
   lighter:"Lighter", grinder:"Grinder", papers:"Rolling papers",
