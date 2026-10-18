@@ -285,7 +285,7 @@
   });
   window.addEventListener("pagehide", () => pause("Session paused. Resume within two minutes."));
   updateHud();
-  Promise.all([import("/arcade-api.js"), import("/shared/arcade-rules.mjs"), import("/shared/arcade-media.mjs").catch(() => null)]).then(async modules => {
+  Promise.all([import("/arcade-api.js"), import("/shared/arcade-rules.mjs"), import("/shared/arcade-media.mjs?v=20261018-distinct-glass2").catch(() => null)]).then(async modules => {
     [api, rules, media] = modules; await checkSession(); mode = "idle";
     if (!session.user) overlayMessage("DISCORD REQUIRED", "Sign in securely with Discord before starting a round. Scores and achievements save to your profile.");
     updateHud();
