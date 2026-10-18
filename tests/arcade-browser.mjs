@@ -132,6 +132,17 @@ try {
   await page.locator('[data-game="green-room-match"]').click();
   await page.locator(".mini-start").click();
   await page.waitForFunction(() => document.querySelector(".mini-game")?.dataset.mode === "playing");
+  const pipe=page.locator('.mini-card[data-kind="clean-glass"] .mini-art-photo').first();
+  const bong=page.locator('.mini-card[data-kind="bong"] .mini-art-photo').first();
+  assert.notEqual(await pipe.getAttribute("src"),await bong.getAttribute("src"),
+    "Glass pipe and bong in the memory game must display different photographs");
+  assert.equal(await page.locator(".mini-progress").getAttribute("role"),"progressbar");
+  const sound=page.locator(".mini-sound");
+  assert.equal(await sound.getAttribute("aria-pressed"),"false");
+  await sound.click();
+  assert.equal(await sound.getAttribute("aria-pressed"),"true");
+  await sound.click();
+  assert.equal(await sound.getAttribute("aria-pressed"),"false");
   await page.clock.runFor(125);
   assert.equal(await page.locator(".mini-card-front img.mini-art-photo").count(),12,"memory cards must use photographic item art");
   await page.locator(".mini-pause").click();
