@@ -1,12 +1,12 @@
 import {createEngine, GAME_CONFIG, LIMITS} from "/shared/arcade-rules.mjs";
 import {startAuthenticatedRun, saveAuthenticatedRun, notifyScoreSaved} from "/arcade-api.js";
+import {createPhoto} from "/shared/arcade-media.mjs";
 
 const LABELS = {
   lighter:"Lighter", grinder:"Grinder", papers:"Rolling papers",
   "clean-glass":"Glass piece", leaf:"Cannabis leaf", bong:"Purple bong"
 };
 const SHORT_LABELS = {lighter:"LIGHTER",grinder:"GRINDER",papers:"PAPERS","clean-glass":"GLASS",leaf:"LEAF",bong:"BONG"};
-const SVG_NS = "http://www.w3.org/2000/svg";
 function node(tag, className, text) {
   const element = document.createElement(tag);
   if (className) element.className = className;
@@ -17,28 +17,9 @@ function button(className, text) {
   const element = node("button", className, text); element.type = "button"; return element;
 }
 function art(kind) {
-  if (kind === "leaf") {
-    const image = node("img", "mini-art mini-leaf");
-    image.src = "/assets/approved-leaf.svg"; image.alt = ""; return image;
-  }
-  const svg = document.createElementNS(SVG_NS, "svg");
-  svg.setAttribute("class", "mini-art"); svg.setAttribute("viewBox", "0 0 100 100"); svg.setAttribute("aria-hidden", "true");
-  if (kind === "bong") {
-    for (const [d, fill, width] of [
-      ["M43 9h18v43l19 24q9 16-12 16H31Q11 92 21 77l22-25Z", "#9d65e7", "3"],
-      ["M29 72h42l9 13H21Z", "#c4fc92", "2"],
-      ["M61 56l17-15 9 9-20 18M40 9h24M49 18v34", "none", "5"]
-    ]) {
-      const path = document.createElementNS(SVG_NS,"path");
-      path.setAttribute("d", d); path.setAttribute("fill", fill); path.setAttribute("stroke", "#e8d9ff");
-      path.setAttribute("stroke-width", width); path.setAttribute("stroke-linecap", "round");
-      svg.append(path);
-    }
-  } else {
-    const use = document.createElementNS(SVG_NS, "use");
-    use.setAttribute("href", "/assets/sesh-gear.svg#" + kind); svg.append(use);
-  }
-  return svg;
+  // Real photographic imagery replaces fake vector paraphernalia.
+  // Gameplay and button accessibility are independent of network media success.
+  return createPhoto(kind,"mini-art mini-art-photo" + (kind==="leaf"?" mini-leaf":""));
 }
 
 /** Mounts an authenticated cabinet. The returned function releases its round. */
