@@ -1,0 +1,57 @@
+/* Interactive lounge. Existing photographic smoke assets and brand lockup stay authoritative. */
+.lounge-lab{--room-accent:#b4f280;--room-glow:rgba(96,170,98,.25);--room-border:rgba(179,243,161,.25);background:radial-gradient(ellipse at 50% 0%,var(--room-glow),transparent 65%),#09110e;color:#eef7e9}
+html[data-lounge-theme="midnight"] .lounge-lab{--room-accent:#b7c8fa;--room-glow:rgba(85,110,190,.28);--room-border:rgba(182,201,251,.3)}
+html[data-lounge-theme="halloween"] .lounge-lab{--room-accent:#ffbd74;--room-glow:rgba(194,88,35,.3);--room-border:rgba(255,189,116,.32)}
+.lounge-lab .section-kicker{border-color:var(--room-border)}
+.lounge-intro{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(240px,.6fr);gap:clamp(22px,5vw,60px);align-items:end;margin-bottom:clamp(25px,4vw,48px)}
+.lounge-intro h2{font-size:clamp(53px,7vw,103px)}
+.lounge-intro h2 em{color:var(--room-accent)}
+.lounge-intro>p{max-width:405px;color:#becdbf;line-height:1.65;font-size:clamp(15px,1.5vw,18px)}
+.lounge-eyebrow{font:700 11px/1.4 "DM Sans",sans-serif;letter-spacing:.16em;color:var(--room-accent);margin-bottom:18px}
+.lounge-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:20px;align-items:stretch}
+.lounge-room,.lounge-moods,.lounge-cheers{border:1px solid var(--room-border);border-radius:20px;overflow:hidden;background:#0e1b15}
+.lounge-room{min-height:630px;display:flex;flex-direction:column;position:relative;isolation:isolate;padding:clamp(18px,3vw,32px);background:linear-gradient(160deg,rgba(7,16,15,.68),rgba(6,17,11,.88)),url("/assets/the420lobby-neon-lounge.webp") center/cover no-repeat}
+.lounge-room::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 45% 15%,var(--room-glow),transparent 60%);pointer-events:none}
+.lounge-room-heading,.lounge-room-footer,.lounge-control-head{display:flex;align-items:center;justify-content:space-between;gap:12px;font:700 11px/1.4 "DM Sans",sans-serif;letter-spacing:.12em}
+.lounge-room-heading,.lounge-room-footer{color:#d7eddb}
+.lounge-room-heading .lamp{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--room-accent);box-shadow:0 0 18px var(--room-accent);margin-right:8px}
+.lounge-doors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:auto 0;padding:34px 0}
+.lounge-door{position:relative;display:flex;flex-direction:column;align-items:flex-start;min-width:0;min-height:160px;border-radius:12px;padding:20px 16px;gap:10px;text-decoration:none;color:#f5f8ee;background:rgba(8,22,17,.84);border:1px solid rgba(195,239,205,.22);backdrop-filter:blur(9px);transition:border-color .2s,transform .2s,background .2s}
+.lounge-door:hover,.lounge-door:focus-visible{border-color:var(--room-accent);background:rgba(17,40,27,.94);transform:translateY(-2px)}
+.lounge-door-index{font:700 10px/1.3 "DM Sans",sans-serif;color:var(--room-accent);letter-spacing:.11em}
+.lounge-door strong{font:800 clamp(24px,2.7vw,42px)/.98 "Barlow Condensed",sans-serif;letter-spacing:.015em}
+.lounge-door small{font:500 12px/1.5 "DM Sans",sans-serif;color:#c7d4c9;padding-right:12px}
+.lounge-door .arrow{position:absolute;right:14px;top:17px;font-size:21px;color:var(--room-accent)}
+.lounge-secret{font-size:23px;line-height:1;color:var(--room-accent);background:rgba(5,15,10,.8);border:1px solid var(--room-border);border-radius:50%;width:44px;height:44px;cursor:pointer}
+.lounge-secret-message{font:600 12px/1.4 "DM Sans",sans-serif;color:var(--room-accent);min-height:16px;margin:7px 0 0}
+.lounge-side{display:grid;grid-template-rows:auto 1fr;gap:20px;min-width:0}
+.lounge-moods,.lounge-cheers{padding:clamp(19px,2.5vw,29px)}
+.lounge-control-head{align-items:flex-start;flex-wrap:wrap;color:#e6f4e7;margin-bottom:23px}
+.lounge-control-head h3{font:800 clamp(22px,2.35vw,33px)/1 "Barlow Condensed",sans-serif;letter-spacing:.03em}
+.lounge-control-head span{font-size:9px;color:var(--room-accent);white-space:nowrap}
+.lounge-mood-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.lounge-mood-options button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:92px;padding:12px 7px;cursor:pointer;font:700 10px/1.35 "DM Sans",sans-serif;letter-spacing:.04em;color:#dbe8dc;background:#12251b;border:1px solid rgba(197,239,205,.19);border-radius:11px;text-align:center}
+.lounge-mood-options button[aria-pressed="true"]{border-color:var(--room-accent);color:var(--room-accent);box-shadow:inset 0 0 0 1px var(--room-accent)}
+.mood-dot{display:block;width:25px;height:25px;border-radius:50%;border:2px solid rgba(255,255,255,.33);box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.mood-lounge{background:radial-gradient(circle at 35% 25%,#d5f79b,#3b7351)}
+.mood-midnight{background:radial-gradient(circle at 35% 25%,#8bb4ff,#22244d)}
+.mood-halloween{background:radial-gradient(circle at 35% 25%,#ffd082,#793116)}
+.lounge-fineprint{font:500 11px/1.6 "DM Sans",sans-serif;color:#b0c5b8;margin:13px 0 0}
+.lounge-cheers{display:flex;flex-direction:column;background:linear-gradient(150deg,#142820,#09150f)}
+.lounge-cheers-art{display:block;width:100%;height:auto;max-height:180px;object-fit:contain;align-self:center}
+.lounge-cheers-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.lounge-cheers-stats>div{border:1px solid var(--room-border);border-radius:10px;padding:12px}
+.lounge-cheers-stats small{display:block;font:700 10px/1.4 "DM Sans",sans-serif;letter-spacing:.1em;color:#b5c7bd}
+.lounge-cheers-stats strong{display:block;font:800 32px/1.15 "Barlow Condensed",sans-serif;color:var(--room-accent);margin-top:5px}
+.lounge-cheers-progress{width:100%;height:5px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+.lounge-cheers-progress span{display:block;height:100%;width:0;background:var(--room-accent);transition:width .8s linear}
+#lounge-cheers-status{font:500 13px/1.6 "DM Sans",sans-serif;color:#d1e0d4;min-height:40px;margin:14px 0}
+.lounge-cheers-button,.lounge-signin{display:block;width:100%;background:var(--room-accent);color:#08130e;border:0;border-radius:10px;padding:15px;text-align:center;text-decoration:none;cursor:pointer;font:800 13px/1.4 "DM Sans",sans-serif;letter-spacing:.07em}
+.lounge-cheers-button:disabled{cursor:not-allowed;opacity:.55}
+.lounge-signin{margin-top:8px;background:transparent;border:1px solid var(--room-accent);color:var(--room-accent)}
+.lounge-signin[hidden]{display:none}
+@media(max-width:1050px){.lounge-layout{grid-template-columns:minmax(0,1fr) minmax(290px,.8fr)}.lounge-room{min-height:600px}.lounge-doors{grid-template-columns:1fr}.lounge-door{min-height:110px}}
+@media(max-width:760px){.lounge-intro,.lounge-layout{grid-template-columns:1fr}.lounge-room{min-height:460px;padding:20px}.lounge-doors{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:24px 0}.lounge-door{min-height:142px;padding:16px 12px}.lounge-door strong{font-size:clamp(24px,7vw,35px)}.lounge-side{grid-template-rows:auto auto}}
+@media(max-width:360px){.lounge-doors{grid-template-columns:1fr}.lounge-door{min-height:94px}.lounge-room-heading{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.lounge-door,.lounge-cheers-progress span{transition:none}.lounge-door:hover{transform:none}}
+html.fx-off .lounge-door{transition:none}
