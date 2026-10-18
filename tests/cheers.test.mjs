@@ -6,10 +6,10 @@ import {handleRequest} from "../functions/_lib/app.mjs";
 import {hash,randomToken,SESSION_COOKIE} from "../functions/_lib/auth.mjs";
 
 class D1 {
-  constructor(){
+  constructor(skipCheersMigration=false){
     this.db=new DatabaseSync(":memory:");
     this.db.exec("PRAGMA foreign_keys=ON");
-    for(const migration of ["0001_arcade.sql","0002_cheers.sql"])
+    for(const migration of skipCheersMigration?["0001_arcade.sql"]:["0001_arcade.sql","0002_cheers.sql"])
       this.db.exec(readFileSync(new URL("../migrations/"+migration,import.meta.url),"utf8"));
   }
   prepare(sql) {
@@ -23,8 +23,8 @@ class D1 {
   }
 }
 const origin="https://lounge.test";
-const make=()=>{
-  const env={DB:new D1(),SITE_ORIGIN:origin,DISCORD_CLIENT_ID:"123456789012345678",DISCORD_CLIENT_SECRET:"test-only-value"};
+const make=(skipCheersMigration=false)=>{
+  const env={DB:new D1(skipCheersMigration),SITE_ORIGIN:origin,DISCORD_CLIENT_ID:"123456789012345678",DISCORD_CLIENT_SECRET:"test-only-value"};
   return {
     env,
     async login(id){
@@ -82,4 +82,33 @@ test("Cheers rejects invalid origins, CSRF, extra fields and methods",async()=>{
  assert.equal((await extra.json()).error.code,"unexpected_field");
  assert.equal((await a.call("DELETE")).status,405);
  assert.equal(a.env.DB.db.prepare("SELECT COUNT(*) AS n FROM cheers_participants").get().n,0);
+});
+
+test("First signed-in Cheers automatically adds only missing schema to existing D1",async()=>{
+  const a=make(true),db=a.env.DB.db;
+  const before=db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='cheers_rounds'").get();
+  assert.equal(before,undefined);
+  const initial=await (await a.call()).json();
+  assert.equal(initial.round,null);
+  assert.equal(initial.setupPending,true);
+  assert.equal(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='cheers_rounds'").get(),undefined,
+    "anonymous reads must never run production schema updates");
+  assert.equal((await a.call("POST",{})).status,401);
+  const signedIn=await a.login("123456789012345789");
+  assert.equal((await a.call("POST",{},signedIn,{Origin:"https://forged.invalid"})).status,403);
+  assert.equal(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='cheers_rounds'").get(),undefined,
+    "unauthenticated or invalid-origin requests must not install new tables");
+  const first=await a.call("POST",{},signedIn);
+  assert.equal(first.status,200);
+  const firstResult=await first.json();
+  assert.equal(firstResult.joined,true);
+  assert.equal(firstResult.round.participants,1);
+  assert.equal(firstResult.setupPending,false);
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM cheers_rounds").get().n,1);
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM users").get().n,1);
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM sessions").get().n,1);
+  assert.equal((await (await a.call()).json()).setupPending,false);
+  const duplicate=await (await a.call("POST",{},signedIn)).json();
+  assert.equal(duplicate.joined,false);
+  assert.equal(duplicate.round.participants,1);
 });

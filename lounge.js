@@ -117,7 +117,13 @@
    try{
      api=api||await import("/arcade-api.js");
      session=session||await api.arcadeRequest("/api/session");
-     if(!session.user||!session.csrfToken){
+     if(!session.configured){
+     available=false;
+     status.textContent="Discord sign-in is not configured on this website yet. Shared Cheers is unavailable.";
+     join.textContent="CHEERS UNAVAILABLE";
+     return;
+   }
+   if(!session.user||!session.csrfToken){
        signin.hidden=false;status.textContent="Sign in with Discord, then return here to join Cheers.";
        return;
      }

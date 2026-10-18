@@ -92,3 +92,33 @@ body.arcade-page{background:radial-gradient(ellipse 75% 30% at 55% 4%,rgba(67,12
   .arcade-hero{grid-template-columns:minmax(0,1.12fr) minmax(0,1fr)}
   .arcade-hero .hero-art{max-width:100%;min-width:0}
 }
+
+/* Arcade v2: clear input feedback, photographic distinctions, and readable HUD.
+   Never alter the timing or validation of ranked server-side actions. */
+.mini-progress{height:6px;overflow:hidden;background:#1b2e21;border-inline:1px solid rgba(174,239,154,.38)}
+.mini-progress-fill{display:block;width:0;height:100%;background:linear-gradient(90deg,#88c579,#d7ff8e);box-shadow:0 0 14px rgba(183,251,155,.55)}
+.mini-action-strip{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 12px;padding:11px 16px;background:linear-gradient(90deg,#0e2117,#162c21);border-inline:1px solid rgba(174,239,154,.38);color:#d5eace}
+.mini-action-label{font:900 clamp(14px,2vw,20px)/1 "Barlow Condensed",Impact,sans-serif;letter-spacing:.07em;color:#c5fa9e}
+.mini-action-detail{font:600 11px/1.45 "DM Sans",system-ui,sans-serif;color:#c3d8c1}
+.mini-game .mini-sound{min-height:47px;padding:10px 14px;background:#14241b;color:#d3e7d0;border:1px solid rgba(180,244,160,.45);font:800 10px/1.2 "DM Sans",sans-serif;letter-spacing:.04em}
+.mini-game .mini-sound[aria-pressed="true"]{color:#092010;background:#c2f3a3}
+.mini-card{transform:translateZ(0)}
+.mini-card.is-open{box-shadow:0 8px 18px #0007,0 0 0 2px #9ce2a2}
+.mini-card[data-kind="clean-glass"].is-open{background:linear-gradient(145deg,#193e52,#0f2635);border-color:#87d8ff}
+.mini-card[data-kind="bong"].is-open{background:linear-gradient(145deg,#183c29,#0b2517);border-color:#bcffa2}
+.mini-card[data-kind="papers"].is-open{background:linear-gradient(145deg,#513920,#26180d);border-color:#e8c285}
+.mini-card[data-kind="grinder"].is-open{background:linear-gradient(145deg,#3b3b3b,#191e1c);border-color:#c5d0cc}
+.mini-card[data-kind="lighter"].is-open{background:linear-gradient(145deg,#512d21,#24160f);border-color:#ffbc8d}
+.mini-card[data-kind="leaf"].is-open{background:linear-gradient(145deg,#244b2b,#0e2516);border-color:#9ff1aa}
+.mini-card-front>.mini-art-photo{object-fit:cover;border:1px solid rgba(244,255,240,.18)}
+.mini-card[data-kind="clean-glass"] .mini-card-front>.mini-art-photo{object-position:center}
+.mini-card-front>.mini-card-name{min-height:16px;padding-inline:1px}
+.mini-target.is-perfect{box-shadow:0 0 0 5px rgba(210,255,160,.33),0 9px 24px #0007}
+.mini-target.is-perfect .mini-art-photo{filter:saturate(1.2) brightness(1.12)}
+@media(max-width:560px){
+ .mini-game .mini-controls{display:grid;grid-template-columns:minmax(0,1fr) auto auto}
+ .mini-game .mini-controls>button{padding:11px 9px;font-size:10px;min-width:0}
+ .mini-action-strip{align-items:flex-start;flex-direction:column;gap:4px}
+ .mini-action-detail{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.mini-progress-fill{transition:none;box-shadow:none}.mini-card{transform:none}}
