@@ -166,9 +166,9 @@ test("internal anchors resolve and IDs are unique", () => {
 test("website outbound links use only the official Discord invitation, never the source repository", () => {
   const outgoing=[...html.matchAll(/<a\b[^>]*\bhref="(https?:[^"]+)"[^>]*>/g)];
   const urls=outgoing.map(([,url])=>url);
-  assert.equal(urls.filter(url=>url==="https://discord.gg/the420lobby").length,7);
+  assert.equal(urls.filter(url=>url==="https://discord.gg/the420lobby").length,8);
   assert.doesNotMatch(html,/https:\/\/github\.com\//i,"source repository must not appear on the public website");
-  assert.equal(urls.length,7,"unexpected external destination");
+  assert.equal(urls.length,8,"unexpected external destination");
   for(const [tag,url] of outgoing){
     assert.equal(url,"https://discord.gg/the420lobby");
     assert.match(tag,/target="_blank"/);
