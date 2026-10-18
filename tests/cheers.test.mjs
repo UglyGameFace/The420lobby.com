@@ -9,7 +9,7 @@ class D1 {
   constructor(skipCheersMigration=false){
     this.db=new DatabaseSync(":memory:");
     this.db.exec("PRAGMA foreign_keys=ON");
-    for(const migration of skipCheersMigration?["0001_arcade.sql"]:["0001_arcade.sql","0002_cheers.sql","0003_spark_relay.sql"])
+    for(const migration of skipCheersMigration?["0001_arcade.sql"]:["0001_arcade.sql","0002_cheers.sql","0003_spark_relay.sql","0004_cheers_presence.sql"])
       this.db.exec(readFileSync(new URL("../migrations/"+migration,import.meta.url),"utf8"));
   }
   prepare(sql) {
@@ -189,4 +189,43 @@ test("Spark Relay bootstraps the scoreboard only after an authorized first join"
   assert.ok(db.prepare("SELECT name FROM sqlite_master WHERE name='cheers_sparks'").get());
   assert.equal(db.prepare("SELECT COUNT(*) AS n FROM users").get().n,1);
   assert.equal(db.prepare("SELECT COUNT(*) AS n FROM sessions").get().n,1);
+});
+
+test("Live lobby shows only consented recent participants, ages out and protects identity",async()=>{
+  const a=make(),u=await a.login("123456789012345750"),v=await a.login("123456789012345751");
+  const path="/api/cheers/presence";
+  const publicStart=await (await a.call()).json();
+  assert.equal(publicStart.onlinePlayers,0);
+  assert.equal(publicStart.lookingPlayers,0);
+  assert.equal((await a.call("POST",{online:true,looking:true},null,{},path)).status,401);
+  assert.equal((await a.call("POST",{online:true,looking:true},u,{Origin:"https://phishing.invalid"},path)).status,403);
+  assert.equal((await a.call("POST",{online:false,looking:true},u,{},path)).status,400);
+  assert.equal((await a.call("POST",{online:true,looking:true,spoofedId:"123"},u,{},path)).status,400);
+  assert.equal((await a.call("GET",undefined,u,{},path)).status,405);
+  assert.equal((await a.call("POST",{online:true,looking:true},u,{},path)).status,200);
+  assert.equal((await a.call("POST",{online:true,looking:false},v,{},path)).status,200);
+  const online=await (await a.call()).json();
+  assert.equal(online.onlinePlayers,2);
+  assert.equal(online.lookingPlayers,1);
+  assert.equal(JSON.stringify(online).includes("123456789012345750"),false);
+  await a.call("POST",{online:false,looking:false},u,{},path);
+  const after=await (await a.call()).json();
+  assert.equal(after.onlinePlayers,1);
+  assert.equal(after.lookingPlayers,0);
+  a.env.DB.db.prepare("UPDATE cheers_presence SET expires_at=?").run(Date.now()-1000);
+  assert.equal((await (await a.call()).json()).onlinePlayers,0);
+});
+test("Spark Relay is harder and irregular, but still server-scored",async()=>{
+  const a=make(),player=await a.login("123456789012345755");
+  const rules=(await (await a.call()).json()).rules;
+  assert.equal(rules.hitWindowMs,550);
+  assert.equal(rules.beatOffsetsMs.length,10);
+  const gaps=rules.beatOffsetsMs.slice(1).map((x,i)=>x-rules.beatOffsetsMs[i]);
+  assert.ok(new Set(gaps).size>=4,"beats must change cadence");
+  const join=await (await a.call("POST",{},player)).json();
+  const round=join.round,db=a.env.DB.db;
+  db.prepare("UPDATE cheers_rounds SET started_at=?,ends_at=? WHERE id=?")
+    .run(Date.now()-3900,Date.now()-3900+42000,round.id);
+  assert.equal((await a.call("POST",{roundId:round.id,beat:0},player,{},"/api/cheers/spark")).status,409,
+    "900ms after the target cannot score as before");
 });
