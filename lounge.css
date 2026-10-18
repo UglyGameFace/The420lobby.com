@@ -143,3 +143,16 @@ html[data-lounge-theme="halloween"] .experiences{background:linear-gradient(180d
 }
 @media(prefers-reduced-motion:reduce){.spark-ember{animation:none!important}.spark-target{transition:none}}
 html.fx-off .spark-ember{animation:none!important}
+
+/* Truthful, opt-in presence: counts only recent authenticated lobby check-ins. */
+.spark-live-panel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;gap:9px;margin:12px 0 18px;padding:12px;border:1px solid rgba(187,251,176,.28);border-radius:12px;background:rgba(11,29,18,.87)}
+.spark-live-count{min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:6px;font:800 9px/1.5 "DM Sans",sans-serif;letter-spacing:.055em;color:#c6e3bb}
+.spark-live-count strong{font-size:clamp(18px,2.8vw,25px);font-variant-numeric:tabular-nums;color:#c2f9a4}
+.spark-live-dot{height:9px;width:9px;border-radius:50%;background:#aef589;box-shadow:0 0 11px rgba(174,246,142,.54);flex:none}
+.spark-presence-toggle{grid-column:1/-1;min-height:45px;padding:12px 14px;border-radius:8px;background:#b9f497;border:1px solid #d6ffb2;color:#102019;font:800 10px/1.3 "DM Sans",sans-serif;letter-spacing:.075em;cursor:pointer}
+.spark-presence-toggle:disabled{opacity:.6;cursor:default}
+.spark-presence-toggle:focus-visible{outline:3px solid #f4ce91;outline-offset:3px}
+.spark-arena[data-phase="verifying"] .spark-target{border-color:#d5f49d;box-shadow:0 0 0 4px rgba(205,249,141,.23),0 0 28px rgba(208,240,141,.28);background:radial-gradient(circle,#3b5c32,#1b321f)}
+.spark-arena[data-phase="verifying"] .spark-ember{filter:hue-rotate(29deg) saturate(.75) brightness(1.3);box-shadow:0 0 17px #a4de6b}
+@media(max-width:360px){.spark-live-panel{padding:9px;gap:7px}.spark-live-count{font-size:8px}.spark-live-count strong{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.spark-live-dot{box-shadow:none}}

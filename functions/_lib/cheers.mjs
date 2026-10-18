@@ -7,7 +7,8 @@ import {HttpError, exactFields, json, readJson} from "./http.mjs";
 
 export const SPARK_RULES=Object.freeze({
   durationMs:42000,firstBeatMs:3000,beatIntervalMs:3800,
-  hitWindowMs:950,beatCount:10
+  beatOffsetsMs:[3000,6800,9500,12400,14950,17850,20400,24200,27800,32500],
+  hitWindowMs:550,beatCount:10
 });
 const DAY_MS=86400000;
 const SCHEMA=[
@@ -16,13 +17,15 @@ const SCHEMA=[
   "CREATE TABLE IF NOT EXISTS cheers_participants (round_id INTEGER NOT NULL REFERENCES cheers_rounds(id) ON DELETE CASCADE,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,joined_at INTEGER NOT NULL,PRIMARY KEY(round_id,user_id))",
   "CREATE INDEX IF NOT EXISTS cheers_user_events ON cheers_participants(user_id,joined_at)",
   "CREATE TABLE IF NOT EXISTS cheers_sparks (round_id INTEGER NOT NULL REFERENCES cheers_rounds(id) ON DELETE CASCADE,beat INTEGER NOT NULL CHECK(beat BETWEEN 0 AND 9),user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,points INTEGER NOT NULL CHECK(points BETWEEN 70 AND 190),created_at INTEGER NOT NULL,PRIMARY KEY(round_id,beat))",
-  "CREATE INDEX IF NOT EXISTS cheers_sparks_user ON cheers_sparks(user_id,created_at)"
+  "CREATE INDEX IF NOT EXISTS cheers_sparks_user ON cheers_sparks(user_id,created_at)",
+  "CREATE TABLE IF NOT EXISTS cheers_presence (user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,expires_at INTEGER NOT NULL,looking INTEGER NOT NULL DEFAULT 1 CHECK(looking IN (0,1)))",
+  "CREATE INDEX IF NOT EXISTS cheers_presence_expiry ON cheers_presence(expires_at)"
 ];
 
 async function tableNames(env){
   if(!env.DB)throw new HttpError(503,"setup_required","Shared Cheers requires the existing Arcade database.");
   const rows=await env.DB.prepare(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('cheers_rounds','cheers_participants','cheers_sparks')"
+    "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('cheers_rounds','cheers_participants','cheers_sparks','cheers_presence')"
   ).all();
   return new Set((rows.results||[]).map(r=>r.name));
 }
@@ -60,7 +63,15 @@ async function state(env,now){
   const names=await tableNames(env);
   const existing=names.has("cheers_rounds")&&names.has("cheers_participants");
   const gameReady=names.has("cheers_sparks");
-  const base={round:null,serverTime:now,setupPending:!existing,gameReady,rules:SPARK_RULES};
+  let onlinePlayers=0,lookingPlayers=0;
+  if(names.has("cheers_presence")){
+    const tally=await env.DB.prepare(
+      "SELECT COUNT(*) AS online, COALESCE(SUM(looking),0) AS looking FROM cheers_presence WHERE expires_at>?"
+    ).bind(now).first();
+    onlinePlayers=Number(tally?.online||0);
+    lookingPlayers=Number(tally?.looking||0);
+  }
+  const base={round:null,serverTime:now,setupPending:!existing,gameReady,rules:SPARK_RULES,onlinePlayers,lookingPlayers};
   if(!existing)return {...base,bestScore:0};
   const row=await env.DB.prepare(
     "SELECT r.id,r.started_at AS startedAt,r.ends_at AS endsAt,"+
@@ -120,7 +131,7 @@ export async function sparkCheers(request,env){
   ).bind(body.roundId,session.user.id).first();
   if(!round)throw new HttpError(403,"not_in_round","Join this round before passing the spark.");
   if(now>=round.endsAt)throw new HttpError(409,"round_ended","This round has ended.");
-  const target=round.startedAt+SPARK_RULES.firstBeatMs+body.beat*SPARK_RULES.beatIntervalMs;
+  const target=round.startedAt+SPARK_RULES.beatOffsetsMs[body.beat];
   const distance=Math.abs(now-target);
   if(distance>SPARK_RULES.hitWindowMs)
     throw new HttpError(409,"off_beat","Not quite on beat. Watch for the next glow.");
@@ -129,7 +140,7 @@ export async function sparkCheers(request,env){
   const previous=body.beat>0?await env.DB.prepare(
     "SELECT user_id FROM cheers_sparks WHERE round_id=? AND beat=?"
   ).bind(round.id,body.beat-1).first():null;
-  const base=distance<=170?150:distance<=450?110:70;
+  const base=distance<=110?150:distance<=310?110:70;
   const points=base+(previous&&previous.user_id!==session.user.id?40:0);
   const result=await env.DB.prepare(
     "INSERT INTO cheers_sparks(round_id,beat,user_id,points,created_at) VALUES(?,?,?,?,?) "+
@@ -137,4 +148,30 @@ export async function sparkCheers(request,env){
   ).bind(round.id,body.beat,session.user.id,points,now).run();
   const captured=Number(result.meta?.changes||0)>0;
   return json({...await state(env,Date.now()),captured,awarded:captured?points:0});
+}
+
+/* Opt-in website presence. Counts only signed-in visitors who chose to be
+   discoverable, never anonymous page views or Discord global online status.
+   Heartbeat expiry means a tab closed without a leave call ages out safely. */
+export async function cheersPresence(request,env){
+  const session=await requireSession(request,env);
+  requireCsrf(request,env,session);
+  const body=await readJson(request,96);
+  exactFields(body,["online","looking"]);
+  if(typeof body.online!=="boolean"||typeof body.looking!=="boolean"||
+     (!body.online&&body.looking))
+    throw new HttpError(400,"invalid_presence","Choose a valid online and looking status.");
+  await rateLimit(env,"cheers:presence:"+session.user.id,160,3600);
+  await prepareGame(env);
+  const now=Date.now();
+  if(body.online){
+    await env.DB.prepare(
+      "INSERT INTO cheers_presence(user_id,expires_at,looking) VALUES(?,?,?) "+
+      "ON CONFLICT(user_id) DO UPDATE SET expires_at=excluded.expires_at,looking=excluded.looking"
+    ).bind(session.user.id,now+55000,body.looking?1:0).run();
+  }else{
+    await env.DB.prepare("DELETE FROM cheers_presence WHERE user_id=?")
+      .bind(session.user.id).run();
+  }
+  return json({...await state(env,now),presence:{online:body.online,looking:body.looking}});
 }
