@@ -166,9 +166,9 @@ test("internal anchors resolve and IDs are unique", () => {
 test("website outbound links use only the official Discord invitation, never the source repository", () => {
   const outgoing=[...html.matchAll(/<a\b[^>]*\bhref="(https?:[^"]+)"[^>]*>/g)];
   const urls=outgoing.map(([,url])=>url);
-  assert.equal(urls.filter(url=>url==="https://discord.gg/the420lobby").length,7);
+  assert.equal(urls.filter(url=>url==="https://discord.gg/the420lobby").length,8);
   assert.doesNotMatch(html,/https:\/\/github\.com\//i,"source repository must not appear on the public website");
-  assert.equal(urls.length,7,"unexpected external destination");
+  assert.equal(urls.length,8,"unexpected external destination");
   for(const [tag,url] of outgoing){
     assert.equal(url,"https://discord.gg/the420lobby");
     assert.match(tag,/target="_blank"/);
@@ -457,4 +457,33 @@ test("CHEERS Spark Relay replaces passive countdown with playable ten-beat co-op
   assert.doesNotMatch(html.slice(html.indexOf('id="spark-relay"'),html.indexOf('id="spark-relay"')+6000),/<svg\b/i);
   assert.match(app,/path === "\/api\/cheers\/spark"/);
   assert.doesNotMatch(client,/Math\.random\(\).*score|fakeMembers|fakeCount/);
+});
+
+
+test("CHEERS game has its own discoverable section and a usable first-time guide",()=>{
+  const page=read("index.html"),css=read("lounge.css"),js=read("lounge.js");
+  const loungeEnd=page.indexOf('</section>',page.indexOf('id="interactive-lounge"'));
+  const gameStart=page.indexOf('id="cheers-game"'),arcadeStart=page.indexOf('id="sesh-signal"');
+  assert.ok(loungeEnd>0&&gameStart>loungeEnd&&arcadeStart>gameStart,
+    "Spark Relay belongs between the room lounge and the regular Arcade");
+  assert.equal((page.match(/id="spark-relay"/g)||[]).length,1);
+  assert.equal((page.match(/class="lounge-cheers-art"/g)||[]).length,1,
+    "Keep one copy of approved CHEERS photography");
+  assert.ok(page.indexOf('id="lounge-cheers-join"')<page.indexOf('id="spark-arena"'),
+    "Start/Join must be visible above the playfield");
+  assert.match(page,/id="cheers-how-title"/);
+  assert.equal((page.match(/class="cheers-step-number"/g)||[]).length,3);
+  assert.match(page,/id="spark-presence-leave"/);
+  assert.match(page,/href="#spark-relay">OPEN THE CHEERS GAME/);
+  assert.match(page,/class="spark-quick-rules"/);
+  assert.match(page,/CALL THE CREW/);
+  assert.match(page,/LOOK FOR PLAYERS/);
+  assert.match(css,/\.cheers-feature-grid\{display:grid/);
+  assert.match(css,/@media\(max-width:760px\)/);
+  assert.match(css,/\.cheers-feature \.spark-relay\{order:0\}/);
+  assert.match(js,/offlineButton\.addEventListener\("click"/);
+  assert.match(js,/await publishPresence\(true,!looking\)/);
+  assert.match(js,/await publishPresence\(false,false\)/);
+  assert.doesNotMatch(page,/href="https:\/\/discord\.gg\/the420lobby"[^>]*>[^<]*CALL THE CREW/i,
+    "Do not imply the website directly invokes the Discord role ping");
 });

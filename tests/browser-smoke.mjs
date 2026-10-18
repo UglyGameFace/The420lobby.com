@@ -89,6 +89,19 @@ try {
     assert.equal(await page.locator("#interactive-lounge").count(),1,"interactive lounge missing");
 
     assert.equal(await page.locator("#spark-relay").count(),1,"Spark Relay game missing");
+    assert.equal(await page.locator("#lounge-cheers-join").count(),1);
+    assert.equal(await page.locator(".cheers-how-steps li").count(),3,
+      "Spark Relay needs three first-time instructions");
+    assert.equal(await page.locator("#spark-relay").evaluate(el=>el.closest(".lounge-side")===null),
+      true,"The game must not be nested inside the theme sidebar");
+    assert.equal(await page.locator("#spark-relay").evaluate(el=>el.closest("#cheers-game")!==null),
+      true,"CHEERS should have a dedicated playable game section");
+    const gameActionBeforeArena=await page.evaluate(()=>
+      document.querySelector("#lounge-cheers-join").compareDocumentPosition(
+        document.querySelector("#spark-arena"))&Node.DOCUMENT_POSITION_FOLLOWING);
+    assert.ok(gameActionBeforeArena,scenario.name+" start button must precede the ember stage");
+    assert.equal(await page.locator("#spark-presence-leave").isVisible(),false,
+      "Offline button should not appear until the visitor opts into presence");
     assert.equal(await page.locator(".spark-step").count(),10,"shared round must have ten visible beats");
     assert.equal(await page.locator("#lounge-spark-button").isDisabled(),true,
       "public visitors cannot submit authenticated sparks without joining");
@@ -191,7 +204,7 @@ try {
     assert.equal(arcadePresentation.machineBorder,"1px","cabinet framing not styled");
     assert.ok(arcadePresentation.machineHeight>450,"arcade cabinet missing");
 
-    assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),7);
+    assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),8);
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
     await page.locator(".leaf-seal").scrollIntoViewIfNeeded();
     await page.locator(".leaf-seal img.seal-cannabis-photo").evaluate(img => img.decode());

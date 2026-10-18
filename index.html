@@ -20,12 +20,12 @@
 <link rel="stylesheet" href="/sesh-signal-v3.css">
 <link rel="stylesheet" href="/lobby-redesign.css?v=20261018-tablet-nav3">
 <link rel="stylesheet" href="/brand-header.css?v=20261017-lockup-align7">
-<link rel="stylesheet" href="/lounge.css?v=20261018-live-hardmode1">
+<link rel="stylesheet" href="/lounge.css?v=20261018-game-layout3">
 <link rel="stylesheet" href="/sesh-photo.css?v=20261018-photo1">
 <script defer src="/visual-engine.js"></script>
 <script defer src="/script.js?v=20261018-tablet-nav3"></script>
 <script defer src="/smoke-brand.js"></script>
-<script defer src="/lounge.js?v=20261018-live-hardmode1"></script>
+<script defer src="/lounge.js?v=20261018-game-layout3"></script>
 <script defer src="/sesh-loader.js"></script>
 </head>
 <body>
@@ -161,7 +161,7 @@
       <div class="section-kicker"><span>THE INTERACTIVE LOUNGE</span><span>REAL EXPERIENCES. NO FAKE ACTIVITY.</span></div>
       <div class="lounge-intro">
         <div><p class="lounge-eyebrow">WELCOME TO YOUR CORNER OF THE INTERNET</p><h2 class="big-type" id="lounge-heading">MAKE THE<br><em>LOBBY YOURS.</em></h2></div>
-        <p>Set the mood, explore the rooms, and drop into a shared CHEERS. Your games and Discord identity travel with you. No downloads needed.</p>
+        <p>Set the atmosphere, explore the rooms, and discover CHEERS: Spark Relay below. The live game is separate from your room settings.</p>
       </div>
       <div class="lounge-layout">
         <div class="lounge-room" aria-label="Explore The 420 Lobby">
@@ -194,47 +194,87 @@
             </div>
             <p id="lounge-mood-status" class="lounge-fineprint" role="status">Atmosphere choice stays on this device. Animation follows your Effects setting.</p>
           </div>
-          <div class="lounge-cheers spark-relay" id="spark-relay" aria-labelledby="lounge-cheers-title">
-            <div class="lounge-control-head"><h3 id="lounge-cheers-title">CHEERS: SPARK RELAY</h3><span>CO-OP REACTION GAME / 42 SEC</span></div>
-            <img class="lounge-cheers-art" src="/assets/cheers-real-smoke-blunt.webp?v=20261017-smoke-flow4" data-smoke-motion="/assets/cheers-real-smoke-blunt-loop.webp?v=20261017-smoke-flow4" data-smoke-still="/assets/cheers-real-smoke-blunt.webp?v=20261017-smoke-flow4" alt="Realistic lit blunt and rising CHEERS smoke" loading="lazy" decoding="async" width="1100" height="367">
-            <p class="spark-tagline">Faster beats. Less warning. Build the crew combo.</p>
-            <div class="spark-live-panel" role="group" aria-label="Live multiplayer presence">
-              <div class="spark-live-count"><span class="spark-live-dot" aria-hidden="true"></span>
-                <strong id="spark-online">0</strong> <span>ONLINE IN LOBBY</span>
-              </div>
-              <div class="spark-live-count"><strong id="spark-looking">0</strong> <span>LOOKING FOR PLAYERS</span></div>
-              <button id="spark-presence-toggle" type="button" class="spark-presence-toggle" disabled>JOIN ONLINE LOBBY</button>
-            </div>
-            <div class="spark-arena" id="spark-arena" data-phase="idle">
-              <div class="spark-stage-top"><span class="spark-stage-label" id="spark-stage-label">THE CREW'S SPARK</span><span class="spark-stage-phase" id="spark-stage-phase">AWAITING PLAYERS</span></div>
-              <div class="spark-target-wrap">
-                <button type="button" id="lounge-spark-button" class="spark-target" disabled aria-label="Join a round to catch the spark"><span class="spark-ember" aria-hidden="true"></span><span class="spark-target-label" id="spark-target-label">JOIN TO PLAY</span></button>
-                <span class="spark-target-countdown" id="spark-target-countdown" aria-hidden="true">READY</span>
-              </div>
-              <div class="spark-round-track" id="spark-round-track" aria-label="Ten sparks in this round" role="group">
-                <span class="spark-step" data-beat="0">01</span><span class="spark-step" data-beat="1">02</span><span class="spark-step" data-beat="2">03</span><span class="spark-step" data-beat="3">04</span><span class="spark-step" data-beat="4">05</span><span class="spark-step" data-beat="5">06</span><span class="spark-step" data-beat="6">07</span><span class="spark-step" data-beat="7">08</span><span class="spark-step" data-beat="8">09</span><span class="spark-step" data-beat="9">10</span>
-              </div>
-              <p class="spark-cue" id="spark-cue" aria-live="polite">Keep an eye on the unpredictable beat. Tap as the ember lights up. Handoffs earn bonus points.</p>
-            </div>
-            <div class="lounge-cheers-stats spark-scoreboard">
-              <div><small>CREW SCORE</small><strong id="spark-score">0</strong></div>
-              <div><small>BEST COMBO</small><strong id="spark-combo">0</strong></div>
-              <div><small>SPARKS CAUGHT</small><strong id="spark-captured">0/10</strong></div>
-              <div><small>7-DAY BEST</small><strong id="spark-record">0</strong></div>
-            </div>
-            <div class="lounge-cheers-stats spark-round-meta">
-              <div><small>PLAYERS</small><strong id="lounge-cheers-participants">—</strong></div>
-              <div><small>TIME REMAINING</small><strong id="lounge-cheers-clock">—</strong></div>
-            </div>
-            <div class="lounge-cheers-progress" aria-hidden="true"><span id="lounge-cheers-progress"></span></div>
-            <p id="lounge-cheers-status" role="status" aria-live="polite">Connecting to the Spark Relay…</p>
-            <button type="button" id="lounge-cheers-join" class="lounge-cheers-button" disabled>CONNECTING…</button>
-            <a href="/auth/discord" class="lounge-signin" id="lounge-cheers-signin" hidden>SIGN IN WITH DISCORD ↗</a>
-            <p class="lounge-fineprint">Real shared timing and server-scored sparks. Join with Discord, no purchases or real-world rewards. Separate from Dank Shield /toke and its notifications.</p>
-          </div>
+          <aside class="lounge-cheers-teaser" aria-labelledby="cheers-teaser-title">
+            <p class="lounge-teaser-kicker"><span class="lamp" aria-hidden="true"></span> WANT A QUICK GAME WITH THE CREW?</p>
+            <h3 id="cheers-teaser-title">CHEERS.<br><em>SPARK RELAY.</em></h3>
+            <p>Ten chances to catch a glowing spark in 42 seconds. Play solo or team up with other Discord members.</p>
+            <a class="lounge-teaser-link" href="#spark-relay">OPEN THE CHEERS GAME <span aria-hidden="true">↓</span></a>
+          </aside>
         </div>
       </div>
       <noscript><p class="lounge-fineprint">JavaScript is needed for shared Cheers and atmosphere controls. The arcade and community links still work.</p></noscript>
+    </div>
+  </section>
+
+  <section class="cheers-feature section-space" id="cheers-game" aria-labelledby="cheers-feature-title">
+    <div class="shell">
+      <div class="section-kicker"><span>PLAY TOGETHER / LIVE ARCADE</span><span>DISCORD MEMBERS · NO DOWNLOADS</span></div>
+      <div class="cheers-feature-heading">
+        <div>
+          <p class="cheers-feature-eyebrow">THE CREW CHALLENGE</p>
+          <h2 class="big-type" id="cheers-feature-title">CATCH THE SPARK.<br><em>PASS THE GLOW.</em></h2>
+          <p>CHEERS: Spark Relay is a real-time 42-second reaction game. Catch ten unpredictable sparks, build a shared score, and get bonus points when another player catches the next one.</p>
+        </div>
+        <a class="cheers-more-games" href="/arcade.html">EXPLORE THE ARCADE <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="cheers-feature-grid">
+        <div class="cheers-feature-guide" aria-labelledby="cheers-how-title">
+          <img class="lounge-cheers-art" src="/assets/cheers-real-smoke-blunt.webp?v=20261017-smoke-flow4" data-smoke-motion="/assets/cheers-real-smoke-blunt-loop.webp?v=20261017-smoke-flow4" data-smoke-still="/assets/cheers-real-smoke-blunt.webp?v=20261017-smoke-flow4" alt="Realistic CHEERS smoke rising from a lit blunt" loading="lazy" decoding="async" width="1100" height="367">
+          <div class="cheers-guide-content">
+            <p class="cheers-guide-kicker">FIRST TIME? HERE'S HOW IT WORKS</p>
+            <h3 id="cheers-how-title">THREE MOVES. ONE CREW.</h3>
+            <ol class="cheers-how-steps">
+              <li><span class="cheers-step-number">01</span><div><strong>START OR JOIN</strong><p>Sign in with Discord. Start a new round or join one already in progress. You can play alone.</p></div></li>
+              <li><span class="cheers-step-number">02</span><div><strong>WATCH FOR THE GLOW</strong><p>Ten sparks appear at unpredictable times. Tap the ember when it lights up, not before. Timing is tight.</p></div></li>
+              <li><span class="cheers-step-number">03</span><div><strong>BUILD THE CREW SCORE</strong><p>Each spark can be caught once. A different player catching the next spark earns a relay bonus.</p></div></li>
+            </ol>
+            <p class="cheers-guide-tip"><strong>Want teammates?</strong> Mark yourself as looking for players in the game lobby. In Discord, members can use the <strong>CALL THE CREW</strong> panel when it's been set up by the bot owner.</p>
+            <a class="cheers-discord-link" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer">OPEN THE DISCORD COMMUNITY <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+        <div class="lounge-cheers spark-relay" id="spark-relay" aria-labelledby="lounge-cheers-title">
+          <div class="lounge-control-head"><h3 id="lounge-cheers-title">SPARK RELAY · LIVE GAME</h3><span>42 SECONDS · 10 SPARKS</span></div>
+          <p class="spark-tagline">Play solo or with your crew. Watch for the glow, then tap the ember.</p>
+          <p class="spark-quick-rules"><b>1.</b> Start or join <span aria-hidden="true">·</span> <b>2.</b> Wait for the glow <span aria-hidden="true">·</span> <b>3.</b> Tap to catch it. <a href="#cheers-how-title">FULL RULES ↓</a></p>
+          <div class="spark-live-panel" role="group" aria-label="Opt-in live multiplayer lobby">
+            <div class="spark-live-count"><span class="spark-live-dot" aria-hidden="true"></span><strong id="spark-online">0</strong><span>IN THE GAME LOBBY</span></div>
+            <div class="spark-live-count"><strong id="spark-looking">0</strong><span>LOOKING FOR PLAYERS</span></div>
+            <p class="spark-live-explainer">These are real, opted-in website players, not Discord-wide online counts. Finding teammates is optional.</p>
+            <button id="spark-presence-toggle" type="button" class="spark-presence-toggle" disabled>LOOK FOR PLAYERS</button>
+            <button id="spark-presence-leave" type="button" class="spark-presence-leave" hidden>GO OFFLINE</button>
+          </div>
+          <div class="cheers-start-panel">
+            <span class="cheers-start-label">READY FOR YOUR FIRST ROUND?</span>
+            <button type="button" id="lounge-cheers-join" class="lounge-cheers-button" disabled>CONNECTING…</button>
+            <a href="/auth/discord" class="lounge-signin" id="lounge-cheers-signin" hidden>SIGN IN WITH DISCORD ↗</a>
+            <p id="lounge-cheers-status" role="status" aria-live="polite">Connecting to the Spark Relay…</p>
+          </div>
+          <div class="spark-arena" id="spark-arena" data-phase="idle" aria-labelledby="spark-stage-label">
+            <div class="spark-stage-top"><span class="spark-stage-label" id="spark-stage-label">THE CREW'S SPARK</span><span class="spark-stage-phase" id="spark-stage-phase">AWAITING PLAYERS</span></div>
+            <div class="spark-target-wrap">
+              <button type="button" id="lounge-spark-button" class="spark-target" disabled aria-label="Start or join a round to catch sparks"><span class="spark-ember" aria-hidden="true"></span><span class="spark-target-label" id="spark-target-label">JOIN TO PLAY</span></button>
+              <span class="spark-target-countdown" id="spark-target-countdown" aria-hidden="true">READY</span>
+            </div>
+            <div class="spark-round-track" id="spark-round-track" aria-label="Ten sparks in this round" role="group">
+              <span class="spark-step" data-beat="0">01</span><span class="spark-step" data-beat="1">02</span><span class="spark-step" data-beat="2">03</span><span class="spark-step" data-beat="3">04</span><span class="spark-step" data-beat="4">05</span><span class="spark-step" data-beat="5">06</span><span class="spark-step" data-beat="6">07</span><span class="spark-step" data-beat="7">08</span><span class="spark-step" data-beat="8">09</span><span class="spark-step" data-beat="9">10</span>
+            </div>
+            <p class="spark-cue" id="spark-cue" aria-live="polite">Once your round starts, catch each glowing ember. Faster timing scores more points.</p>
+          </div>
+          <div class="lounge-cheers-progress" aria-hidden="true"><span id="lounge-cheers-progress"></span></div>
+          <div class="lounge-cheers-stats spark-round-meta">
+            <div><small>PLAYERS IN THIS ROUND</small><strong id="lounge-cheers-participants">—</strong></div>
+            <div><small>TIME LEFT</small><strong id="lounge-cheers-clock">READY</strong></div>
+          </div>
+          <div class="lounge-cheers-stats spark-scoreboard" aria-label="Live Spark Relay scores">
+            <div><small>CREW SCORE</small><strong id="spark-score">0</strong></div>
+            <div><small>SPARKS CAUGHT</small><strong id="spark-captured">0/10</strong></div>
+            <div><small>BEST COMBO</small><strong id="spark-combo">0</strong></div>
+            <div><small>7-DAY HIGH SCORE</small><strong id="spark-record">0</strong></div>
+          </div>
+          <p class="lounge-fineprint">Server-verified scores. No purchases or real-world rewards. This website game doesn't start a Dank Shield /toke session or ping Discord roles.</p>
+        </div>
+      </div>
+      <noscript><p class="lounge-fineprint">JavaScript is required for Spark Relay. The Arcade and Discord community links still work.</p></noscript>
     </div>
   </section>
 

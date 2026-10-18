@@ -156,3 +156,105 @@ html.fx-off .spark-ember{animation:none!important}
 .spark-arena[data-phase="verifying"] .spark-ember{filter:hue-rotate(29deg) saturate(.75) brightness(1.3);box-shadow:0 0 17px #a4de6b}
 @media(max-width:360px){.spark-live-panel{padding:9px;gap:7px}.spark-live-count{font-size:8px}.spark-live-count strong{font-size:18px}}
 @media(prefers-reduced-motion:reduce){.spark-live-dot{box-shadow:none}}
+
+
+/* Spark Relay is its own co-op game, not a full-height setting inside the
+   lounge mood sidebar. Existing room/game/Arcade assets stay untouched. */
+.lounge-side{grid-template-rows:auto auto;align-content:start}
+.lounge-cheers-teaser{padding:clamp(22px,3vw,30px);border:1px solid var(--room-border);border-radius:18px;background:radial-gradient(ellipse at 75% 0%,rgba(185,115,62,.18),transparent 60%),linear-gradient(155deg,#15261b,#08150f);min-width:0}
+.lounge-teaser-kicker{display:flex;align-items:center;gap:9px;font:800 10px/1.35 "DM Sans",sans-serif;letter-spacing:.1em;color:var(--room-accent)}
+.lounge-teaser-kicker .lamp{display:inline-block;width:8px;height:8px;flex:none;border-radius:50%;background:var(--room-accent);box-shadow:0 0 12px var(--room-accent)}
+.lounge-cheers-teaser h3{font:900 clamp(34px,4vw,54px)/.98 "Barlow Condensed",Impact,sans-serif;letter-spacing:.02em;margin:13px 0;color:#f2ffee}
+.lounge-cheers-teaser h3 em{font-style:normal;color:var(--room-accent)}
+.lounge-cheers-teaser>p:not(.lounge-teaser-kicker){max-width:42ch;color:#c7d9c9;font:500 13px/1.65 "DM Sans",sans-serif}
+.lounge-teaser-link{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:46px;padding:12px 15px;margin-top:22px;border:1px solid rgba(195,250,164,.35);border-radius:9px;color:#0d1a10;background:var(--room-accent);font:900 11px/1.4 "DM Sans",sans-serif;letter-spacing:.045em;text-decoration:none}
+.lounge-teaser-link:focus-visible{outline:3px solid #fff;outline-offset:3px}
+
+.cheers-feature{--room-accent:#b4f280;--room-border:rgba(179,243,161,.25);--room-glow:rgba(96,170,98,.25);background:radial-gradient(ellipse 70% 55% at 12% 0%,rgba(60,107,62,.16),transparent 70%),linear-gradient(180deg,#0c1811,#101c14);color:#edf7eb;scroll-margin-top:75px}
+html[data-lounge-theme="midnight"] .cheers-feature{--room-accent:#b7c8fa;--room-border:rgba(182,201,251,.3)}
+html[data-lounge-theme="halloween"] .cheers-feature{--room-accent:#ffbd74;--room-border:rgba(255,189,116,.32)}
+.cheers-feature .section-kicker{border-color:var(--room-border)}
+.cheers-feature-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin:23px 0 clamp(22px,3.5vw,38px)}
+.cheers-feature-heading h2{font-size:clamp(51px,5.7vw,88px);line-height:.95}
+.cheers-feature-heading h2 em{font-style:normal;color:var(--room-accent)}
+.cheers-feature-eyebrow,.cheers-guide-kicker{font:900 10px/1.45 "DM Sans",sans-serif;letter-spacing:.17em;color:var(--room-accent);margin-bottom:12px}
+.cheers-feature-heading p:not(.cheers-feature-eyebrow){font:500 clamp(13px,1.3vw,16px)/1.65 "DM Sans",sans-serif;color:#c9d9ca;max-width:65ch;margin-top:16px}
+.cheers-more-games{display:inline-flex;align-items:center;justify-content:space-between;gap:18px;padding:13px 15px;min-height:45px;border:1px solid var(--room-border);border-radius:9px;color:var(--room-accent);font:800 10px/1.3 "DM Sans",sans-serif;text-decoration:none;white-space:nowrap}
+.cheers-more-games:focus-visible,.cheers-discord-link:focus-visible{outline:3px solid var(--room-accent);outline-offset:4px}
+.cheers-feature-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);align-items:start;gap:clamp(14px,2.5vw,28px)}
+.cheers-feature-guide,.cheers-feature .spark-relay{min-width:0;border:1px solid var(--room-border);border-radius:19px;background:linear-gradient(145deg,#13251b,#081710)}
+.cheers-feature-guide{overflow:hidden}
+.cheers-feature-guide>.lounge-cheers-art{display:block;width:100%;max-height:clamp(135px,18vw,230px);height:auto;object-fit:contain;object-position:center;padding:clamp(8px,1.5vw,18px);background:radial-gradient(ellipse at center,rgba(194,197,178,.13),transparent 70%),#101b14}
+.cheers-guide-content{padding:clamp(19px,2.7vw,31px)}
+.cheers-guide-content h3{font:900 clamp(28px,3vw,39px)/1.02 "Barlow Condensed",Impact,sans-serif;letter-spacing:.03em;color:#f4ffe9}
+.cheers-how-steps{list-style:none;display:grid;gap:0;margin:20px 0 0;padding:0}
+.cheers-how-steps li{display:grid;grid-template-columns:39px minmax(0,1fr);gap:11px;align-items:start;padding:15px 0;border-top:1px solid rgba(182,230,180,.16)}
+.cheers-step-number{display:grid;place-items:center;min-width:35px;height:35px;border:1px solid rgba(188,234,165,.4);border-radius:9px;color:#c2f69d;font:900 14px/1 "Barlow Condensed",sans-serif}
+.cheers-how-steps strong{font:900 14px/1.15 "Barlow Condensed",sans-serif;letter-spacing:.08em;color:#effbe8}
+.cheers-how-steps p,.cheers-guide-tip{font:500 12px/1.65 "DM Sans",sans-serif;color:#bed0c0;margin:5px 0 0}
+.cheers-guide-tip{padding:14px 15px;border:1px solid rgba(197,236,175,.22);border-radius:10px;background:rgba(155,201,135,.06);margin:13px 0 0}
+.cheers-guide-tip strong{color:#efffe8}
+.cheers-discord-link{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;padding:14px 15px;border:1px solid rgba(192,244,165,.27);border-radius:9px;color:var(--room-accent);text-decoration:none;font:800 10px/1.4 "DM Sans",sans-serif;letter-spacing:.04em}
+.cheers-feature .spark-relay{padding:clamp(17px,2.3vw,26px);scroll-margin-top:90px}
+.cheers-feature .lounge-control-head{margin-bottom:8px;gap:5px 13px}
+.cheers-feature .lounge-control-head h3{font-size:clamp(24px,2.8vw,31px)}
+.cheers-feature .spark-tagline{margin:5px 0 15px;font-size:12px;line-height:1.55}
+.cheers-feature .spark-live-panel{margin:0 0 11px}
+.spark-live-explainer{grid-column:1/-1;margin:1px 0 4px;font:500 10px/1.45 "DM Sans",sans-serif;color:#b6cfb6}
+.spark-presence-leave{grid-column:1/-1;min-height:40px;padding:10px;border:1px solid rgba(202,251,178,.3);border-radius:8px;background:transparent;color:#e3f6dd;font:800 10px/1.3 "DM Sans",sans-serif;cursor:pointer;letter-spacing:.08em}
+.spark-presence-leave[hidden]{display:none}
+.spark-presence-leave:focus-visible{outline:3px solid var(--room-accent);outline-offset:3px}
+.cheers-start-panel{padding:12px 13px 8px;margin:0 0 15px;border:1px solid rgba(178,236,158,.26);border-radius:12px;background:rgba(17,47,28,.52)}
+.cheers-start-label{display:block;color:#dff4c9;font:800 10px/1.4 "DM Sans",sans-serif;letter-spacing:.09em;margin-bottom:9px}
+.cheers-start-panel .lounge-cheers-button{min-height:51px;padding:13px 10px;font-size:12px}
+.cheers-start-panel #lounge-cheers-status{min-height:0;margin:10px 0 2px;font-size:11px;line-height:1.5;color:#bdd2be}
+.cheers-start-panel .lounge-signin{margin-top:8px;font-size:11px}
+.cheers-feature .spark-arena{padding:13px 13px 14px}
+.cheers-feature .spark-target-wrap{min-height:160px;padding:6px 0 7px}
+.cheers-feature .spark-target{width:122px;height:122px}
+.cheers-feature .spark-ember{width:42px;height:38px}
+.cheers-feature .spark-cue{min-height:0;font-size:11px;padding-top:9px}
+.cheers-feature .lounge-cheers-progress{margin:10px 0 0}
+.cheers-feature .lounge-cheers-stats{gap:7px;margin:9px 0 0}
+.cheers-feature .lounge-cheers-stats>div{padding:9px 11px;border-radius:8px}
+.cheers-feature .lounge-cheers-stats small{font-size:9px}
+.cheers-feature .spark-round-meta strong{font-size:20px}
+.cheers-feature .spark-scoreboard{grid-template-columns:repeat(4,minmax(0,1fr))}
+.cheers-feature .spark-scoreboard strong{font-size:clamp(19px,2vw,28px)}
+.cheers-feature .spark-scoreboard small{font-size:8px}
+.cheers-feature .lounge-fineprint{margin-top:12px;font-size:10px;line-height:1.55}
+@media(max-width:1000px){
+ .cheers-feature-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .cheers-feature .spark-scoreboard{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .cheers-feature-heading{align-items:start;flex-direction:column}
+ .cheers-feature-guide>.lounge-cheers-art{max-height:155px}
+}
+@media(max-width:760px){
+ .cheers-feature-grid{grid-template-columns:minmax(0,1fr);gap:15px}
+ /* Make the button and playable arena discoverable first on phone, while the
+    full rules and approved artwork are one short scroll below it. */
+ .cheers-feature .spark-relay{order:0}
+ .cheers-feature-guide{order:1}
+ .cheers-feature-heading{margin:19px 0 17px}
+ .cheers-feature-heading h2{font-size:clamp(43px,10vw,66px)}
+ .cheers-feature-heading p:not(.cheers-feature-eyebrow){font-size:13px;line-height:1.5;margin-top:10px}
+ .cheers-more-games{align-self:flex-start}
+ .cheers-feature .spark-scoreboard{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .cheers-feature-guide>.lounge-cheers-art{max-height:118px}
+ .cheers-guide-content{padding:20px}
+ .cheers-how-steps{margin-top:10px}
+ .cheers-how-steps li{padding:10px 0}
+ .cheers-feature .spark-live-panel{padding:10px}
+}
+@media(max-width:360px){
+ .cheers-feature-heading h2{font-size:41px}
+ .cheers-feature .lounge-cheers-stats strong{font-size:21px}
+ .cheers-feature .spark-round-meta strong{font-size:20px}
+ .cheers-feature .spark-target{width:116px;height:116px}
+}
+@media(prefers-reduced-motion:reduce){.lounge-teaser-link,.cheers-feature .spark-target{transition:none}}
+
+.spark-quick-rules{margin:0 0 14px;font:600 11px/1.6 "DM Sans",sans-serif;color:#d3e6cc}
+.spark-quick-rules b{color:var(--room-accent)}
+.spark-quick-rules a{color:var(--room-accent);display:inline-block;white-space:nowrap;margin-left:4px;text-decoration:underline;text-underline-offset:3px;font-weight:800}
+.spark-quick-rules a:focus-visible{outline:3px solid var(--room-accent);outline-offset:3px}

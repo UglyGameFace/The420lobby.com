@@ -94,9 +94,18 @@ try{
       "Player cannot score the same beat again");
     const image=page.locator(".lounge-cheers-art");
     assert.match(await image.getAttribute("data-smoke-motion"),/cheers-real-smoke-blunt-loop/);
+    assert.equal(await page.locator("#spark-presence-leave").isVisible(),true,
+      "A player must be able to opt out of being listed online");
     await page.locator("#spark-relay").screenshot({
       path:"artifacts/spark-relay-"+width+".png",animations:"disabled"
     });
+    await page.locator("#spark-presence-leave").click();
+    await page.waitForFunction(()=>document.querySelector("#spark-online")?.textContent==="0");
+    await page.locator("#spark-presence-leave").waitFor({state:"hidden",timeout:2500});
+    assert.equal(await page.locator("#spark-presence-leave").isVisible(),false);
+    await page.locator("#spark-presence-toggle").click();
+    await page.waitForFunction(()=>document.querySelector("#spark-looking")?.textContent==="1");
+    assert.equal(await page.locator("#spark-online").textContent(),"1");
     assert.deepEqual(errors,[],"Spark Relay frontend threw an error");
     await page.close();
     console.log("PASS Spark Relay "+width+"px: join, synchronized spark, server points, disabled duplicate, responsive stage");
