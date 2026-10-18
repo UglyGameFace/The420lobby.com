@@ -131,7 +131,7 @@ test("Dank Shield is semantic responsive content, not a stretched poster", () =>
   assert.ok(html.includes("02 // PROTECTION · VERIFICATION · MODERATION"));
   assert.ok(html.includes("PROTECT THE LOBBY"));
   assert.ok(html.includes('class="card-link shield-card-link" href="https://discord.gg/the420lobby"'));
-  assert.ok(html.includes('href="/lobby-redesign.css?v=20261018-weedtech-card2"'));
+  assert.ok(html.includes('href="/lobby-redesign.css?v=20261018-tablet-nav3"'));
   for (const rule of [".experience-grid>.shield-card{display:flex!important",
     ".hero-content", ".arcade-layout", ".community-proof .proof-grid",
     "@media(max-width:1100px)", "@media(max-width:760px)", "@media(max-width:460px)"])
