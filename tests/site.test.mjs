@@ -145,7 +145,7 @@ test("experience cards use real licensed media and a unified design",()=>{
   assert.doesNotMatch(html,/class="film-reel"|class="voxel-scape"|class="cinema-beam"/);
   assert.match(redesign,/\.experience-card \.card-visual,\.experience-grid>\.shield-card \.shield-feature-art\{/);
   assert.match(redesign,/\.experience-card \.card-body h3,\.shield-feature-copy h3\{/);
-  for(const text of ["PLAN A MOVIE NIGHT","GET SERVER UPDATES","SEE DANK SHIELD IN THE LOBBY"])assert.ok(html.includes(text));
+  for(const text of ["PLAN A MOVIE NIGHT","GET SERVER UPDATES","PROTECT THE LOBBY"])assert.ok(html.includes(text));
   assert.doesNotMatch(css,/Approved Dank Shield poster/);
 });
 
