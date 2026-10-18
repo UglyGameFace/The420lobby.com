@@ -439,3 +439,22 @@ test("Arcade artwork preserves complete source proportions on every device",()=>
   assert.doesNotMatch(visual,/\.hero-art(?: img)?\{[^}]*aspect-ratio:1\.(?:33|65|7)/);
   assert.doesNotMatch(visual,/\.game-art \.game-card-photo\{[^}]*object-fit:cover/);
 });
+
+
+test("CHEERS Spark Relay replaces passive countdown with playable ten-beat co-op stage",()=>{
+  const html=read("index.html"),client=read("lounge.js"),styles=read("lounge.css"),app=read("functions/_lib/app.mjs");
+  for(const id of ["spark-relay","spark-arena","lounge-spark-button","spark-target-countdown","spark-score","spark-combo",
+    "spark-record","spark-captured","spark-round-track","lounge-cheers-join","lounge-cheers-participants","lounge-cheers-clock"])
+    assert.match(html,new RegExp('id="'+id+'"'),"Missing Spark Relay widget: "+id);
+  assert.equal((html.match(/class="spark-step" data-beat="/g)||[]).length,10);
+  assert.match(html,/SPARK RELAY/);
+  assert.match(html,/cheers-real-smoke-blunt-loop\.webp/);
+  assert.match(client,/\/api\/cheers\/spark/);
+  assert.match(client,/csrfToken:auth\.csrfToken/);
+  assert.match(client,/sessionStorage/);
+  assert.match(styles,/prefers-reduced-motion:reduce/);
+  assert.match(styles,/html\.fx-off \.spark-ember/);
+  assert.doesNotMatch(html.slice(html.indexOf('id="spark-relay"'),html.indexOf('id="spark-relay"')+6000),/<svg\b/i);
+  assert.match(app,/path === "\/api\/cheers\/spark"/);
+  assert.doesNotMatch(client,/Math\.random\(\).*score|fakeMembers|fakeCount/);
+});
