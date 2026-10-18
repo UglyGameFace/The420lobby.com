@@ -288,7 +288,7 @@
      const data=await api.arcadeRequest("/api/cheers",{body:{},csrfToken:auth.csrfToken});
      if(data.round)setJoinedRound(data.round.id);
      applyStatus(data,sentAt);
-     if(!online)void publishPresence(true,false);
+     if(!online||looking)void publishPresence(true,false);
      cheerStatus.textContent=data.joined?"You're in! Catch the ember when it glows.":"You're already in this round. Catch the next spark!";
    }catch(error){
      if(["invalid_csrf","sign_in_required"].includes(error.code))session=null;
