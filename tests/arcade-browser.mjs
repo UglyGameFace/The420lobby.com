@@ -75,6 +75,14 @@ try {
     const state = await fixture(page, false);
     await page.goto(address + "/arcade.html", {waitUntil:"domcontentloaded"});
     await page.waitForFunction(() => document.querySelector("#auth-status")?.textContent !== "Checking sign-in availability…");
+    assert.equal(await page.locator(".game-card-photo").count(),3,
+      width+"px landing game cards must use photographs instead of SVG collages");
+    assert.equal(await page.locator(".hero-art img").getAttribute("src"),"/assets/the420lobby-neon-lounge.webp");
+    const artSizing=await page.locator(".game-card-photo").evaluateAll(images=>images.map(img=>({
+      width:img.getBoundingClientRect().width,height:img.getBoundingClientRect().height
+    })));
+    assert.ok(artSizing.every(size=>size.width>=150&&size.height>=120),
+      width+"px photographed game card collapsed: "+JSON.stringify(artSizing));
     await page.locator('[data-filter="memory"]').click();
     assert.equal(await page.locator(".game-card:visible").count(), 1, "memory filter must show one game");
     await page.locator('[data-filter="all"]').click();
@@ -112,6 +120,7 @@ try {
   await page.locator(".mini-start").click();
   await page.waitForFunction(() => document.querySelector(".mini-game")?.dataset.mode === "playing");
   await page.clock.runFor(125);
+  assert.equal(await page.locator(".mini-card-front img.mini-art-photo").count(),12,"memory cards must use photographic item art");
   await page.locator(".mini-pause").click();
   assert.equal(await page.locator(".mini-game").getAttribute("data-mode"), "paused");
   const frozen = await page.locator(".mini-timer").textContent();
@@ -150,6 +159,7 @@ try {
   await page.waitForFunction(() => document.querySelector(".mini-game")?.dataset.mode === "playing");
   const target = createGame("bong-blitz", "browser-integration-seed").targets[0];
   await page.clock.runFor(target.sweetAt + 10);
+  assert.ok(await page.locator(".mini-target img.mini-art-photo").count()>0,"timing target should be a photo, not a fake glass SVG");
   await page.locator('.mini-target[data-target-id="' + target.id + '"]').evaluate(button => button.click());
   assert.ok(Number(await page.locator(".mini-score").textContent()) > 0, "timed tap should award points");
   await page.clock.runFor(31000);
