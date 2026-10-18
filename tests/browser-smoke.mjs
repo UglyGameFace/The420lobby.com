@@ -113,7 +113,7 @@ try {
     assert.equal(arcadePresentation.machineBorder,"1px","cabinet framing not styled");
     assert.ok(arcadePresentation.machineHeight>450,"arcade cabinet missing");
 
-    assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),4);
+    assert.equal(await page.locator('a[href="https://discord.gg/the420lobby"]').count(),6);
     assert.equal(await page.locator("img.lounge-illustration").evaluate(el=>el.complete && el.naturalWidth>0),true,"hero illustration failed");
     await page.locator(".leaf-seal").scrollIntoViewIfNeeded();
     await page.locator(".leaf-seal img.seal-cannabis-photo").evaluate(img => img.decode());

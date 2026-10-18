@@ -156,11 +156,14 @@ test("internal anchors resolve and IDs are unique", () => {
   for(const [,id] of html.matchAll(/\bhref="#([^"]+)"/g)) assert.ok(ids.includes(id),"missing #"+id);
 });
 
-test("only four safe outbound official Discord invites exist", () => {
+test("external links use only approved Discord and Dank Shield destinations", () => {
   const outgoing=[...html.matchAll(/<a\b[^>]*\bhref="(https?:[^"]+)"[^>]*>/g)];
-  assert.equal(outgoing.length,4);
+  const urls=outgoing.map(([,url])=>url);
+  assert.equal(urls.filter(url=>url==="https://discord.gg/the420lobby").length,6);
+  assert.equal(urls.filter(url=>url==="https://github.com/UglyGameFace/Dank-Shield").length,1);
+  assert.equal(urls.length,7,"unexpected external destination");
   for(const [tag,url] of outgoing){
-    assert.equal(url,"https://discord.gg/the420lobby");
+    assert.ok(["https://discord.gg/the420lobby","https://github.com/UglyGameFace/Dank-Shield"].includes(url),url);
     assert.match(tag,/target="_blank"/);
     assert.match(tag,/rel="noopener noreferrer"/);
   }
