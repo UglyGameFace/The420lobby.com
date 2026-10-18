@@ -61,6 +61,19 @@ try {
     assert.equal(initialHeroOpacity,"1","hero text must be readable immediately, not hidden behind scroll observer");
     assert.equal(await page.title(),"The 420 Lobby | After Cheers, We Play");
     assert.equal(await page.locator(".experience-card").count(),4);
+
+    assert.equal(await page.locator("#interactive-lounge").count(),1,"interactive lounge missing");
+    assert.equal(await page.locator(".lounge-door").count(),4,"lounge destinations missing");
+    const loungeBox=await page.locator(".lounge-layout").boundingBox();
+    assert.ok(loungeBox && loungeBox.x>=-2 && loungeBox.x+loungeBox.width<=scenario.size.width+2,
+      "interactive lounge overflows "+scenario.name+": "+JSON.stringify(loungeBox));
+    await page.locator('button[data-lounge-theme="midnight"]').click();
+    assert.equal(await page.locator('html').getAttribute("data-lounge-theme"),"midnight");
+    assert.equal(await page.locator('button[data-lounge-theme="midnight"]').getAttribute("aria-pressed"),"true");
+    assert.equal(await page.evaluate(()=>localStorage.getItem("lobby:theme:v1")),"midnight");
+    await page.locator("#lounge-secret").click({clickCount:4});
+    assert.equal(await page.locator('html').getAttribute("data-lounge-theme"),"halloween");
+
     assert.equal(await page.locator(".card-body").count(),3,"other three experience cards retain semantic HTML");
     assert.equal(await page.locator(".shield-card .shield-card-link").count(),1,"responsive Shield card preserves visible accessible CTA");
     assert.equal(await page.locator("#sesh-stage").count(),1,"arcade field is missing");

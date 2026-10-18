@@ -23,6 +23,7 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check script.js
+          node --check lounge.js
           node --check visual-engine.js
           node --check sesh-signal.js
           node --check sesh-loader.js
