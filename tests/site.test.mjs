@@ -219,7 +219,7 @@ test("the homepage remains a build-free static shell", () => {
   assert.match(html,/<link rel="stylesheet" href="\/styles\.css\?v=20261016-shieldmobile29">/);
   assert.match(html,/<link rel="stylesheet" href="\/sesh-signal-v3\.css">/);
   assert.match(html,/<link rel="stylesheet" href="\/cheers-hero-v1\.css\?v=[^"]+">/);
-  assert.match(html,/<script defer src="\/script\.js"><\/script>/);
+  assert.match(html,/<script defer src="\/script\.js\?v=20261018-tablet-nav3"><\/script>/);
   assert.match(html,/<script defer src="\/visual-engine\.js"><\/script>/);
   assert.doesNotMatch(html,/https?:\/\/cdn\..*\/.*\.js/);
 });
