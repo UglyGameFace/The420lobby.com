@@ -476,7 +476,7 @@ test("CHEERS game has its own discoverable section and a usable first-time guide
   assert.match(page,/id="spark-presence-leave"/);
   assert.match(page,/href="#spark-relay">SEE HOW TO PLAY/);
   assert.match(page,/CALL THE CREW/);
-  assert.match(page,/FIND PLAYERS/);
+  assert.match(page,/LOOK FOR PLAYERS/);
   assert.match(css,/\.cheers-feature-grid\{display:grid/);
   assert.match(css,/@media\(max-width:760px\)/);
   assert.match(css,/\.cheers-feature \.spark-relay\{order:0\}/);
