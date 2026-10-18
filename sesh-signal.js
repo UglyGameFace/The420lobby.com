@@ -24,6 +24,14 @@
     "clean-glass":"Clean glass piece", "broken-bong":"Broken bong glass",
     "broken-pipe":"Broken glass pipe"
   };
+  const pickupFeedback=document.createElement("output");
+  pickupFeedback.className="sesh-pickup-feedback";
+  pickupFeedback.setAttribute("aria-hidden","true");
+  stage.append(pickupFeedback);
+  function displayPickup(message,hazard=false){
+    pickupFeedback.textContent=message;
+    pickupFeedback.dataset.hazard=String(hazard);
+  }
   const elements = new Map();
   let api, rules, media, engine, session, run, events = [], started = 0, raf = 0;
   let mode = "loading", best = 0, score = 0, soundOn = false, audioContext;
@@ -160,6 +168,7 @@
     if (!dispatch("catch", {id:target.id})) return;
     const points = snapshot.score - before;
     showBurst(target, points < 0 ? "−" + Math.abs(points) : "+" + points);
+    displayPickup(isHazard(target.kind)?"AVOID BROKEN GLASS":points>0?("NICE PICKUP · +"+points):"KIT UPDATED",isHazard(target.kind));
     announce(isHazard(target.kind) ? "Broken glass! Combo and sesh-kit progress reset. Leave cracked glass alone."
       : ITEM_LABELS[target.kind] + " collected. +" + points + " points.");
     playNote(isHazard(target.kind) ? 170 : target.kind === "clean-glass" ? 640 : 325 + Math.min(400, snapshot.combo * 32), .12, isHazard(target.kind) ? "static" : "collect");
@@ -168,6 +177,7 @@
   function boost() {
     if (!dispatch("boost")) return;
     announce("Chill Mode activated. Double points for five seconds!");
+    displayPickup("CHILL MODE · DOUBLE POINTS");
     playNote(510,.22,"collect"); updateHud();
   }
   function pause(reason) {
@@ -247,6 +257,7 @@
       session = authorized.session; run = authorized.run; engine = rules.createEngine("sesh-signal", run.seed);
       events = []; started = performance.now(); snapshot = engine.snapshot();
       mode = "playing"; lastAnnouncedTime = -1; overlay.hidden = true; resultText.textContent = "";
+      displayPickup("COLLECT THE KIT · AVOID BROKEN GLASS");
       status("Playing as " + session.user.username + ". Round active.");
       updateHud(); announce("Round started. Collect lighter, grinder and papers. Avoid broken glass.");
       stage.focus({preventScroll:true});
