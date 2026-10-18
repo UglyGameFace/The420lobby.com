@@ -2,8 +2,8 @@
    No WebGL requirement, no SVG paraphernalia, no score/runtime alterations.
    Existing site WebP makes gameplay visually complete even if Wikimedia
    thumbnails are blocked or slow on a visitor's network. */
-:root{--bg:#08120f;--panel:#10221b;--ink:#f0f6eb;--muted:#b7cbbb;--lime:#b7f184;--purple:#e9b68b;--line:rgba(190,242,177,.21)}
-body{background:radial-gradient(ellipse 75% 30% at 55% 4%,rgba(67,123,82,.18),transparent 75%),#08120f}
+body.arcade-page{--bg:#08120f;--panel:#10221b;--ink:#f0f6eb;--muted:#b7cbbb;--lime:#b7f184;--purple:#e9b68b;--line:rgba(190,242,177,.21)}
+body.arcade-page{background:radial-gradient(ellipse 75% 30% at 55% 4%,rgba(67,123,82,.18),transparent 75%),#08120f}
 .arcade-header{background:rgba(7,18,13,.94);border-bottom-color:rgba(178,247,174,.21)}
 .arcade-hero{gap:clamp(22px,4vw,72px)}
 .hero-copy h1>span{color:#9deda6}
