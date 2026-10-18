@@ -8,8 +8,8 @@ body.arcade-page{background:radial-gradient(ellipse 75% 30% at 55% 4%,rgba(67,12
 .arcade-hero{gap:clamp(22px,4vw,72px)}
 .hero-copy h1>span{color:#9deda6}
 .hero-description{color:#bfd0bf}
-.hero-art{margin:0;min-width:0;overflow:hidden;isolation:isolate;border-radius:23px;border:1px solid rgba(189,249,178,.18);background:#13241b;aspect-ratio:1.33;box-shadow:0 22px 55px rgba(0,0,0,.35)}
-.hero-art img{width:100%;height:100%;max-height:none;object-fit:cover;object-position:center;filter:brightness(.8) saturate(.95)}
+.hero-art{margin:0;min-width:0;overflow:hidden;isolation:isolate;border-radius:23px;border:1px solid rgba(189,249,178,.18);background:#13241b;aspect-ratio:auto;box-shadow:0 22px 55px rgba(0,0,0,.35)}
+.hero-art img{display:block;width:100%;height:auto;max-height:none;object-fit:contain;object-position:center;filter:brightness(.8) saturate(.95)}
 .hero-art:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 65%,rgba(8,16,10,.73));z-index:0;pointer-events:none}
 .hero-art .art-sticker,.hero-art .art-coordinate{z-index:1}
 .hero-art .art-sticker{border-radius:8px;box-shadow:0 8px 24px #0008}
@@ -17,9 +17,9 @@ body.arcade-page{background:radial-gradient(ellipse 75% 30% at 55% 4%,rgba(67,12
 .game-card{border-radius:17px;border-color:rgba(177,232,170,.25);background:linear-gradient(150deg,#152a1f,#0d1c17);box-shadow:0 15px 36px rgba(0,0,0,.2)}
 .game-card:hover,.game-card:focus-within{border-color:var(--lime);box-shadow:0 20px 48px rgba(0,0,0,.36)}
 .game-card .game-art{height:clamp(210px,22vw,285px);background:linear-gradient(150deg,#25442c,#07150f),url("/assets/the420lobby-neon-lounge.webp") center/cover no-repeat;isolation:isolate;overflow:hidden}
-.game-art .game-card-photo{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center;filter:brightness(.75) saturate(.88) contrast(1.08);transition:transform .28s ease,filter .28s ease}
+.game-art .game-card-photo{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:contain;object-position:center;filter:brightness(.75) saturate(.88) contrast(1.08);transition:transform .28s ease,filter .28s ease}
 .game-art .game-card-photo:not([src]),.game-art .game-card-photo[hidden],.game-art.artwork-fallback .game-card-photo{display:none}
-.game-card:hover .game-card-photo{transform:scale(1.025);filter:brightness(.83) saturate(.95)}
+.game-card:hover .game-card-photo{transform:none;filter:brightness(.83) saturate(.95)}
 .game-art:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(5,17,12,.23),rgba(5,17,12,.1) 40%,rgba(5,17,12,.92) 100%)}
 .game-art .game-badge,.game-art .art-number,.game-art .art-word,.game-art .game-photo-label{z-index:2}
 .game-art .game-badge{font-size:9px;border-radius:7px;padding:8px 11px;background:rgba(6,19,13,.87);border:1px solid rgba(201,241,196,.34);color:#d9ffdb}
@@ -73,7 +73,7 @@ body.arcade-page{background:radial-gradient(ellipse 75% 30% at 55% 4%,rgba(67,12
 /* Tablet and mobile remain usable without overlays, expensive effects or hover. */
 @media(max-width:1120px){.hero-art{margin:0}.game-card .game-art{height:clamp(190px,24vw,260px)}}
 @media(max-width:850px){.hero-art{margin:0}.game-card .game-art{height:210px}}
-@media(max-width:560px){.arcade-hero{gap:16px}.hero-art{width:100%;height:auto;aspect-ratio:1.65;max-width:none;margin:0}.hero-art img{height:100%}.game-card .game-art{height:225px}.mini-target{width:92px;height:92px}.mini-target>.mini-art-photo{width:86%;height:86%}#sesh-signal .sesh-item-caption{font-size:7px}}
+@media(max-width:560px){.arcade-hero{gap:16px}.hero-art{width:100%;height:auto;aspect-ratio:auto;max-width:none;margin:0}.hero-art img{height:auto}.game-card .game-art{height:225px}.mini-target{width:92px;height:92px}.mini-target>.mini-art-photo{width:86%;height:86%}#sesh-signal .sesh-item-caption{font-size:7px}}
 @media(prefers-reduced-motion:reduce){.game-art .game-card-photo{transition:none;transform:none!important}}
 @media(hover:none){.game-art .game-card-photo{transform:none!important}}
 
@@ -85,8 +85,8 @@ body.arcade-page{background:radial-gradient(ellipse 75% 30% at 55% 4%,rgba(67,12
   .arcade-hero{grid-template-columns:minmax(0,1fr);gap:24px;padding-block:35px}
   .arcade-hero .hero-copy{min-width:0;max-width:710px}
   .arcade-hero .hero-copy h1{font-size:clamp(62px,9vw,90px)}
-  .arcade-hero .hero-art{width:min(100%,690px);height:auto;aspect-ratio:1.7;min-width:0;max-width:100%;margin-inline:auto}
-  .arcade-hero .hero-art img{width:100%;height:100%;object-fit:cover}
+  .arcade-hero .hero-art{width:min(100%,690px);height:auto;aspect-ratio:auto;min-width:0;max-width:100%;margin-inline:auto}
+  .arcade-hero .hero-art img{width:100%;height:auto;object-fit:contain}
 }
 @media(min-width:951px){
   .arcade-hero{grid-template-columns:minmax(0,1.12fr) minmax(0,1fr)}
