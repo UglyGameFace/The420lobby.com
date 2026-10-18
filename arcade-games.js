@@ -84,7 +84,6 @@ export function mountGame(container, gameId, initialSession) {
   let engine, snapshot, session = initialSession, run, started = 0, events = [];
   let mode = "idle", raf = 0, pauseTimer = 0, disposed = false, pendingSave = null;
   let generation = 0, lastWallMs = 0, soundOn = false, soundContext = null;
-  const motionReduced=window.matchMedia("(prefers-reduced-motion: reduce)");
   const controller = new AbortController(), elements = new Map();
   function wallTime() {
     // Browser scheduling can report an earlier sample than the last input/frame.
@@ -336,6 +335,7 @@ export function mountGame(container, gameId, initialSession) {
   updateControls();
   return () => {
     disposed = true; generation++; stopClock(); controller.abort();
+    if(soundContext){soundContext.close().catch(()=>{});soundContext=null;}
     document.removeEventListener("visibilitychange", onVisibility);
     window.removeEventListener("pagehide", onPageHide);
     clearBoard();
