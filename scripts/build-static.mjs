@@ -6,8 +6,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = join(root, 'dist');
 export const publicFiles = [
   'index.html','arcade.html','favicon.svg','styles.css','cheers-hero-v1.css',
-  'lobby-redesign.css','brand-header.css','sesh-signal-v3.css','arcade.css','arcade-games.css',
-  'script.js','smoke-brand.js','visual-engine.js','sesh-loader.js','sesh-signal.js',
+  'lobby-redesign.css','brand-header.css','lounge.css','sesh-signal-v3.css','arcade.css','arcade-games.css',
+  'script.js','smoke-brand.js','lounge.js','visual-engine.js','sesh-loader.js','sesh-signal.js',
   'arcade-app.js','arcade-api.js','arcade-games.js','_headers','_routes.json',
   'shared/arcade-rules.mjs','assets/BarlowCondensed-ExtraBold.ttf','assets/BarlowCondensed-OFL.txt'
 ];
