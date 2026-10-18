@@ -101,6 +101,7 @@ try{
     });
     await page.locator("#spark-presence-leave").click();
     await page.waitForFunction(()=>document.querySelector("#spark-online")?.textContent==="0");
+    await page.locator("#spark-presence-leave").waitFor({state:"hidden",timeout:2500});
     assert.equal(await page.locator("#spark-presence-leave").isVisible(),false);
     await page.locator("#spark-presence-toggle").click();
     await page.waitForFunction(()=>document.querySelector("#spark-looking")?.textContent==="1");
