@@ -9,12 +9,6 @@
  const moodStatus=document.getElementById("lounge-mood-status");
  const secret=document.getElementById("lounge-secret");
  const secretMessage=document.getElementById("lounge-secret-message");
- const join=document.getElementById("lounge-cheers-join");
- const signin=document.getElementById("lounge-cheers-signin");
- const status=document.getElementById("lounge-cheers-status");
- const count=document.getElementById("lounge-cheers-participants");
- const clock=document.getElementById("lounge-cheers-clock");
- const progress=document.getElementById("lounge-cheers-progress");
  let theme="lounge";
  try{const saved=localStorage.getItem("lobby:theme:v1");if(Object.hasOwn(themes,saved))theme=saved;}
  catch(_){/* Storage can be unavailable in private browsing. */}
