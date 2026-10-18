@@ -109,6 +109,7 @@
  let rules=defaultRules,api=null,session=null,active=null,serverOffset=0;
  let available=false,pending=false,playing=false,bestScore=0,joinedRound=null,lastRefresh=0;
  let online=false,looking=false,heartbeatBusy=false,lastHeartbeat=0;
+ let networkLeadMs=0;
  const restored=(()=>{
    try{return Number(sessionStorage.getItem("lobby:spark-round:v1"))||null;}
    catch(_){return null;}
@@ -142,7 +143,7 @@
  }
  function render(){
    if(document.hidden)return;
-   const now=currentMillis();
+   const now=currentMillis()+networkLeadMs;
    const remaining=active?Math.max(0,Math.ceil((active.endsAt-now)/1000)):0;
    const inRound=Boolean(active&&remaining>0);
    const joined=Boolean(inRound&&joinedRound===active.id);
@@ -198,6 +199,7 @@
  }
  function applyStatus(data,sentAt=Date.now()){
    serverOffset=data.serverTime-(sentAt+Date.now())/2;
+   networkLeadMs=Math.min(200,Math.max(0,(Date.now()-sentAt)/2));
    active=data.round;
    rules=data.rules||defaultRules;
    bestScore=data.bestScore||0;
@@ -295,7 +297,7 @@
  });
  sparkButton.addEventListener("click",async()=>{
    if(playing||!active||joinedRound!==active.id)return;
-   const now=currentMillis(),timing=currentBeat(now);
+   const now=currentMillis()+networkLeadMs,timing=currentBeat(now);
    if(!timing||Math.abs(timing.delta)>rules.hitWindowMs||
      (active.hits||[]).some(h=>h.beat===timing.beat))return;
    const roundId=active.id,beat=timing.beat;
