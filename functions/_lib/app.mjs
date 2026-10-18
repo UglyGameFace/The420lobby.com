@@ -1,7 +1,7 @@
 import {allowMethod, errorResponse, HttpError, json} from "./http.mjs";
 import {beginDiscord, completeDiscord, getSession, isConfigured, logout, requireSession} from "./auth.mjs";
 import {finishRun, leaderboards, profile, startRun} from "./arcade.mjs";
-import {getCheers, joinCheers, sparkCheers} from "./cheers.mjs";
+import {getCheers, joinCheers, sparkCheers, cheersPresence} from "./cheers.mjs";
 
 export async function handleRequest(context, options = {}) {
   const {request, env} = context;
@@ -24,6 +24,9 @@ export async function handleRequest(context, options = {}) {
     } else if (path === "/api/cheers/spark") {
       allowMethod(request, ["POST"]);
       response = await sparkCheers(request, env);
+    } else if (path === "/api/cheers/presence") {
+      allowMethod(request, ["POST"]);
+      response = await cheersPresence(request, env);
     } else if (path === "/api/profile") {
       allowMethod(request, ["GET"]); response = await profile(request, env);
     } else if (path === "/api/leaderboards") {
