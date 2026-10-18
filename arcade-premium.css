@@ -18,7 +18,7 @@ body.arcade-page{background:radial-gradient(ellipse 75% 30% at 55% 4%,rgba(67,12
 .game-card:hover,.game-card:focus-within{border-color:var(--lime);box-shadow:0 20px 48px rgba(0,0,0,.36)}
 .game-card .game-art{height:clamp(210px,22vw,285px);background:linear-gradient(150deg,#25442c,#07150f),url("/assets/the420lobby-neon-lounge.webp") center/cover no-repeat;isolation:isolate;overflow:hidden}
 .game-art .game-card-photo{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center;filter:brightness(.75) saturate(.88) contrast(1.08);transition:transform .28s ease,filter .28s ease}
-.game-art .game-card-photo:not([src]){display:none}
+.game-art .game-card-photo:not([src]),.game-art .game-card-photo[hidden],.game-art.artwork-fallback .game-card-photo{display:none}
 .game-card:hover .game-card-photo{transform:scale(1.025);filter:brightness(.83) saturate(.95)}
 .game-art:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(5,17,12,.23),rgba(5,17,12,.1) 40%,rgba(5,17,12,.92) 100%)}
 .game-art .game-badge,.game-art .art-number,.game-art .art-word,.game-art .game-photo-label{z-index:2}
