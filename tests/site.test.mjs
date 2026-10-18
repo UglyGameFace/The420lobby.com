@@ -118,13 +118,18 @@ test("photo-real smoke moves in raster frames, with a clean text header and pres
 
 test("Dank Shield is semantic responsive content, not a stretched poster", () => {
   const redesign=read("lobby-redesign.css");
-  assert.ok(html.includes('class="dank-shield-brand-art" src="/assets/dank-shield-logo.avif"'));
+  assert.ok(html.includes('class="dank-shield-weedtech-art" src="/assets/dank-shield-weedtech-card.webp"'));
+  assert.ok(!html.includes('dank-shield-logo.avif'),"old uploaded Shield image must not be displayed");
+  const art=fs.readFileSync(new URL("../assets/dank-shield-weedtech-card.webp",import.meta.url));
+  assert.ok(art.length>4000&&art.length<200000,"optimized Shield card art must be present and lightweight");
+  assert.equal(art.toString("ascii",0,4),"RIFF");
+  assert.equal(art.toString("ascii",8,12),"WEBP");
   assert.ok(!html.includes('file_00000000b25c822f94a1d2b422440108.png'));
   assert.ok(html.includes('class="shield-feature-art"'));
   assert.ok(html.includes('class="shield-feature-copy"'));
   assert.ok(html.includes('id="shield-title"'));
   assert.ok(html.includes('class="card-link shield-card-link" href="https://discord.gg/the420lobby"'));
-  assert.ok(html.includes('href="/lobby-redesign.css?v=20261017-real-cards1"'));
+  assert.ok(html.includes('href="/lobby-redesign.css?v=20261018-weedtech-card2"'));
   for (const rule of [".experience-grid>.shield-card{display:flex!important",
     ".hero-content", ".arcade-layout", ".community-proof .proof-grid",
     "@media(max-width:1100px)", "@media(max-width:760px)", "@media(max-width:460px)"])
