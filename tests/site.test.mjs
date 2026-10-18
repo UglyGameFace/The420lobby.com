@@ -294,18 +294,29 @@ test("arcade CSS is independently versioned and not hidden in stale global style
 });
 
 
-test("Sesh accessories are custom illustrated rather than emoji placeholders", () => {
-  for(const id of ["lighter","grinder","papers","clean-glass","broken-bong","broken-pipe"]){
-    assert.match(gear,new RegExp('<symbol id="'+id+'"'));
-    assert.ok(game.includes('"'+id+'"'),"missing playable accessory "+id);
+test("all Arcade game accessories are represented by photographs, not SVG props", () => {
+  const media=read("shared/arcade-media.mjs");
+  const mini=read("arcade-games.js");
+  const arcade=read("arcade.html");
+  const polish=read("arcade-premium.css");
+  for(const id of ["lighter","grinder","papers","clean-glass","broken-bong","broken-pipe","leaf","bong"]){
+    assert.ok(media.includes(id+":" )||media.includes('"'+id+'":'),"missing photograph: "+id);
   }
-  assert.match(game,/createElementNS\("http:\/\/www\.w3\.org\/2000\/svg","svg"\)/);
-  assert.match(game,/assets\/sesh-gear\.svg#/);
+  assert.match(media,/createPhoto/);
+  assert.match(game,/media\?\.createPhoto/);
+  assert.match(game,/sesh-item-caption/);
+  assert.doesNotMatch(game,/createElementNS\("http:\/\/www\.w3\.org\/2000\/svg","svg"\)/);
+  assert.doesNotMatch(mini,/createElementNS|sesh-gear\.svg/);
+  assert.match(mini,/createPhoto\(kind/);
+  assert.match(arcade,/src="\/assets\/the420lobby-neon-lounge\.webp"/);
+  assert.doesNotMatch(arcade,/class="gear-collage"|class="memory-collage"|class="timing-orbit"|src="\/assets\/arcade-night\.svg"/);
+  assert.equal((arcade.match(/class="game-card-photo"/g)||[]).length,3);
+  assert.match(polish,/\.sesh-item-photo/);
+  assert.match(polish,/\.mini-art-photo/);
+  assert.match(polish,/prefers-reduced-motion/);
   assert.match(html,/COLLECT USEFUL GEAR/);
   assert.match(html,/AVOID BROKEN GLASS/);
   assert.match(html,/<details class="arcade-help">/);
-  assert.match(html,/class="arcade-play"/);
-  assert.match(html,/class="arcade-rules-strip"/);
   for(const name of ["lighter","grinder","papers"])assert.match(html,new RegExp('data-kit="'+name+'"'));
   assert.match(game,/querySelectorAll\("\.sesh-kit-tracker \[data-kit\]"\)/);
 });
@@ -382,4 +393,16 @@ test("lounge room buttons switch between four real scenes, not one fixed backgro
   const credits=read("credits.html");
   for(const source of ["The best gaming room","Empty Movie Theater","Man playing video games","Gamer friends playing video game"])
     assert.ok(credits.includes(source),"missing attribution: "+source);
+});
+
+test("tablet nav cannot appear open by CSS alone or remain open on browser restoration",()=>{
+  const reset=read("script.js");
+  const design=read("lobby-redesign.css");
+  assert.match(design, /@media \(min-width:761px\) and \(max-width:1050px\)/);
+  assert.match(design,/\.site-header \.header-shell \.desktop-nav:not\(\.open\)\{display:none\}/);
+  assert.match(design,/\.site-header \.header-shell \.desktop-nav\.open\{/);
+  assert.match(reset,/window\.addEventListener\("pageshow", closeMenu\)/);
+  assert.match(reset,/document\.addEventListener\("pointerdown"/);
+  assert.match(html,/src="\/script\.js\?v=20261018-tablet-nav3"/);
+  assert.match(html,/lobby-redesign\.css\?v=20261018-tablet-nav3/);
 });
