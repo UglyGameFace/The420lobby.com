@@ -108,20 +108,20 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .experience-card .card-link span{font-size:22px;color:var(--leaf)}
 .experience-card .card-glow{opacity:.22;pointer-events:none}
 .experience-grid>.shield-card .shield-feature-art{
-  display:grid;place-items:center;
-  background:radial-gradient(ellipse at 50% 50%,rgba(62,160,82,.24),transparent 70%),#0b2317
+  display:block;
+  background:#071711
 }
 .experience-grid>.shield-card .shield-feature-art::before{
-  content:"";position:absolute;inset:0;width:auto;aspect-ratio:auto;
-  border:0;border-radius:0;box-shadow:none;
-  background:radial-gradient(circle at center,rgba(130,251,129,.17),transparent 62%)
+  content:"";position:absolute;inset:0;z-index:1;width:auto;aspect-ratio:auto;
+  border:0;border-radius:0;box-shadow:none;pointer-events:none;
+  background:linear-gradient(180deg,rgba(2,16,9,.04) 42%,rgba(2,16,9,.46) 100%)
 }
-.experience-grid>.shield-card .dank-shield-brand-art{
-  position:relative!important;inset:auto!important;z-index:2;
-  width:min(76%,246px)!important;height:auto!important;max-height:91%!important;
-  aspect-ratio:1;object-fit:contain!important;opacity:1;
-  transform:none!important;animation:none!important;
-  filter:drop-shadow(0 15px 24px rgba(0,0,0,.45)) drop-shadow(0 0 18px rgba(84,222,89,.15))!important
+.experience-grid>.shield-card .dank-shield-weedtech-art{
+  display:block;position:absolute;inset:0;
+  width:100%;height:100%;max-width:none;max-height:none;
+  object-fit:cover;object-position:center 48%;
+  opacity:1;transform:none;animation:none;
+  filter:saturate(1.07) contrast(1.03)
 }
 .experience-card .card-info h3,.shield-feature-copy h3{overflow-wrap:normal;word-break:normal}
 .arcade-layout{display:grid;grid-template-columns:minmax(0,.68fr) minmax(0,1.32fr);align-items:start;gap:clamp(32px,5vw,78px)}
@@ -201,7 +201,6 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   .experience-card .card-body h3,.shield-feature-copy h3{font-size:clamp(61px,11vw,84px)}
   .experience-card .card-body{margin-top:17px}
   .shield-feature-copy h3{margin-top:17px}
-  .experience-grid>.shield-card .dank-shield-brand-art{width:min(73%,245px)!important}
   .arcade-layout{grid-template-columns:1fr;gap:12px}
   .arcade-heading{font-size:clamp(64px,14vw,92px)}
   .reality-section{min-height:620px}
@@ -221,7 +220,6 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   .experience-card .card-body h3,.shield-feature-copy h3{
     font-size:clamp(62px,16vw,78px)
   }
-  .experience-grid>.shield-card .dank-shield-brand-art{width:min(78%,215px)!important}
   .experience-card .card-link{padding-top:13px}
   .arcade-machine{border-radius:12px}
   .section-kicker span:last-child{display:none}

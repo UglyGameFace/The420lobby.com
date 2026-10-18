@@ -120,7 +120,7 @@ try {
     assert.ok(await page.locator(".leaf-seal img.seal-cannabis-photo").evaluate(img => img.complete && img.naturalWidth>0),
       "photographic Good Stuff badge leaf failed to load");
     await page.locator(".shield-card").scrollIntoViewIfNeeded();
-    const brand=page.locator(".shield-card img.dank-shield-brand-art");
+    const brand=page.locator(".shield-card img.dank-shield-weedtech-art");
     await brand.evaluate(img=>img.decode());
     // Test the actual responsive composition rather than a hardcoded 2:3
     // poster ratio. Media, text and CTA must remain readable at any width.
@@ -138,13 +138,16 @@ try {
         art:box(art),copy:box(copy),title:box(heading),cta:box(action),
         viewport:innerWidth,documentWidth:document.documentElement.scrollWidth};
     });
-    assert.ok(shieldGeometry.loaded,"approved logo asset failed to decode: "+JSON.stringify(shieldGeometry));
+    assert.ok(shieldGeometry.loaded,"weed-tech Shield artwork failed to decode: "+JSON.stringify(shieldGeometry));
     assert.ok(shieldGeometry.card.left>=-2 && shieldGeometry.card.right<=scenario.size.width+2,
       "Shield card overflows viewport: "+JSON.stringify(shieldGeometry));
     assert.ok(shieldGeometry.documentWidth<=scenario.size.width+2,
       "page has horizontal overflow: "+JSON.stringify(shieldGeometry));
-    assert.ok(shieldGeometry.img.width>=90 && shieldGeometry.img.height>=90,
-      "Shield logo is microscopic: "+JSON.stringify(shieldGeometry));
+    assert.ok(shieldGeometry.img.width>=160 && shieldGeometry.img.height>=170,
+      "Shield weed-tech artwork must fill the media well: "+JSON.stringify(shieldGeometry));
+    assert.ok(Math.abs(shieldGeometry.art.width-shieldGeometry.img.width)<=2 &&
+      Math.abs(shieldGeometry.art.height-shieldGeometry.img.height)<=2,
+      "Shield imagery must cover its dedicated visual well: "+JSON.stringify(shieldGeometry));
     assert.ok(shieldGeometry.title.width>80&&shieldGeometry.title.height>45,
       "Shield title collapsed: "+JSON.stringify(shieldGeometry));
     assert.ok(shieldGeometry.cta.height>=30,
