@@ -98,6 +98,21 @@ try {
     await page.keyboard.press("Escape");
     assert.equal(await page.locator("#login-dialog").evaluate(dialog => dialog.open), false);
     assert.equal(await page.locator(".hero-art img").evaluate(image => image.complete && image.naturalWidth > 0), true);
+    const heroFit=await page.locator(".hero-art img").evaluate(image=>{
+      const rect=image.getBoundingClientRect(),frame=image.closest(".hero-art").getBoundingClientRect();
+      return {fit:getComputedStyle(image).objectFit,intrinsic:image.naturalWidth/image.naturalHeight,
+        rendered:rect.width/rect.height,width:rect.width,height:rect.height,
+        frameWidth:frame.width,frameHeight:frame.height};
+    });
+    assert.equal(heroFit.fit,"contain",width+"px hero should never crop approved 420 wordmark");
+    assert.ok(Math.abs(heroFit.intrinsic-heroFit.rendered)<.025,
+      width+"px image distorted or crop-prone forced ratio: "+JSON.stringify(heroFit));
+    assert.ok(heroFit.width<=heroFit.frameWidth+2&&heroFit.height<=heroFit.frameHeight+2,
+      width+"px hero image extends beyond its frame: "+JSON.stringify(heroFit));
+    assert.ok(await page.locator(".game-card-photo").evaluateAll(images=>images.every(
+      image=>getComputedStyle(image).objectFit==="contain"
+    )),width+"px game card images must show full real equipment without cropping");
+
     const overflowDiagnostic = await page.evaluate(() => {
       const viewport=innerWidth;
       const overflow=document.documentElement.scrollWidth-viewport;
