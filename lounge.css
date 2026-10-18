@@ -253,3 +253,8 @@ html[data-lounge-theme="halloween"] .cheers-feature{--room-accent:#ffbd74;--room
  .cheers-feature .spark-target{width:116px;height:116px}
 }
 @media(prefers-reduced-motion:reduce){.lounge-teaser-link,.cheers-feature .spark-target{transition:none}}
+
+.spark-quick-rules{margin:0 0 14px;font:600 11px/1.6 "DM Sans",sans-serif;color:#d3e6cc}
+.spark-quick-rules b{color:var(--room-accent)}
+.spark-quick-rules a{color:var(--room-accent);display:inline-block;white-space:nowrap;margin-left:4px;text-decoration:underline;text-underline-offset:3px;font-weight:800}
+.spark-quick-rules a:focus-visible{outline:3px solid var(--room-accent);outline-offset:3px}
