@@ -103,6 +103,7 @@
  const onlineCount=document.getElementById("spark-online");
  const lookingCount=document.getElementById("spark-looking");
  const onlineToggle=document.getElementById("spark-presence-toggle");
+ const offlineButton=document.getElementById("spark-presence-leave");
  const calls=["LIGHT THE SPARK","PASS THE GLOW","KEEP IT LIT","FAN THE FLAME","DON'T BREAK THE CHAIN",
    "PASS IT FORWARD","LIGHTNING HANDS","KEEP THE COMBO","ONE MORE SPARK","CHEERS TO THE CREW"];
  const defaultRules={durationMs:42000,firstBeatMs:3000,beatIntervalMs:3800,beatOffsetsMs:[3000,6800,9500,12400,14950,17850,20400,24200,27800,32500],hitWindowMs:550,beatCount:10};
@@ -206,7 +207,9 @@
    onlineCount.textContent=String(data.onlinePlayers||0);
    lookingCount.textContent=String(data.lookingPlayers||0);
    onlineToggle.disabled=false;
-   onlineToggle.textContent=online?(looking?"LEAVE LOOKING LIST":"GO OFFLINE"):"JOIN ONLINE LOBBY";
+   onlineToggle.textContent=looking?"LEAVE LOOKING LIST":online?"LOOK FOR TEAMMATES":"GO ONLINE & FIND PLAYERS";
+   offlineButton.hidden=!online;
+   offlineButton.disabled=!available||heartbeatBusy;
    available=true;
    if(active?.id!==joinedRound&&joinedRound&&!active)setJoinedRound(null);
    signIn.hidden=true;
@@ -275,8 +278,14 @@
  onlineToggle.addEventListener("click",async()=>{
    if(heartbeatBusy)return;
    onlineToggle.disabled=true;
-   await publishPresence(!online,!online);
+   await publishPresence(true,!looking);
    onlineToggle.disabled=false;
+ });
+ offlineButton.addEventListener("click",async()=>{
+   if(heartbeatBusy||!online)return;
+   offlineButton.disabled=true;
+   await publishPresence(false,false);
+   offlineButton.disabled=false;
  });
  joinButton.addEventListener("click",async()=>{
    if(pending||!available)return;
