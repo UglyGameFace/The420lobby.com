@@ -9,7 +9,7 @@ export const publicFiles = [
   'lobby-redesign.css','brand-header.css','lounge.css','sesh-signal-v3.css','arcade.css','arcade-games.css','arcade-premium.css',
   'script.js','smoke-brand.js','lounge.js','visual-engine.js','sesh-loader.js','sesh-signal.js',
   'arcade-app.js','arcade-api.js','arcade-games.js','_headers','_routes.json',
-  'shared/arcade-rules.mjs','shared/arcade-media.mjs','assets/BarlowCondensed-ExtraBold.ttf,'assets/BarlowCondensed-OFL.txt'
+  'shared/arcade-rules.mjs','shared/arcade-media.mjs','assets/BarlowCondensed-ExtraBold.ttf','assets/BarlowCondensed-OFL.txt'
 ];
 await rm(output,{recursive:true,force:true});
 await mkdir(join(output,'assets'),{recursive:true});
