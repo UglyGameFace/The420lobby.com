@@ -30,12 +30,21 @@ try{
   for(const width of [390,960]){
     const page=await browser.newPage({viewport:{width,height:900},reducedMotion:"reduce"});
     const errors=[];page.on("pageerror",e=>errors.push(e.message));
-    let round=null,attempts=0;
-    await page.route(/\/api\/cheers(?:\/spark)?(?:\?.*)?$/,async route=>{
+    let round=null,attempts=0,online=false,looking=false;
+    await page.route(/\/api\/cheers(?:\/spark|\/presence)?(?:\?.*)?$/,async route=>{
       const req=route.request();
       let body;
       if(req.method()==="GET")body={serverTime:Date.now(),rules,round,gameReady:true,
-        setupPending:false,bestScore:340};
+        setupPending:false,bestScore:340,onlinePlayers:Number(online),lookingPlayers:Number(looking)};
+      else if(new URL(req.url()).pathname==="/api/cheers/presence"){
+        const payload=req.postDataJSON();
+        assert.equal(req.headers()["x-csrf-token"],"browser-csrf");
+        assert.equal(typeof payload.online,"boolean");
+        assert.equal(typeof payload.looking,"boolean");
+        online=payload.online;looking=payload.looking;
+        body={serverTime:Date.now(),rules,round,gameReady:true,bestScore:340,
+          onlinePlayers:Number(online),lookingPlayers:Number(looking),presence:{online,looking}};
+      }
       else if(new URL(req.url()).pathname==="/api/cheers"){
         assert.equal(req.headers()["x-csrf-token"],"browser-csrf");
         const now=Date.now();
@@ -62,8 +71,15 @@ try{
     assert.equal(await page.locator(".spark-step").count(),10);
     const bounds=await page.locator("#spark-arena").boundingBox();
     assert.ok(bounds&&bounds.x>=0&&bounds.x+bounds.width<=width+2,"Spark Relay clips on "+width);
+    assert.equal(await page.locator("#spark-online").textContent(),"0");
+    await page.locator("#spark-presence-toggle").click();
+    await page.waitForFunction(()=>document.querySelector("#spark-online")?.textContent==="1");
+    assert.equal(await page.locator("#spark-looking").textContent(),"1");
+    assert.equal(await page.locator("#spark-presence-toggle").textContent(),"LEAVE LOOKING LIST");
     await page.locator("#lounge-cheers-join").click();
     await page.waitForFunction(()=>document.querySelector("#spark-arena")?.dataset.phase==="live",{timeout:2000});
+    await page.waitForFunction(()=>document.querySelector("#spark-looking")?.textContent==="0");
+    assert.equal(await page.locator("#spark-online").textContent(),"1");
     assert.equal(await page.locator("#lounge-cheers-participants").textContent(),"2");
     assert.equal(await page.locator("#spark-score").textContent(),"0");
     assert.equal(await page.locator("#lounge-spark-button").isDisabled(),false,
