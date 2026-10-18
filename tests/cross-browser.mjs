@@ -68,6 +68,22 @@ try{
           throw new Error(name+"/"+width+" failed to load stylesheets: "+JSON.stringify({detail,cssFailures})+" "+String(error));
         }
         await page.locator("#hero-heading").waitFor({state:"visible"});
+        assert.equal(await page.locator(".lounge-hotspot").count(),4,name+" missing four game room markers");
+        await page.locator(".lounge-hotspot--profile").click();
+        assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"/arcade.html#profile",
+          name+" cannot select the player profile room");
+        await page.locator(".lounge-hotspot--profile").press("End");
+        assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"#join",
+          name+" End key does not select the final room");
+        await page.locator(".lounge-hotspot--crew").press("Home");
+        assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"/arcade.html",
+          name+" Home key does not select the first room");
+        const hitboxes=await page.locator(".lounge-hotspot").evaluateAll(buttons=>buttons.map(button=>{
+          const b=button.getBoundingClientRect();return {width:b.width,height:b.height};
+        }));
+        assert.ok(hitboxes.every(b=>b.width>=44&&b.height>=44),
+          name+"/"+width+" has a room hotspot smaller than 44px: "+JSON.stringify(hitboxes));
+
         await page.locator(".brand-smoke-image").evaluate(img=>img.decode());
         assert.equal(await page.locator(".brand-smoke-image").evaluate(el=>el.complete && el.naturalWidth>0),true,name+" failed animated smoke load");
         const countPaintedPixels = async locator => locator.evaluate(img => {
