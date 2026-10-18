@@ -360,3 +360,26 @@ test("arcade styles support keyboard focus, reduced motion and narrow screens", 
   }
   assert.equal(depth, 0, "unmatched arcade CSS opening brace");
 });
+
+
+test("lounge room buttons switch between four real scenes, not one fixed background",()=>{
+  const lounge=read("lounge.js"),styles=read("lounge.css");
+  const buttons=[...html.matchAll(/<button\b[^>]*class="lounge-hotspot lounge-hotspot--[^"]+"[^>]*>/g)].map(m=>m[0]);
+  assert.equal(buttons.length,4,"there must be exactly four selectable scenes");
+  const sceneImages=buttons.map(button=>button.match(/data-room-image="([^"]+)"/)?.[1]);
+  assert.ok(sceneImages.every(Boolean),"every scene must have a real image");
+  assert.equal(new Set(sceneImages).size,4,"the four scenes must not all use the same photograph");
+  for(const button of buttons){
+    assert.match(button,/data-room-key="[^"]+"/);
+    assert.match(button,/data-room-alt="[^"]+"/);
+  }
+  assert.match(html,/<img\b[^>]*id="lounge-scene-photo"/);
+  assert.match(lounge,/sceneImage\.setAttribute\("src",nextImage\)/);
+  assert.match(lounge,/sceneImage\.alt=button\.dataset\.roomAlt/);
+  assert.match(lounge,/sceneImage\.addEventListener\("error"/);
+  assert.doesNotMatch(styles,/\.lounge-scene-photo\{[^}]*background:[^}]*url\(/,
+    "do not render the same hardcoded photo over every selection");
+  const credits=read("credits.html");
+  for(const source of ["The best gaming room","Empty Movie Theater","Man playing video games","Gamer friends playing video game"])
+    assert.ok(credits.includes(source),"missing attribution: "+source);
+});

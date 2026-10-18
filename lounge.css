@@ -10,18 +10,37 @@ html[data-lounge-theme="halloween"] .lounge-lab{--room-accent:#ffbd74;--room-glo
 .lounge-eyebrow{font:700 11px/1.4 "DM Sans",sans-serif;letter-spacing:.16em;color:var(--room-accent);margin-bottom:18px}
 .lounge-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:20px;align-items:stretch}
 .lounge-room,.lounge-moods,.lounge-cheers{border:1px solid var(--room-border);border-radius:20px;overflow:hidden;background:#0e1b15}
-.lounge-room{min-height:630px;display:flex;flex-direction:column;position:relative;isolation:isolate;padding:clamp(18px,3vw,32px);background:linear-gradient(160deg,rgba(7,16,15,.68),rgba(6,17,11,.88)),url("/assets/the420lobby-neon-lounge.webp") center/cover no-repeat}
+.lounge-room{min-width:0;min-height:0;display:flex;flex-direction:column;position:relative;isolation:isolate;padding:clamp(18px,3vw,32px);background:linear-gradient(160deg,#14231c,#07120d)}
 .lounge-room::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 45% 15%,var(--room-glow),transparent 60%);pointer-events:none}
 .lounge-room-heading,.lounge-room-footer,.lounge-control-head{display:flex;align-items:center;justify-content:space-between;gap:12px;font:700 11px/1.4 "DM Sans",sans-serif;letter-spacing:.12em}
 .lounge-room-heading,.lounge-room-footer{color:#d7eddb}
 .lounge-room-heading .lamp{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--room-accent);box-shadow:0 0 18px var(--room-accent);margin-right:8px}
-.lounge-doors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:auto 0;padding:34px 0}
-.lounge-door{position:relative;display:flex;flex-direction:column;align-items:flex-start;min-width:0;min-height:160px;border-radius:12px;padding:20px 16px;gap:10px;text-decoration:none;color:#f5f8ee;background:rgba(8,22,17,.84);border:1px solid rgba(195,239,205,.22);backdrop-filter:blur(9px);transition:border-color .2s,transform .2s,background .2s}
-.lounge-door:hover,.lounge-door:focus-visible{border-color:var(--room-accent);background:rgba(17,40,27,.94);transform:translateY(-2px)}
-.lounge-door-index{font:700 10px/1.3 "DM Sans",sans-serif;color:var(--room-accent);letter-spacing:.11em}
-.lounge-door strong{font:800 clamp(24px,2.7vw,42px)/.98 "Barlow Condensed",sans-serif;letter-spacing:.015em}
-.lounge-door small{font:500 12px/1.5 "DM Sans",sans-serif;color:#c7d4c9;padding-right:12px}
-.lounge-door .arrow{position:absolute;right:14px;top:17px;font-size:21px;color:var(--room-accent)}
+/* Picture-backed scene: absolute markers on wide screens, usable buttons below it on touch layouts. */
+.lounge-scene{position:relative;min-width:0;aspect-ratio:1024/683;border:1px solid var(--room-border);border-radius:13px;overflow:hidden;margin:24px 0 12px;isolation:isolate;background:#112018}
+.lounge-scene-photo{display:block;position:absolute;inset:0;z-index:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center;filter:brightness(.67) saturate(.95);opacity:0;transition:opacity .24s ease}
+.lounge-scene-photo[data-photo-state="ready"]{opacity:1}
+.lounge-scene[data-active-room="cinema"]{background:#1e1619}
+.lounge-scene[data-active-room="profile"]{background:#111d25}
+.lounge-scene[data-active-room="crew"]{background:#1c211a}
+.lounge-photo-status{margin:0 0 12px;font:600 11px/1.5 "DM Sans",sans-serif;color:var(--room-accent)}
+.lounge-photo-status[hidden]{display:none}
+.lounge-doors{position:absolute;inset:0;z-index:2}
+.lounge-hotspot{position:absolute;z-index:1;display:flex;align-items:center;gap:8px;min-height:44px;min-width:44px;padding:7px 10px 7px 7px;border:1px solid rgba(233,255,227,.56);border-radius:25px;color:#fff;background:rgba(8,19,14,.87);backdrop-filter:blur(7px);cursor:pointer;box-shadow:0 3px 15px rgba(0,0,0,.36);font:800 11px/1.1 "DM Sans",sans-serif;letter-spacing:.055em;transition:background .16s,border-color .16s,transform .16s;text-align:left}
+.lounge-hotspot[aria-pressed="true"],.lounge-hotspot:hover{border-color:var(--room-accent);background:rgba(7,28,16,.96);color:var(--room-accent)}
+.lounge-hotspot:focus-visible{outline:3px solid var(--room-accent);outline-offset:4px}
+.lounge-hotspot-pin{flex:none;display:flex;align-items:center;justify-content:center;width:31px;height:31px;border-radius:50%;color:#05100a;background:var(--room-accent);font-size:12px;box-shadow:0 0 13px var(--room-glow)}
+.lounge-hotspot--arcade{top:26%;left:3%}
+.lounge-hotspot--cinema{top:13%;left:37%}
+.lounge-hotspot--profile{bottom:17%;left:22%}
+.lounge-hotspot--crew{top:37%;right:3%}
+.lounge-room-preview{display:flex;justify-content:space-between;align-items:center;gap:18px;min-width:0;padding:18px 0 14px;border-top:1px solid var(--room-border)}
+.lounge-room-preview-copy{min-width:0}
+.lounge-preview-eyebrow{font:800 9px/1.5 "DM Sans",sans-serif;letter-spacing:.15em;color:var(--room-accent)}
+.lounge-room-preview h3{margin:4px 0 6px;font:800 clamp(25px,2.8vw,40px)/1 "Barlow Condensed",sans-serif;color:#fff}
+.lounge-room-preview p{font:500 12px/1.55 "DM Sans",sans-serif;color:#ccddcc;max-width:360px}
+.lounge-preview-link{flex-shrink:0;display:block;min-width:112px;padding:12px 13px;border-radius:9px;background:var(--room-accent);color:#09140c;text-decoration:none;text-align:center;font:800 10px/1.4 "DM Sans",sans-serif;letter-spacing:.045em}
+.lounge-photo-credit{font:500 10px/1.5 "DM Sans",sans-serif;color:#abc0af;margin:0 0 14px}
+.lounge-photo-credit a{color:var(--room-accent)}
 .lounge-secret{font-size:23px;line-height:1;color:var(--room-accent);background:rgba(5,15,10,.8);border:1px solid var(--room-border);border-radius:50%;width:44px;height:44px;cursor:pointer}
 .lounge-secret-message{font:600 12px/1.4 "DM Sans",sans-serif;color:var(--room-accent);min-height:16px;margin:7px 0 0}
 .lounge-side{display:grid;grid-template-rows:auto 1fr;gap:20px;min-width:0}
@@ -50,11 +69,23 @@ html[data-lounge-theme="halloween"] .lounge-lab{--room-accent:#ffbd74;--room-glo
 .lounge-cheers-button:disabled{cursor:not-allowed;opacity:.55}
 .lounge-signin{margin-top:8px;background:transparent;border:1px solid var(--room-accent);color:var(--room-accent)}
 .lounge-signin[hidden]{display:none}
-@media(max-width:1050px){.lounge-layout{grid-template-columns:minmax(0,1fr) minmax(290px,.8fr)}.lounge-room{min-height:600px}.lounge-doors{grid-template-columns:1fr}.lounge-door{min-height:110px}}
-@media(max-width:760px){.lounge-intro,.lounge-layout{grid-template-columns:1fr}.lounge-room{min-height:460px;padding:20px}.lounge-doors{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:24px 0}.lounge-door{min-height:142px;padding:16px 12px}.lounge-door strong{font-size:clamp(24px,7vw,35px)}.lounge-side{grid-template-rows:auto auto}}
-@media(max-width:360px){.lounge-doors{grid-template-columns:1fr}.lounge-door{min-height:94px}.lounge-room-heading{font-size:9px}}
-@media(prefers-reduced-motion:reduce){.lounge-door,.lounge-cheers-progress span{transition:none}.lounge-door:hover{transform:none}}
-html.fx-off .lounge-door{transition:none}
+@media(max-width:1100px){
+ .lounge-scene{aspect-ratio:auto;overflow:visible;border:0;background:transparent}
+ .lounge-scene-photo{position:relative;inset:auto;height:auto;width:100%;aspect-ratio:1024/683;border:1px solid var(--room-border);border-radius:11px;overflow:hidden}
+ .lounge-doors{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-top:12px}
+ .lounge-hotspot{position:static;min-width:0;min-height:58px;border-radius:11px;padding:8px;box-shadow:none}
+ .lounge-hotspot strong{overflow-wrap:anywhere}
+}
+@media(max-width:760px){
+ .lounge-intro,.lounge-layout{grid-template-columns:1fr}
+ .lounge-room{padding:20px}
+ .lounge-side{grid-template-rows:auto auto}
+ .lounge-room-preview{flex-wrap:wrap}
+ .lounge-preview-link{min-height:44px}
+}
+@media(max-width:360px){.lounge-doors{grid-template-columns:1fr}.lounge-room-heading{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.lounge-hotspot,.lounge-cheers-progress span,.lounge-scene-photo{transition:none}}
+html.fx-off .lounge-hotspot,html.fx-off .lounge-scene-photo{transition:none}
 
 /* Atmospheres tint the full homepage. The real 420/CHEERS imagery never gets filters or cheap movement. */
 html[data-lounge-theme="midnight"]{--leaf:#b7c8fa;--mint:#a1c4ec;--stroke:rgba(174,199,254,.24)}

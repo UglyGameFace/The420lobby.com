@@ -33,6 +33,58 @@
    if(taps<4){secretMessage.textContent=["Something is hidden…","Two more taps.","Almost there…"][taps-1];return;}
    taps=0;setTheme("halloween");secretMessage.textContent="Secret found: After Dark atmosphere activated. ✳";
  });
+ /* One authoritative set of hotspot metadata lives on the existing room controls. */
+ const spots=Array.from(section.querySelectorAll(".lounge-hotspot"));
+ const roomTitle=document.getElementById("lounge-preview-title");
+ const roomCopy=document.getElementById("lounge-preview-description");
+ const roomLink=document.getElementById("lounge-preview-link");
+ const scene=section.querySelector(".lounge-scene");
+ const sceneImage=document.getElementById("lounge-scene-photo");
+ const photoStatus=document.getElementById("lounge-photo-status");
+ function showPhoto(){
+   sceneImage.dataset.photoState="ready";
+   photoStatus.hidden=true;
+   photoStatus.textContent="";
+ }
+ sceneImage.addEventListener("load",showPhoto);
+ sceneImage.addEventListener("error",()=>{
+   sceneImage.dataset.photoState="error";
+   photoStatus.textContent="The selected room photo couldn't load. Try another room or check your connection.";
+   photoStatus.hidden=false;
+ });
+ if(sceneImage.complete&&sceneImage.naturalWidth>0)showPhoto();
+ function selectSpot(button){
+   if(!spots.includes(button))return;
+   spots.forEach(item=>item.setAttribute("aria-pressed",String(item===button)));
+   roomTitle.textContent=button.dataset.roomTitle;
+   roomCopy.textContent=button.dataset.roomCopy;
+   roomLink.setAttribute("href",button.dataset.roomHref);
+   scene.dataset.activeRoom=button.dataset.roomKey;
+   const nextImage=button.dataset.roomImage;
+   if(sceneImage.getAttribute("src")!==nextImage){
+     sceneImage.dataset.photoState="loading";
+     photoStatus.hidden=true;
+     photoStatus.textContent="";
+     sceneImage.alt=button.dataset.roomAlt;
+     sceneImage.setAttribute("src",nextImage);
+     if(sceneImage.complete&&sceneImage.naturalWidth>0)showPhoto();
+   }
+ }
+ spots.forEach((button,index)=>{
+   button.addEventListener("click",()=>selectSpot(button));
+   button.addEventListener("keydown",event=>{
+     let next=null;
+     if(event.key==="ArrowRight"||event.key==="ArrowDown")next=spots[(index+1)%spots.length];
+     if(event.key==="ArrowLeft"||event.key==="ArrowUp")next=spots[(index+spots.length-1)%spots.length];
+     if(event.key==="Home")next=spots[0];
+     if(event.key==="End")next=spots[spots.length-1];
+     if(!next)return;
+     event.preventDefault();
+     selectSpot(next);
+     next.focus();
+   });
+ });
+ if(spots.length)selectSpot(spots[0]);
  let api=null,session=null,active=null,serverOffset=0,available=false,pending=false;
  function render(){
    const remaining=active?Math.max(0,Math.ceil((active.endsAt-Date.now()-serverOffset)/1000)):0;
