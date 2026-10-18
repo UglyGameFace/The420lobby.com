@@ -25,7 +25,7 @@
     "broken-pipe":"Broken glass pipe"
   };
   const elements = new Map();
-  let api, rules, engine, session, run, events = [], started = 0, raf = 0;
+  let api, rules, media, engine, session, run, events = [], started = 0, raf = 0;
   let mode = "loading", best = 0, score = 0, soundOn = false, audioContext;
   let snapshot = null, finishPayload = null, pauseTimeout = 0;
   let generation = 0, lastAnnouncedTime = -1, savedScore = false;
@@ -120,11 +120,13 @@
         element.dataset.targetId = String(target.id);
         element.setAttribute("aria-label", ITEM_LABELS[target.kind] + (isHazard(target.kind) ? ", avoid clicking" : ", tap to collect"));
         element.title = ITEM_LABELS[target.kind] + (isHazard(target.kind) ? " · BROKEN · AVOID" : " · COLLECT");
-        const symbol = document.createElementNS("http://www.w3.org/2000/svg","svg");
-        symbol.setAttribute("class","sesh-item-art"); symbol.setAttribute("viewBox","0 0 100 100"); symbol.setAttribute("aria-hidden","true");
-        const use = document.createElementNS("http://www.w3.org/2000/svg","use");
-        use.setAttribute("href","/assets/sesh-gear.svg#" + target.kind);
-        symbol.append(use); element.append(symbol);
+        const photo = media?.createPhoto(target.kind,"sesh-item-art sesh-item-photo");
+        if(photo) element.append(photo);
+        const caption = document.createElement("span");
+        caption.className = "sesh-item-caption";
+        caption.textContent = ITEM_LABELS[target.kind];
+        caption.setAttribute("aria-hidden","true");
+        element.append(caption);
         element.style.left = target.x + "%"; element.style.top = target.y + "%";
         element.addEventListener("click", () => catchTarget(target));
         elements.set(target.id, element); layer.append(element);
@@ -283,8 +285,8 @@
   });
   window.addEventListener("pagehide", () => pause("Session paused. Resume within two minutes."));
   updateHud();
-  Promise.all([import("/arcade-api.js"), import("/shared/arcade-rules.mjs")]).then(async modules => {
-    [api, rules] = modules; await checkSession(); mode = "idle";
+  Promise.all([import("/arcade-api.js"), import("/shared/arcade-rules.mjs"), import("/shared/arcade-media.mjs").catch(() => null)]).then(async modules => {
+    [api, rules, media] = modules; await checkSession(); mode = "idle";
     if (!session.user) overlayMessage("DISCORD REQUIRED", "Sign in securely with Discord before starting a round. Scores and achievements save to your profile.");
     updateHud();
   }).catch(error => {

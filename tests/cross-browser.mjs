@@ -38,7 +38,7 @@ try{
     let browser;
     try{
       browser=await engine.launch({headless:true,executablePath:name === "chromium" ? process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined : undefined});
-      for(const width of [390,1440]){
+      for(const width of [390,960,1051,1440]){
         const mobile=width===390;
         const page=await browser.newPage({viewport:{width,height:mobile?844:900},reducedMotion:"reduce"});
         const errors=[];
@@ -68,6 +68,12 @@ try{
           throw new Error(name+"/"+width+" failed to load stylesheets: "+JSON.stringify({detail,cssFailures})+" "+String(error));
         }
         await page.locator("#hero-heading").waitFor({state:"visible"});
+        const collapsed=width<=1050;
+        assert.equal(await page.locator("#primary-nav").isVisible(),!collapsed,
+          name+"/"+width+" initial menu visibility disagrees with breakpoint");
+        assert.equal(await page.locator("#menu-toggle").getAttribute("aria-expanded"),"false",
+          name+"/"+width+" initial aria-expanded must be false");
+
         assert.equal(await page.locator(".lounge-hotspot").count(),4,name+" missing four game room markers");
         const roomImage=page.locator("#lounge-scene-photo");
         const originalRoomImage=await roomImage.getAttribute("src");

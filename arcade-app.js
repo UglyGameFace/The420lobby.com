@@ -1,3 +1,10 @@
+/* Media errors are cosmetic: keep the verified games accessible and the
+   locally hosted lounge artwork visible even when Wikimedia is unreachable. */
+document.querySelectorAll(".game-card-photo").forEach(img=>{
+  const fallback=()=>{img.hidden=true;img.closest(".game-art")?.classList.add("artwork-fallback");};
+  img.addEventListener("error",fallback,{once:true});
+  if(img.complete&&!img.naturalWidth)fallback();
+});
 import {ACHIEVEMENTS} from '/shared/arcade-rules.mjs';
 /* The 420 Lobby arcade shell. Identity and scores always come from the API. */
 const byId = id => document.getElementById(id);

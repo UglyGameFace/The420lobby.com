@@ -32,6 +32,7 @@ jobs:
           node --check arcade-app.js
           node --check arcade-games.js
           node --check shared/arcade-rules.mjs
+          node --check shared/arcade-media.mjs
           find functions -type f \( -name '*.mjs' -o -name '*.js' \) -exec node --check {} \;
       - name: Site, gameplay, authentication and persistence regression tests
         run: node --test tests/*.test.mjs

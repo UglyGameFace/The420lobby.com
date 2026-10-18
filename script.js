@@ -78,9 +78,17 @@
       menuButton.setAttribute("aria-expanded", String(open));
       menuButton.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
     });
+    // Restored pages/tabs may retain stale menu classes. Always start closed.
+    closeMenu();
+    window.addEventListener("pageshow", closeMenu);
     menu.querySelectorAll("a").forEach(function(link) { link.addEventListener("click",closeMenu); });
     document.addEventListener("keydown", function(event) { if (event.key === "Escape") closeMenu(); });
-    window.addEventListener("resize", function() { if (window.innerWidth > 1050) closeMenu(); }, {passive:true});
+    document.addEventListener("pointerdown", function(event) {
+      if (menu.classList.contains("open") && !menu.contains(event.target) && !menuButton.contains(event.target)) closeMenu();
+    });
+    window.addEventListener("resize", function() {
+      if (window.innerWidth > 1050) closeMenu();
+    }, {passive:true});
   }
 
   function updateScroll() {

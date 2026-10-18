@@ -68,13 +68,23 @@ let browser;
 try {
   browser = await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,args:["--no-sandbox"]});
   await mkdir("artifacts", {recursive:true});
-  for (const width of [320,390,820,1440]) {
+  for (const width of [320,390,560,820,950,960,1051,1440]) {
     const page = await browser.newPage({viewport:{width,height:width < 800 ? 844 : 1000},reducedMotion:"reduce"});
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
     const state = await fixture(page, false);
     await page.goto(address + "/arcade.html", {waitUntil:"domcontentloaded"});
     await page.waitForFunction(() => document.querySelector("#auth-status")?.textContent !== "Checking sign-in availability…");
+    assert.equal(await page.locator(".game-card-photo").count(),3,
+      width+"px landing game cards must use photographs instead of SVG collages");
+    assert.equal(await page.locator(".hero-art img").getAttribute("src"),"/assets/the420lobby-neon-lounge.webp");
+    const artSizing=await page.locator(".game-card .game-art").evaluateAll(wells=>wells.map(well=>{
+      const rect=well.getBoundingClientRect(), img=well.querySelector(".game-card-photo");
+      return {width:rect.width,height:rect.height,source:img?.getAttribute("src"),
+        hasLocalFallback:getComputedStyle(well).backgroundImage.includes("the420lobby-neon-lounge.webp")};
+    }));
+    assert.ok(artSizing.every(x=>x.width>=150&&x.height>=120&&x.hasLocalFallback),
+      width+"px game card must remain visible with or without third-party photo: "+JSON.stringify(artSizing));
     await page.locator('[data-filter="memory"]').click();
     assert.equal(await page.locator(".game-card:visible").count(), 1, "memory filter must show one game");
     await page.locator('[data-filter="all"]').click();
@@ -88,8 +98,19 @@ try {
     await page.keyboard.press("Escape");
     assert.equal(await page.locator("#login-dialog").evaluate(dialog => dialog.open), false);
     assert.equal(await page.locator(".hero-art img").evaluate(image => image.complete && image.naturalWidth > 0), true);
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
-    assert.ok(overflow <= 2, width + "px arcade has horizontal overflow: " + overflow);
+    const overflowDiagnostic = await page.evaluate(() => {
+      const viewport=innerWidth;
+      const overflow=document.documentElement.scrollWidth-viewport;
+      const out=[...document.querySelectorAll("body *")].map(element=>{
+        const rect=element.getBoundingClientRect();
+        return {selector:element.tagName.toLowerCase()+(element.id?"#"+element.id:"")+
+          (typeof element.className==="string"?"."+element.className.trim().split(/\\s+/).slice(0,2).join("."):""),
+          left:Math.round(rect.left),right:Math.round(rect.right),width:Math.round(rect.width)};
+      }).filter(r=>r.right>viewport+2||r.left< -2).sort((a,b)=>b.right-a.right).slice(0,15);
+      return {overflow,out};
+    });
+    if(width===820)await page.screenshot({path:"artifacts/arcade-debug-820.png",fullPage:true,animations:"disabled"});
+    assert.ok(overflowDiagnostic.overflow <= 2, width + "px arcade has horizontal overflow: "+JSON.stringify(overflowDiagnostic));
     assert.equal(await page.locator('.community-card[href="/#experiences"]').count(), 1);
     assert.equal(await page.locator('.community-card[href="/#after-dark"]').count(), 1);
     await page.screenshot({path:"artifacts/arcade-guest-" + width + ".png",fullPage:true,animations:"disabled"});
@@ -112,6 +133,7 @@ try {
   await page.locator(".mini-start").click();
   await page.waitForFunction(() => document.querySelector(".mini-game")?.dataset.mode === "playing");
   await page.clock.runFor(125);
+  assert.equal(await page.locator(".mini-card-front img.mini-art-photo").count(),12,"memory cards must use photographic item art");
   await page.locator(".mini-pause").click();
   assert.equal(await page.locator(".mini-game").getAttribute("data-mode"), "paused");
   const frozen = await page.locator(".mini-timer").textContent();
@@ -150,6 +172,7 @@ try {
   await page.waitForFunction(() => document.querySelector(".mini-game")?.dataset.mode === "playing");
   const target = createGame("bong-blitz", "browser-integration-seed").targets[0];
   await page.clock.runFor(target.sweetAt + 10);
+  assert.ok(await page.locator(".mini-target img.mini-art-photo").count()>0,"timing target should be a photo, not a fake glass SVG");
   await page.locator('.mini-target[data-target-id="' + target.id + '"]').evaluate(button => button.click());
   assert.ok(Number(await page.locator(".mini-score").textContent()) > 0, "timed tap should award points");
   await page.clock.runFor(31000);

@@ -41,6 +41,9 @@ try {
   for (const scenario of [
     {name:"desktop",size:{width:1440,height:900},mobile:false},
     {name:"tablet",size:{width:820,height:1024},mobile:false},
+    {name:"tablet-960",size:{width:960,height:1200},mobile:false},
+    {name:"tablet-1050",size:{width:1050,height:900},mobile:false},
+    {name:"desktop-edge-1051",size:{width:1051,height:900},mobile:false},
     {name:"mobile",size:{width:390,height:844},mobile:true},
     {name:"samsung-mobile",size:{width:412,height:915},mobile:true},
     {name:"compact-mobile",size:{width:360,height:740},mobile:true},
@@ -60,6 +63,27 @@ try {
     const initialHeroOpacity = await page.locator("#hero-heading").evaluate(el=>getComputedStyle(el).opacity);
     assert.equal(initialHeroOpacity,"1","hero text must be readable immediately, not hidden behind scroll observer");
     assert.equal(await page.title(),"The 420 Lobby | After Cheers, We Play");
+    const tabletOrPhone=scenario.size.width<=1050;
+    const nav=page.locator("#primary-nav"), menuButton=page.locator("#menu-toggle");
+    assert.equal(await menuButton.getAttribute("aria-expanded"),"false",
+      scenario.name+" navigation must start closed");
+    assert.equal(await nav.isVisible(),!tabletOrPhone,
+      scenario.name+" navigation panel displayed without being opened");
+    if(tabletOrPhone){
+      assert.equal(await menuButton.isVisible(),true,scenario.name+" hamburger is hidden");
+      await menuButton.click();
+      assert.equal(await nav.isVisible(),true,scenario.name+" menu should open on tap");
+      assert.equal(await menuButton.getAttribute("aria-expanded"),"true");
+      await page.locator(".logo").click();
+      assert.equal(await nav.isVisible(),false,scenario.name+" outside tap should dismiss nav");
+      await menuButton.click();
+      await page.evaluate(()=>window.dispatchEvent(new Event("pageshow")));
+      assert.equal(await nav.isVisible(),false,scenario.name+" BFCache restore should reset nav");
+      await menuButton.click();
+      await page.keyboard.press("Escape");
+      assert.equal(await nav.isVisible(),false,scenario.name+" Escape should dismiss nav");
+    }
+
     assert.equal(await page.locator(".experience-card").count(),4);
 
     assert.equal(await page.locator("#interactive-lounge").count(),1,"interactive lounge missing");
