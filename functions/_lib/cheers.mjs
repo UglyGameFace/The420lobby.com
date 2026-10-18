@@ -161,8 +161,8 @@ export async function cheersPresence(request,env){
   if(typeof body.online!=="boolean"||typeof body.looking!=="boolean"||
      (!body.online&&body.looking))
     throw new HttpError(400,"invalid_presence","Choose a valid online and looking status.");
-  await rateLimit(env,"cheers:presence:"+session.user.id,160,3600);
-  await prepareGame(env);
+  await rateLimit(env,"cheers:presence:"+session.user.id,300,3600);
+  if(!(await tableNames(env)).has("cheers_presence"))await prepareGame(env);
   const now=Date.now();
   if(body.online){
     await env.DB.prepare(
