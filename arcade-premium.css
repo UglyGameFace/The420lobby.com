@@ -1,0 +1,78 @@
+/* The 420 Lobby Arcade: photographic, brand-matched visuals.
+   No WebGL requirement, no SVG paraphernalia, no score/runtime alterations.
+   Existing site WebP makes gameplay visually complete even if Wikimedia
+   thumbnails are blocked or slow on a visitor's network. */
+:root{--bg:#08120f;--panel:#10221b;--ink:#f0f6eb;--muted:#b7cbbb;--lime:#b7f184;--purple:#e9b68b;--line:rgba(190,242,177,.21)}
+body{background:radial-gradient(ellipse 75% 30% at 55% 4%,rgba(67,123,82,.18),transparent 75%),#08120f}
+.arcade-header{background:rgba(7,18,13,.94);border-bottom-color:rgba(178,247,174,.21)}
+.arcade-hero{gap:clamp(22px,4vw,72px)}
+.hero-copy h1>span{color:#9deda6}
+.hero-description{color:#bfd0bf}
+.hero-art{margin:0;min-width:0;overflow:hidden;isolation:isolate;border-radius:23px;border:1px solid rgba(189,249,178,.18);background:#13241b;aspect-ratio:1.33;box-shadow:0 22px 55px rgba(0,0,0,.35)}
+.hero-art img{width:100%;height:100%;max-height:none;object-fit:cover;object-position:center;filter:brightness(.8) saturate(.95)}
+.hero-art:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 65%,rgba(8,16,10,.73));z-index:0;pointer-events:none}
+.hero-art .art-sticker,.hero-art .art-coordinate{z-index:1}
+.hero-art .art-sticker{border-radius:8px;box-shadow:0 8px 24px #0008}
+.marquee{border-color:rgba(190,242,177,.24);background:rgba(124,175,116,.08)}
+.game-card{border-radius:17px;border-color:rgba(177,232,170,.25);background:linear-gradient(150deg,#152a1f,#0d1c17);box-shadow:0 15px 36px rgba(0,0,0,.2)}
+.game-card:hover,.game-card:focus-within{border-color:var(--lime);box-shadow:0 20px 48px rgba(0,0,0,.36)}
+.game-card .game-art{height:clamp(210px,22vw,285px);background:linear-gradient(150deg,#25442c,#07150f),url("/assets/the420lobby-neon-lounge.webp") center/cover no-repeat;isolation:isolate;overflow:hidden}
+.game-art .game-card-photo{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center;filter:brightness(.75) saturate(.88) contrast(1.08);transition:transform .28s ease,filter .28s ease}
+.game-art .game-card-photo:not([src]){display:none}
+.game-card:hover .game-card-photo{transform:scale(1.025);filter:brightness(.83) saturate(.95)}
+.game-art:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(5,17,12,.23),rgba(5,17,12,.1) 40%,rgba(5,17,12,.92) 100%)}
+.game-art .game-badge,.game-art .art-number,.game-art .art-word,.game-art .game-photo-label{z-index:2}
+.game-art .game-badge{font-size:9px;border-radius:7px;padding:8px 11px;background:rgba(6,19,13,.87);border:1px solid rgba(201,241,196,.34);color:#d9ffdb}
+.game-art .art-number{font-size:13px;color:#ecffcf;font-weight:900;text-shadow:0 2px 12px #000}
+.game-art .art-word{font-size:clamp(36px,3.1vw,52px);bottom:20px;text-shadow:0 4px 15px #000}
+.game-photo-label{position:absolute;z-index:2;left:20px;bottom:22px;right:18px;font:900 clamp(15px,1.75vw,23px)/1.1 "Barlow Condensed",Impact,sans-serif;letter-spacing:.12em;color:#effde5;text-shadow:0 2px 13px #000}
+.sesh-art .game-photo-label{bottom:94px;font-size:11px;letter-spacing:.15em;color:#b9f6a2}
+.memory-art .game-card-photo{object-position:center 53%}
+.blitz-art .game-card-photo{object-position:center 40%}
+.game-card-copy{padding:clamp(20px,2vw,29px)}
+.game-card h3{font-size:clamp(30px,3vw,41px)}
+.game-card-copy>p{color:#c5d4c6;min-height:0}
+.play-link{color:#e4f8df}
+.play-link>span,.game-meta{color:#b8efa4}
+.signin-banner{background:linear-gradient(120deg,#1d3625,#142019);border:1px solid rgba(190,242,177,.27);border-radius:15px}
+.button,.button-purple{border-radius:11px}
+/* Gameplay uses a realistic environment, with separate legible HUD and target states. */
+.mini-game{--mini-green:#baff87;--mini-purple:#f2bb82;--mini-muted:#b6cdb8;color:#eaf7e8}
+.mini-hud{border-color:rgba(174,239,154,.38);background:linear-gradient(120deg,#153124,#1b281e);border-radius:15px 15px 0 0}
+.mini-metric{border-color:rgba(187,243,173,.22)}
+.mini-metric>span{color:#cce1c7}
+.mini-board{background:linear-gradient(150deg,rgba(5,19,13,.67),rgba(8,20,15,.81)),url("/assets/the420lobby-neon-lounge.webp") center/cover no-repeat;border-color:rgba(184,247,177,.36);border-radius:0 0 16px 16px}
+.mini-board::before{opacity:.15}
+.mini-overlay{background:linear-gradient(135deg,rgba(7,23,15,.91),rgba(8,20,17,.95))}
+.mini-overlay-title{color:#c1f7a3}
+.mini-art-photo{display:block;width:100%;height:100%;border-radius:9px;object-fit:cover;object-position:center;filter:saturate(.87) contrast(1.08)}
+.mini-art-photo[hidden]{display:none}
+.mini-memory-board{padding:clamp(10px,2vw,22px)}
+.mini-cards{gap:clamp(7px,1vw,13px)}
+.mini-card{border-radius:13px;border:1px solid rgba(182,240,155,.43);background:linear-gradient(140deg,rgba(14,41,26,.97),rgba(5,20,14,.99));overflow:hidden;box-shadow:0 5px 20px rgba(0,0,0,.22)}
+.mini-card-back{transform:none;color:#bff5ae;font-size:clamp(25px,4vw,40px)}
+.mini-card-back:after{content:"";position:absolute;inset:12px;border:1px solid rgba(193,249,161,.18);border-radius:9px;pointer-events:none}
+.mini-card.is-open{background:#142c1e;border-color:#b6fb9e}
+.mini-card.is-matched{border-color:#ceff9c;box-shadow:0 0 0 2px rgba(180,249,142,.2),inset 0 0 15px rgba(180,249,142,.15)}
+.mini-card-front>.mini-art-photo{width:min(88%,94px);height:calc(100% - 21px);min-height:30px;border-radius:7px}
+.mini-card-front>.mini-leaf{width:min(88%,94px)}
+.mini-card-name{color:#dff8d7;font-size:clamp(7px,1vw,10px);white-space:normal}
+.mini-target{width:clamp(90px,18vw,142px);height:clamp(90px,18vw,142px);padding:11px;box-shadow:0 9px 28px rgba(0,0,0,.5);border-radius:50%;background:radial-gradient(circle,rgba(176,241,139,.14),rgba(11,26,15,.92))}
+.mini-target>.mini-art-photo{width:90%;height:90%;border-radius:50%;border:2px solid rgba(199,252,181,.35)}
+.mini-overlay>.mini-art-photo{width:96px;height:96px;border-radius:20px;border:1px solid rgba(191,254,173,.45)}
+/* Home-page Sesh uses the same photographic props but original rules. */
+#sesh-signal .sesh-stage{background:linear-gradient(140deg,rgba(5,25,14,.63),rgba(6,23,15,.88)),url("/assets/the420lobby-neon-lounge.webp") center/cover no-repeat}
+#sesh-signal .sesh-item{border-radius:15px;overflow:visible;background:#10291d;border:2px solid rgba(180,248,154,.66);box-shadow:0 5px 18px #0009;padding:3px}
+#sesh-signal .sesh-item-photo{width:100%;height:100%;object-fit:cover;object-position:center;border-radius:11px;filter:brightness(.91) saturate(.95);overflow:hidden}
+#sesh-signal .sesh-item-art[hidden]{display:none}
+#sesh-signal .sesh-item-caption{position:absolute;z-index:3;bottom:-5px;left:-4px;right:-4px;padding:3px 2px;border-radius:5px;background:rgba(3,17,9,.95);font:900 8px/1.15 "Barlow Condensed",sans-serif;letter-spacing:.025em;color:#ecffe6;text-align:center;pointer-events:none}
+#sesh-signal .sesh-item--hazard{border:2px solid #ffa3a3;background:#40171a;box-shadow:0 0 0 2px rgba(255,111,107,.14),0 5px 18px #0009}
+#sesh-signal .sesh-item--hazard .sesh-item-photo{filter:grayscale(.18) saturate(1.2) brightness(.73)}
+#sesh-signal .sesh-item--hazard .sesh-item-caption{background:rgba(128,22,30,.97);color:#fff}
+#sesh-signal .sesh-item--hazard::after{content:"!";z-index:5}
+/* Tablet and mobile remain usable without overlays, expensive effects or hover. */
+@media(max-width:1120px){.hero-art{margin:0}.game-card .game-art{height:clamp(190px,24vw,260px)}}
+@media(max-width:850px){.hero-art{margin:0}.game-card .game-art{height:210px}}
+@media(max-width:560px){.arcade-hero{gap:16px}.hero-art{width:100%;height:auto;aspect-ratio:1.65;max-width:none;margin:0}.hero-art img{height:100%}.game-card .game-art{height:225px}.mini-target{width:92px;height:92px}.mini-target>.mini-art-photo{width:86%;height:86%}#sesh-signal .sesh-item-caption{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.game-art .game-card-photo{transition:none;transform:none!important}}
+@media(hover:none){.game-art .game-card-photo{transform:none!important}}
