@@ -9,7 +9,7 @@ class D1 {
   constructor(skipCheersMigration=false){
     this.db=new DatabaseSync(":memory:");
     this.db.exec("PRAGMA foreign_keys=ON");
-    for(const migration of skipCheersMigration?["0001_arcade.sql"]:["0001_arcade.sql","0002_cheers.sql"])
+    for(const migration of skipCheersMigration?["0001_arcade.sql"]:["0001_arcade.sql","0002_cheers.sql","0003_spark_relay.sql"])
       this.db.exec(readFileSync(new URL("../migrations/"+migration,import.meta.url),"utf8"));
   }
   prepare(sql) {
@@ -33,11 +33,11 @@ const make=(skipCheersMigration=false)=>{
       await env.DB.prepare("INSERT INTO sessions(token_hash,user_id,created_at,expires_at) VALUES(?,?,?,?)").bind(await hash(token),id,now,now+1000000).run();
       return {token,csrf:await hash("csrf:"+token)};
     },
-    async call(method="GET",body,auth,headers={}){
+    async call(method="GET",body,auth,headers={},path="/api/cheers"){
       const h=new Headers(headers);
       if(auth){h.set("Cookie",SESSION_COOKIE+"="+auth.token);if(!h.has("X-CSRF-Token"))h.set("X-CSRF-Token",auth.csrf);}
       if(method==="POST"){h.set("Content-Type","application/json");if(!h.has("Origin"))h.set("Origin",origin);}
-      return handleRequest({request:new Request(origin+"/api/cheers",{method,headers:h,body:body===undefined?undefined:JSON.stringify(body)}),env,next:()=>new Response("not a static route")});
+      return handleRequest({request:new Request(origin+path,{method,headers:h,body:body===undefined?undefined:JSON.stringify(body)}),env,next:()=>new Response("not a static route")});
     }
   };
 };
@@ -111,4 +111,82 @@ test("First signed-in Cheers automatically adds only missing schema to existing 
   const duplicate=await (await a.call("POST",{},signedIn)).json();
   assert.equal(duplicate.joined,false);
   assert.equal(duplicate.round.participants,1);
+});
+
+
+test("Spark Relay's server awards a unique beat only once and values genuine player handoffs", async()=>{
+  const a=make();
+  const first=await a.login("123456789012345701");
+  const second=await a.login("123456789012345702");
+  const joined=await (await a.call("POST",{},first)).json();
+  const roundId=joined.round.id;
+  assert.equal(joined.rules.beatCount,10);
+  assert.equal(joined.rules.durationMs,42000);
+  assert.equal(joined.round.teamScore,0);
+  assert.equal(joined.round.maxCombo,0);
+  await a.call("POST",{},second);
+  const sql=a.env.DB.db.prepare("UPDATE cheers_rounds SET started_at=?,ends_at=? WHERE id=?");
+  const beat0=Date.now()-3000;
+  sql.run(beat0,beat0+42000,roundId);
+  const shot=await a.call("POST",{roundId,beat:0},first,{},"/api/cheers/spark");
+  assert.equal(shot.status,200);
+  const hit=await shot.json();
+  assert.equal(hit.captured,true);
+  assert.equal(hit.awarded,150);
+  assert.equal(hit.round.teamScore,150);
+  assert.equal(hit.round.hits.length,1);
+  assert.deepEqual(hit.round.hits[0],{beat:0,points:150});
+  const duplicate=await (await a.call("POST",{roundId,beat:0},first,{},"/api/cheers/spark")).json();
+  assert.equal(duplicate.captured,false);
+  assert.equal(duplicate.awarded,0);
+  const secondAttempt=await (await a.call("POST",{roundId,beat:0},second,{},"/api/cheers/spark")).json();
+  assert.equal(secondAttempt.captured,false);
+  sql.run(Date.now()-6800,Date.now()-6800+42000,roundId);
+  const pass=await (await a.call("POST",{roundId,beat:1},second,{},"/api/cheers/spark")).json();
+  assert.equal(pass.captured,true);
+  assert.equal(pass.awarded,190,"a different user on the consecutive beat earns +40 relay points");
+  assert.equal(pass.round.teamScore,340);
+  assert.equal(pass.round.maxCombo,2);
+  assert.equal(pass.round.participants,2);
+  const publicBoard=await (await a.call()).json();
+  assert.equal(publicBoard.round.hits.length,2);
+  assert.equal(publicBoard.round.teamScore,340);
+  assert.equal(publicBoard.bestScore,340);
+  assert.equal(JSON.stringify(publicBoard).includes("123456789012345701"),false);
+  assert.equal(JSON.stringify(publicBoard).includes("123456789012345702"),false);
+});
+test("Spark Relay enforces login, CSRF, round membership, time window and input validation",async()=>{
+  const a=make();
+  const first=await a.login("123456789012345703");
+  const stranger=await a.login("123456789012345704");
+  const round=(await (await a.call("POST",{},first)).json()).round;
+  const id=round.id,path="/api/cheers/spark";
+  assert.equal((await a.call("POST",{roundId:id,beat:0},null,{},path)).status,401);
+  assert.equal((await a.call("POST",{roundId:id,beat:0},stranger,{},path)).status,403);
+  assert.equal((await a.call("POST",{roundId:id,beat:0},first,{Origin:"https://evil.invalid"},path)).status,403);
+  assert.equal((await a.call("POST",{roundId:id,beat:0},first,{"X-CSRF-Token":"bad"},path)).status,403);
+  for(const invalid of [{roundId:id,beat:99},{roundId:id,beat:0,score:999},{roundId:"1",beat:0}]){
+    assert.equal((await a.call("POST",invalid,first,{},path)).status,400);
+  }
+  assert.equal((await a.call("GET",undefined,first,{},path)).status,405);
+  assert.equal((await a.call("POST",{roundId:id,beat:8},first,{},path)).status,409);
+  assert.equal(a.env.DB.db.prepare("SELECT COUNT(*) AS c FROM cheers_sparks").get().c,0);
+  a.env.DB.db.prepare("UPDATE cheers_rounds SET started_at=?, ends_at=? WHERE id=?")
+    .run(Date.now()-45000,Date.now()-3000,id);
+  assert.equal((await a.call("POST",{roundId:id,beat:0},first,{},path)).status,409);
+});
+test("Spark Relay bootstraps the scoreboard only after an authorized first join",async()=>{
+  const a=make(true);
+  const db=a.env.DB.db;
+  assert.equal(db.prepare("SELECT name FROM sqlite_master WHERE name='cheers_sparks'").get(),undefined);
+  const guest=await (await a.call()).json();
+  assert.equal(guest.gameReady,false);
+  assert.equal(db.prepare("SELECT name FROM sqlite_master WHERE name='cheers_sparks'").get(),undefined);
+  const first=await a.login("123456789012345705");
+  await a.call("POST",{},first);
+  const ready=await (await a.call()).json();
+  assert.equal(ready.gameReady,true);
+  assert.ok(db.prepare("SELECT name FROM sqlite_master WHERE name='cheers_sparks'").get());
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM users").get().n,1);
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM sessions").get().n,1);
 });

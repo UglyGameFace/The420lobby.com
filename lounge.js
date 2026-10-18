@@ -9,12 +9,6 @@
  const moodStatus=document.getElementById("lounge-mood-status");
  const secret=document.getElementById("lounge-secret");
  const secretMessage=document.getElementById("lounge-secret-message");
- const join=document.getElementById("lounge-cheers-join");
- const signin=document.getElementById("lounge-cheers-signin");
- const status=document.getElementById("lounge-cheers-status");
- const count=document.getElementById("lounge-cheers-participants");
- const clock=document.getElementById("lounge-cheers-clock");
- const progress=document.getElementById("lounge-cheers-progress");
  let theme="lounge";
  try{const saved=localStorage.getItem("lobby:theme:v1");if(Object.hasOwn(themes,saved))theme=saved;}
  catch(_){/* Storage can be unavailable in private browsing. */}
@@ -85,58 +79,212 @@
    });
  });
  if(spots.length)selectSpot(spots[0]);
- let api=null,session=null,active=null,serverOffset=0,available=false,pending=false;
+ /* Spark Relay: a real shared reaction game, no fake participants or client scores. */
+ const joinButton=document.getElementById("lounge-cheers-join");
+ const sparkButton=document.getElementById("lounge-spark-button");
+ const signIn=document.getElementById("lounge-cheers-signin");
+ const cheerStatus=document.getElementById("lounge-cheers-status");
+ const players=document.getElementById("lounge-cheers-participants");
+ const clock=document.getElementById("lounge-cheers-clock");
+ const progress=document.getElementById("lounge-cheers-progress");
+ const arena=document.getElementById("spark-arena");
+ const stagePhase=document.getElementById("spark-stage-phase");
+ const stageLabel=document.getElementById("spark-stage-label");
+ const sparkLabel=document.getElementById("spark-target-label");
+ const sparkCountdown=document.getElementById("spark-target-countdown");
+ const cue=document.getElementById("spark-cue");
+ const scoreboard={
+   score:document.getElementById("spark-score"),
+   combo:document.getElementById("spark-combo"),
+   caught:document.getElementById("spark-captured"),
+   record:document.getElementById("spark-record")
+ };
+ const steps=Array.from(document.querySelectorAll("#spark-round-track .spark-step"));
+ const calls=["LIGHT THE SPARK","PASS THE GLOW","KEEP IT LIT","FAN THE FLAME","DON'T BREAK THE CHAIN",
+   "PASS IT FORWARD","LIGHTNING HANDS","KEEP THE COMBO","ONE MORE SPARK","CHEERS TO THE CREW"];
+ const defaultRules={durationMs:42000,firstBeatMs:3000,beatIntervalMs:3800,hitWindowMs:950,beatCount:10};
+ let rules=defaultRules,api=null,session=null,active=null,serverOffset=0;
+ let available=false,pending=false,playing=false,bestScore=0,joinedRound=null,lastRefresh=0;
+ const restored=(()=>{
+   try{return Number(sessionStorage.getItem("lobby:spark-round:v1"))||null;}
+   catch(_){return null;}
+ })();
+ joinedRound=restored;
+ let lastPhaseText="";
+ function showCue(message){
+   if(cue.textContent!==message)cue.textContent=message;
+ }
+ function currentMillis(){return Date.now()+serverOffset;}
+ function setJoinedRound(id){
+   joinedRound=id;
+   try{
+     if(id)sessionStorage.setItem("lobby:spark-round:v1",String(id));
+     else sessionStorage.removeItem("lobby:spark-round:v1");
+   }catch(_){}
+ }
+ function currentBeat(now){
+   if(!active)return null;
+   const approx=Math.round((now-active.startedAt-rules.firstBeatMs)/rules.beatIntervalMs);
+   if(approx<0||approx>=rules.beatCount)return null;
+   const target=active.startedAt+rules.firstBeatMs+approx*rules.beatIntervalMs;
+   return {beat:approx,target,delta:now-target};
+ }
+ function changePhase(phase,label){
+   arena.dataset.phase=phase;
+   stagePhase.textContent=label;
+ }
  function render(){
-   const remaining=active?Math.max(0,Math.ceil((active.endsAt-Date.now()-serverOffset)/1000)):0;
-   count.textContent=remaining>0?String(active.participants):"—";
-   clock.textContent=remaining>0?String(remaining)+"s":"READY";
-   progress.style.width=(remaining>0?Math.min(100,remaining/42*100).toFixed(1):"0")+"%";
-   if(available&&!pending){join.disabled=false;join.textContent=remaining>0?"JOIN THE SHARED CHEERS":"START A SHARED CHEERS";}
- }
- function applyState(data){
-   serverOffset=data.serverTime-Date.now();
-   active=data.round;available=true;
-   render();
-   status.textContent=active?"A real 42-second Cheers is happening. Join the crew!":"No active round. Start one and other visitors can join.";
- }
- async function refresh(){
-   if(document.hidden||pending)return;
-   try{
-     api=api||await import("/arcade-api.js");
-     const data=await api.arcadeRequest("/api/cheers");
-     applyState(data);
-   }catch(_){
-     available=false;active=null;count.textContent="—";clock.textContent="—";
-     progress.style.width="0%";join.disabled=true;join.textContent="CHEERS UNAVAILABLE";
-     status.textContent="The shared lounge is offline for now. Arcade and community links still work.";
-   }
- }
- join.addEventListener("click",async()=>{
-   if(pending||!available)return;
-   pending=true;join.disabled=true;join.textContent="JOINING…";
-   try{
-     api=api||await import("/arcade-api.js");
-     session=session||await api.arcadeRequest("/api/session");
-     if(!session.configured){
-     available=false;
-     status.textContent="Discord sign-in is not configured on this website yet. Shared Cheers is unavailable.";
-     join.textContent="CHEERS UNAVAILABLE";
+   if(document.hidden)return;
+   const now=currentMillis();
+   const remaining=active?Math.max(0,Math.ceil((active.endsAt-now)/1000)):0;
+   const inRound=Boolean(active&&remaining>0);
+   const joined=Boolean(inRound&&joinedRound===active.id);
+   players.textContent=inRound?String(active.participants):"—";
+   clock.textContent=inRound?remaining+"s":"READY";
+   progress.style.width=inRound?(100*remaining/rules.durationMs*1000).toFixed(1)+"%":"0%";
+   scoreboard.score.textContent=String(inRound?active.teamScore||0:0);
+   scoreboard.combo.textContent=String(inRound?active.maxCombo||0:0);
+   scoreboard.caught.textContent=(inRound?(active.hits||[]).length:0)+"/"+rules.beatCount;
+   scoreboard.record.textContent=String(Math.max(bestScore,inRound?active.teamScore||0:0));
+   joinButton.disabled=!available||pending||joined;
+   if(available&&!pending)
+     joinButton.textContent=joined?"YOU'RE IN · CATCH THE NEXT SPARK":inRound?"JOIN THIS RELAY":"START A SPARK RELAY";
+   if(!inRound){
+     changePhase("idle","READY TO PLAY");
+     sparkButton.disabled=true;
+     sparkButton.setAttribute("aria-label","Join a relay round to catch sparks");
+     sparkLabel.textContent="JOIN TO PLAY";
+     sparkCountdown.textContent="READY";
+     stageLabel.textContent="THE CREW'S SPARK";
+     steps.forEach(s=>s.dataset.state="waiting");
+     showCue("Start a round, then catch the glowing ember on each beat. Take turns for bonus points.");
      return;
    }
+   const caught=new Set((active.hits||[]).map(x=>x.beat));
+   const timing=currentBeat(now);
+   const live=timing&&Math.abs(timing.delta)<=rules.hitWindowMs;
+   const claimable=live&&!caught.has(timing.beat);
+   steps.forEach((step,i)=>{
+     const target=active.startedAt+rules.firstBeatMs+i*rules.beatIntervalMs;
+     step.dataset.state=caught.has(i)?"caught":target+rules.hitWindowMs<now?"missed":timing&&timing.beat===i?"current":"waiting";
+   });
+   sparkButton.disabled=!joined||!claimable||playing;
+   if(live){
+     changePhase(claimable?"live":"caught",claimable?"THE SPARK IS LIVE":"SPARK SECURED");
+     stageLabel.textContent=calls[timing.beat];
+     sparkLabel.textContent=claimable?(joined?"CATCH SPARK":"JOIN TO PLAY"):"ALREADY CAUGHT";
+     sparkButton.setAttribute("aria-label",claimable?"Catch spark "+(timing.beat+1):"Spark already caught");
+     sparkCountdown.textContent=claimable?"NOW!":"PASSED";
+     showCue(claimable?"Tap the ember now! A handoff from another player earns a relay bonus.":"The crew caught this one. Get ready for the next beat.");
+   }else{
+     changePhase("waiting",joined?"WAIT FOR THE GLOW":"JOIN THE ROUND");
+     stageLabel.textContent="KEEP THE CHAIN ALIVE";
+     sparkLabel.textContent=joined?"WATCH THE EMBER":"JOIN TO PLAY";
+     sparkButton.setAttribute("aria-label","Wait for the next timed spark");
+     const next=Array.from({length:rules.beatCount},(_,i)=>({i,
+       time:active.startedAt+rules.firstBeatMs+i*rules.beatIntervalMs}))
+       .find(x=>x.time+rules.hitWindowMs>=now);
+     sparkCountdown.textContent=next?Math.max(0,(next.time-now)/1000).toFixed(1)+"s":"ROUND ENDING";
+     showCue(next?(joined?"Wait for the glow, then tap. Timing matters more than speed.":"Join the relay to help build the crew score."):"Great run. The next round is coming up.");
+   }
+ }
+ function applyStatus(data,sentAt=Date.now()){
+   serverOffset=data.serverTime-(sentAt+Date.now())/2;
+   active=data.round;
+   rules=data.rules||defaultRules;
+   bestScore=data.bestScore||0;
+   available=true;
+   if(active?.id!==joinedRound&&joinedRound&&!active)setJoinedRound(null);
+   signIn.hidden=true;
+   render();
+ }
+ async function client(){
+   api=api||await import("/arcade-api.js");
+   return api;
+ }
+ async function refresh(force=false){
+   if(document.hidden||pending||playing)return;
+   const now=Date.now();
+   if(!force&&now-lastRefresh<(active?1800:9500))return;
+   lastRefresh=now;
+   try{
+     const sdk=await client(),sentAt=Date.now();
+     const data=await sdk.arcadeRequest("/api/cheers");
+     applyStatus(data,sentAt);
+     if(data.round&&!data.gameReady)
+       cheerStatus.textContent="Spark Relay setup is finishing. Join to activate the game.";
+     else if(data.round)
+       cheerStatus.textContent="Crew relay in progress. "+data.round.participants+" player(s), "+
+         data.round.teamScore+" points. Catch the next glow!";
+     else
+       cheerStatus.textContent="No round running. Be the first to light up the scoreboard.";
+   }catch(_){
+     available=false;active=null;
+     joinButton.disabled=true;joinButton.textContent="GAME OFFLINE";
+     sparkButton.disabled=true;arena.dataset.phase="idle";
+     cheerStatus.textContent="The shared game is currently unavailable. The Arcade and Discord community still work.";
+   }
+ }
+ async function authenticated(){
+   const sdk=await client();
+   session=session||await sdk.arcadeRequest("/api/session");
+   if(!session.configured){
+     available=false;
+     cheerStatus.textContent="The website's Discord login is not configured yet.";
+     return null;
+   }
    if(!session.user||!session.csrfToken){
-       signin.hidden=false;status.textContent="Sign in with Discord, then return here to join Cheers.";
-       return;
-     }
-     const result=await api.arcadeRequest("/api/cheers",{body:{},csrfToken:session.csrfToken});
-     signin.hidden=true;applyState(result);
-     status.textContent=result.joined?"You're in! CHEERS to the crew.":"You're already in this round. CHEERS!";
+     signIn.hidden=false;
+     cheerStatus.textContent="Sign in with Discord, then come back to play.";
+     return null;
+   }
+   return session;
+ }
+ joinButton.addEventListener("click",async()=>{
+   if(pending||!available)return;
+   pending=true;joinButton.disabled=true;joinButton.textContent="JOINING THE CREW…";
+   try{
+     const auth=await authenticated();
+     if(!auth)return;
+     const sentAt=Date.now();
+     const data=await api.arcadeRequest("/api/cheers",{body:{},csrfToken:auth.csrfToken});
+     if(data.round)setJoinedRound(data.round.id);
+     applyStatus(data,sentAt);
+     cheerStatus.textContent=data.joined?"You're in! Catch the ember when it glows.":"You're already in this round. Catch the next spark!";
    }catch(error){
      if(["invalid_csrf","sign_in_required"].includes(error.code))session=null;
-     status.textContent=error.message||"Could not join this round. Try again.";
+     cheerStatus.textContent=error.message||"Could not join. Try again.";
    }finally{pending=false;render();}
  });
- setInterval(render,1000);
- setInterval(refresh,12000);
- document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh();});
- refresh();
+ sparkButton.addEventListener("click",async()=>{
+   if(playing||!active||joinedRound!==active.id)return;
+   const now=currentMillis(),timing=currentBeat(now);
+   if(!timing||Math.abs(timing.delta)>rules.hitWindowMs||
+     (active.hits||[]).some(h=>h.beat===timing.beat))return;
+   const roundId=active.id,beat=timing.beat;
+   playing=true;sparkButton.disabled=true;sparkLabel.textContent="PASSING…";
+   try{
+     const auth=await authenticated();
+     if(!auth)return;
+     const sentAt=Date.now();
+     const data=await api.arcadeRequest("/api/cheers/spark",
+       {body:{roundId,beat},csrfToken:auth.csrfToken});
+     applyStatus(data,sentAt);
+     cheerStatus.textContent=data.captured?
+       "SPARK CAUGHT! +"+data.awarded+" crew points. Keep the chain going!":
+       "Someone caught that spark first. Get the next one!";
+   }catch(error){
+     if(["invalid_csrf","sign_in_required"].includes(error.code))session=null;
+     cheerStatus.textContent=error.code==="off_beat"?
+       "Close! Catch the next glow when the ember lights up.":
+       error.message||"That spark didn't register. Try the next one.";
+     refresh(true);
+   }finally{playing=false;render();}
+ });
+ // Only animate the countdown during a live round; idle pages should not
+ // repaint ten markers eight times a second on low-power tablets.
+ setInterval(()=>{if(active&&!document.hidden)render();},180);
+ setInterval(()=>refresh(),1000);
+ document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh(true);});
+ refresh(true);
 })();

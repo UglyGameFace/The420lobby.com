@@ -20,12 +20,12 @@
 <link rel="stylesheet" href="/sesh-signal-v3.css">
 <link rel="stylesheet" href="/lobby-redesign.css?v=20261018-tablet-nav3">
 <link rel="stylesheet" href="/brand-header.css?v=20261017-lockup-align7">
-<link rel="stylesheet" href="/lounge.css?v=20261018-room-photo1">
+<link rel="stylesheet" href="/lounge.css?v=20261018-spark-relay1">
 <link rel="stylesheet" href="/sesh-photo.css?v=20261018-photo1">
 <script defer src="/visual-engine.js"></script>
 <script defer src="/script.js?v=20261018-tablet-nav3"></script>
 <script defer src="/smoke-brand.js"></script>
-<script defer src="/lounge.js?v=20261018-cheers-ready2"></script>
+<script defer src="/lounge.js?v=20261018-spark-relay1"></script>
 <script defer src="/sesh-loader.js"></script>
 </head>
 <body>
@@ -194,15 +194,36 @@
             </div>
             <p id="lounge-mood-status" class="lounge-fineprint" role="status">Atmosphere choice stays on this device. Animation follows your Effects setting.</p>
           </div>
-          <div class="lounge-cheers" aria-labelledby="lounge-cheers-title">
-            <div class="lounge-control-head"><h3 id="lounge-cheers-title">CHEERS WITH THE CREW</h3><span>SHARED / 42 SECONDS</span></div>
-            <img class="lounge-cheers-art" src="/assets/cheers-real-smoke-blunt.webp?v=20261017-smoke-flow4" data-smoke-motion="/assets/cheers-real-smoke-blunt-loop.webp?v=20261017-smoke-flow4" data-smoke-still="/assets/cheers-real-smoke-blunt.webp?v=20261017-smoke-flow4" alt="Realistic lit blunt, CHEERS lettering, and rising smoke" width="1100" height="367" loading="lazy" decoding="async">
-            <div class="lounge-cheers-stats"><div><small>IN THIS ROUND</small><strong id="lounge-cheers-participants">—</strong></div><div><small>TIME LEFT</small><strong id="lounge-cheers-clock">—</strong></div></div>
+          <div class="lounge-cheers spark-relay" id="spark-relay" aria-labelledby="lounge-cheers-title">
+            <div class="lounge-control-head"><h3 id="lounge-cheers-title">CHEERS: SPARK RELAY</h3><span>CO-OP REACTION GAME / 42 SEC</span></div>
+            <img class="lounge-cheers-art" src="/assets/cheers-real-smoke-blunt.webp?v=20261017-smoke-flow4" data-smoke-motion="/assets/cheers-real-smoke-blunt-loop.webp?v=20261017-smoke-flow4" data-smoke-still="/assets/cheers-real-smoke-blunt.webp?v=20261017-smoke-flow4" alt="Realistic lit blunt and rising CHEERS smoke" loading="lazy" decoding="async" width="1100" height="367">
+            <p class="spark-tagline">Catch the glow. Pass the spark. Build the crew combo.</p>
+            <div class="spark-arena" id="spark-arena" data-phase="idle">
+              <div class="spark-stage-top"><span class="spark-stage-label" id="spark-stage-label">THE CREW'S SPARK</span><span class="spark-stage-phase" id="spark-stage-phase">AWAITING PLAYERS</span></div>
+              <div class="spark-target-wrap">
+                <button type="button" id="lounge-spark-button" class="spark-target" disabled aria-label="Join a round to catch the spark"><span class="spark-ember" aria-hidden="true"></span><span class="spark-target-label" id="spark-target-label">JOIN TO PLAY</span></button>
+                <span class="spark-target-countdown" id="spark-target-countdown" aria-hidden="true">READY</span>
+              </div>
+              <div class="spark-round-track" id="spark-round-track" aria-label="Ten sparks in this round" role="group">
+                <span class="spark-step" data-beat="0">01</span><span class="spark-step" data-beat="1">02</span><span class="spark-step" data-beat="2">03</span><span class="spark-step" data-beat="3">04</span><span class="spark-step" data-beat="4">05</span><span class="spark-step" data-beat="5">06</span><span class="spark-step" data-beat="6">07</span><span class="spark-step" data-beat="7">08</span><span class="spark-step" data-beat="8">09</span><span class="spark-step" data-beat="9">10</span>
+              </div>
+              <p class="spark-cue" id="spark-cue" aria-live="polite">When the ember glows, tap to catch it. A different player on the next beat scores a relay bonus.</p>
+            </div>
+            <div class="lounge-cheers-stats spark-scoreboard">
+              <div><small>CREW SCORE</small><strong id="spark-score">0</strong></div>
+              <div><small>BEST COMBO</small><strong id="spark-combo">0</strong></div>
+              <div><small>SPARKS CAUGHT</small><strong id="spark-captured">0/10</strong></div>
+              <div><small>7-DAY BEST</small><strong id="spark-record">0</strong></div>
+            </div>
+            <div class="lounge-cheers-stats spark-round-meta">
+              <div><small>PLAYERS</small><strong id="lounge-cheers-participants">—</strong></div>
+              <div><small>TIME REMAINING</small><strong id="lounge-cheers-clock">—</strong></div>
+            </div>
             <div class="lounge-cheers-progress" aria-hidden="true"><span id="lounge-cheers-progress"></span></div>
-            <p id="lounge-cheers-status" role="status" aria-live="polite">Connecting to the shared lounge…</p>
+            <p id="lounge-cheers-status" role="status" aria-live="polite">Connecting to the Spark Relay…</p>
             <button type="button" id="lounge-cheers-join" class="lounge-cheers-button" disabled>CONNECTING…</button>
             <a href="/auth/discord" class="lounge-signin" id="lounge-cheers-signin" hidden>SIGN IN WITH DISCORD ↗</a>
-            <p class="lounge-fineprint">Free community countdown. One join per round. No real-world rewards. Your Discord name is not published here. Separate from Dank Shield /toke sessions and role pings.</p>
+            <p class="lounge-fineprint">Real shared timing and server-scored sparks. Join with Discord, no purchases or real-world rewards. Separate from Dank Shield /toke and its notifications.</p>
           </div>
         </div>
       </div>

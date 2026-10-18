@@ -94,3 +94,52 @@ html[data-lounge-theme="midnight"] .hero{background:radial-gradient(ellipse at 7
 html[data-lounge-theme="halloween"] .hero{background:radial-gradient(ellipse at 78% 32%,#55301d,transparent 52%),linear-gradient(140deg,#211913,#0e1010 66%)}
 html[data-lounge-theme="midnight"] .experiences{background:linear-gradient(180deg,#111b2a,#131e32 65%,#0c1321)}
 html[data-lounge-theme="halloween"] .experiences{background:linear-gradient(180deg,#241b16,#282018 65%,#151510)}
+
+/* CHEERS: Spark Relay. Keep the approved realistic smoke and lit-cherry art.
+   The ember is a functional reaction target, not a fake illustrated joint. */
+.spark-relay{--spark-orange:#ffb770;--spark-heat:#ff7c3e;min-width:0}
+.spark-relay .lounge-cheers-art{max-height:164px}
+.spark-tagline{margin:4px 0 17px;color:#d5e6d3;font:700 12px/1.5 "DM Sans",sans-serif;letter-spacing:.025em}
+.spark-arena{position:relative;isolation:isolate;overflow:hidden;border-radius:17px;border:1px solid rgba(246,204,152,.3);padding:16px 15px 15px;background:radial-gradient(ellipse at 50% 25%,rgba(161,89,40,.23),transparent 72%),linear-gradient(140deg,#0e1b14,#101a13 75%);box-shadow:inset 0 0 20px rgba(0,0,0,.2)}
+.spark-arena:before{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,rgba(242,116,46,.08),transparent 65%)}
+.spark-stage-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;font:800 10px/1.35 "DM Sans",sans-serif;letter-spacing:.09em;color:#d6dfca}
+.spark-stage-phase{color:var(--spark-orange);text-align:right}
+.spark-target-wrap{position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;min-height:201px;padding:15px 0}
+.spark-target{appearance:none;position:relative;width:140px;height:140px;flex:none;border-radius:50%;border:2px solid rgba(250,175,113,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:radial-gradient(circle,rgba(210,88,40,.2),rgba(12,30,17,.98) 67%);box-shadow:inset 0 0 33px rgba(248,142,46,.09),0 6px 24px rgba(0,0,0,.44);color:#ffedcc;cursor:default;transition:border-color .15s,box-shadow .15s,background .15s;touch-action:manipulation}
+.spark-target:focus-visible{outline:3px solid #ffba71;outline-offset:5px}
+.spark-target-label{font:900 12px/1.2 "Barlow Condensed",Impact,sans-serif;letter-spacing:.11em;color:inherit;max-width:95px}
+.spark-target-countdown{font:900 15px/1 "Barlow Condensed",Impact,sans-serif;letter-spacing:.13em;color:#fac791;min-height:15px}
+.spark-ember{position:relative;display:block;width:48px;height:42px;flex:none;border-radius:50%;background:radial-gradient(circle at 50% 48%,#ffe9a7 0%,#ffbb5a 18%,#e86429 41%,#772c18 68%,#21130e 82%);box-shadow:0 0 15px rgba(246,135,52,.28),inset 0 -9px 12px rgba(33,12,7,.65)}
+.spark-ember:after{content:"";position:absolute;inset:4px;border-radius:50%;border:1px solid rgba(250,213,154,.23);pointer-events:none}
+.spark-arena[data-phase="live"] .spark-target{cursor:pointer;border-color:#ffeab7;background:radial-gradient(circle,rgba(255,135,51,.3),rgba(16,40,20,.98) 68%);box-shadow:0 0 0 5px rgba(255,139,57,.14),0 0 42px rgba(253,135,40,.42),inset 0 0 23px rgba(246,134,40,.17)}
+.spark-arena[data-phase="live"] .spark-ember{box-shadow:0 0 18px 7px rgba(255,134,42,.44),0 0 38px rgba(249,117,44,.32),inset 0 -6px 10px rgba(96,25,7,.37);animation:spark-flicker 1.1s ease-in-out infinite alternate}
+.spark-arena[data-phase="live"] .spark-target-label{color:#fff9dd}
+.spark-arena[data-phase="caught"] .spark-target{border-color:rgba(170,245,144,.67);box-shadow:0 0 23px rgba(139,218,104,.2)}
+.spark-arena[data-phase="caught"] .spark-ember{filter:hue-rotate(25deg) saturate(.75)}
+.spark-target:disabled{cursor:default}
+.spark-round-track{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;align-items:center}
+.spark-step{display:flex;align-items:center;justify-content:center;min-width:0;height:28px;border:1px solid rgba(198,237,178,.17);border-radius:5px;background:rgba(4,18,10,.75);font:800 9px/1 "DM Sans",sans-serif;color:#9bac97}
+.spark-step[data-state="caught"]{color:#14300e;border-color:#afea83;background:#b9f497;box-shadow:0 0 13px rgba(155,236,135,.2)}
+.spark-step[data-state="current"]{color:#fff6e0;border-color:#f7b665;background:rgba(181,76,31,.35);box-shadow:0 0 12px rgba(255,153,63,.2)}
+.spark-step[data-state="missed"]{color:#b2a7a3;background:rgba(83,40,32,.28);border-color:rgba(243,173,135,.18)}
+.spark-cue{min-height:35px;padding-top:12px;font:600 11px/1.55 "DM Sans",sans-serif;color:#d6e8d0}
+.spark-scoreboard{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0 7px}
+.spark-scoreboard>div{padding:10px 11px;background:rgba(10,27,16,.66)}
+.spark-scoreboard strong{font-size:clamp(23px,3.1vw,33px);font-variant-numeric:tabular-nums}
+.spark-scoreboard small{font-size:9px}
+.spark-round-meta{margin:0 0 13px;gap:8px}
+.spark-round-meta>div{padding:8px 11px}
+.spark-round-meta strong{font-size:23px}
+.spark-relay .lounge-cheers-button{min-height:48px}
+.spark-relay .lounge-cheers-button:focus-visible,.spark-relay .lounge-signin:focus-visible{outline:3px solid #ffe1ad;outline-offset:3px}
+@keyframes spark-flicker{from{filter:brightness(.95);transform:scale(.985)}to{filter:brightness(1.12);transform:scale(1.025)}}
+@media(max-width:420px){
+ .spark-arena{padding:13px 10px}
+ .spark-target{width:126px;height:126px}
+ .spark-target-wrap{min-height:179px}
+ .spark-round-track{gap:3px}
+ .spark-step{height:26px;font-size:8px}
+ .spark-scoreboard strong{font-size:25px}
+}
+@media(prefers-reduced-motion:reduce){.spark-ember{animation:none!important}.spark-target{transition:none}}
+html.fx-off .spark-ember{animation:none!important}
