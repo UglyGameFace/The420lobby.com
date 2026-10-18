@@ -281,7 +281,9 @@
      refresh(true);
    }finally{playing=false;render();}
  });
- setInterval(render,125);
+ // Only animate the countdown during a live round; idle pages should not
+ // repaint ten markers eight times a second on low-power tablets.
+ setInterval(()=>{if(active&&!document.hidden)render();},180);
  setInterval(()=>refresh(),1000);
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh(true);});
  refresh(true);
