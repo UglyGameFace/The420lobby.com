@@ -64,14 +64,34 @@ try {
 
     assert.equal(await page.locator("#interactive-lounge").count(),1,"interactive lounge missing");
     assert.equal(await page.locator(".lounge-hotspot").count(),4,"lounge destinations missing");
+    const loungeImage=page.locator("#lounge-scene-photo");
+    const arcadeImage=await loungeImage.getAttribute("src");
+    const expectedImages=new Set([...await page.locator(".lounge-hotspot").evaluateAll(buttons=>buttons.map(button=>button.dataset.roomImage))]);
+    assert.equal(expectedImages.size,4,"each lounge room needs a distinct picture");
     await page.locator(".lounge-hotspot--cinema").click();
+    const cinemaImage=await loungeImage.getAttribute("src");
+    assert.notEqual(cinemaImage,arcadeImage,"cinema must replace arcade photo");
+    assert.match(cinemaImage,/Empty_Movie_Theater/);
+    assert.match(await loungeImage.getAttribute("alt"),/movie theater/i);
+    if(scenario.name==="desktop"){
+      await loungeImage.evaluate(img=>img.decode());
+      assert.equal(await loungeImage.getAttribute("data-photo-state"),"ready",
+        "cinema scene never becomes visible after loading");
+    }
     assert.equal(await page.locator("#lounge-preview-title").textContent(),"MOVIE NIGHTS");
     assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"#after-dark");
     await page.locator(".lounge-hotspot--cinema").press("ArrowRight");
+    assert.notEqual(await loungeImage.getAttribute("src"),cinemaImage,
+      "keyboard navigation must change the scene image");
+    assert.match(await loungeImage.getAttribute("src"),/Man_playing_video_games/);
     assert.equal(await page.locator("#lounge-preview-title").textContent(),"YOUR PLAYER CORNER");
     assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"/arcade.html#profile");
     assert.equal(await page.locator(".lounge-hotspot--profile").getAttribute("aria-pressed"),"true");
+    await page.locator(".lounge-hotspot--crew").click();
+    assert.match(await loungeImage.getAttribute("src"),/Gamer_friends_playing_video_game/);
+    assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"#join");
     await page.locator(".lounge-hotspot--arcade").click();
+    assert.equal(await loungeImage.getAttribute("src"),arcadeImage,"arcade image should restore");
     assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"/arcade.html");
     const loungeBox=await page.locator(".lounge-layout").boundingBox();
     assert.ok(loungeBox && loungeBox.x>=-2 && loungeBox.x+loungeBox.width<=scenario.size.width+2,
