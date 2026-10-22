@@ -1,0 +1,135 @@
+/* Arcade-only structural rules for the homepage's existing site header.
+   The actual smoke logo typography, dimensions, and banner styling come from
+   the shared /brand-header.css used by index.html. Do not replace that artwork. */
+.arcade-site .site-header{
+  position:relative;z-index:80;min-height:84px;
+  background:rgba(7,18,15,.93);border-bottom:1px solid rgba(187,240,187,.17);
+  backdrop-filter:blur(20px);
+}
+.arcade-site .site-header .header-shell{
+  width:min(calc(100% - 2 * clamp(20px,4.6vw,76px)),1260px);
+  max-width:1260px;margin-inline:auto;height:84px;min-height:84px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.arcade-site .site-header .logo{color:#eff6e7;text-decoration:none;flex:0 0 auto}
+.arcade-site .site-header .desktop-nav{
+  display:flex;align-items:center;gap:clamp(13px,2vw,29px);margin-left:auto;
+}
+.arcade-site .site-header .desktop-nav a{
+  color:#eaf0dd;font:800 clamp(9px,.82vw,11px)/1.2 'DM Sans',sans-serif;
+  letter-spacing:.09em;white-space:nowrap;text-decoration:none;transition:color .2s;
+}
+.arcade-site .site-header .desktop-nav a:hover,
+.arcade-site .site-header .desktop-nav a[aria-current="page"]{color:#b8f875}
+.arcade-site .site-header .desktop-nav .nav-join{
+  padding:14px 17px;border:1px solid rgba(184,240,147,.36);
+  border-radius:10px;color:#b8f875;
+}
+.arcade-site .site-header .desktop-nav .nav-join:hover{border-color:#b8f875;background:rgba(184,248,117,.1)}
+.arcade-site .site-header .nav-join span{font-size:17px;margin-left:10px}
+.arcade-site .site-header .header-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.arcade-site .site-header .fx-toggle{
+  background:rgba(10,28,23,.66);border:1px solid rgba(187,240,187,.17);color:#d5e8d0;
+  font:800 9px/1.2 'DM Sans',sans-serif;letter-spacing:.08em;padding:9px 12px;
+  display:flex;align-items:center;gap:10px;cursor:pointer;white-space:nowrap;
+}
+.arcade-site .site-header .fx-switch{
+  position:relative;width:34px;height:18px;border-radius:999px;
+  background:#1d3a2e;border:1px solid rgba(187,240,187,.17);
+  flex:none;transition:background .25s,border-color .25s;
+}
+.arcade-site .site-header .fx-knob{
+  position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;
+  background:#8fa895;transition:left .25s,background .25s,box-shadow .25s;
+}
+.arcade-site .site-header .fx-toggle[aria-pressed="true"] .fx-switch{
+  background:rgba(184,248,117,.22);border-color:rgba(184,248,117,.6);
+}
+.arcade-site .site-header .fx-toggle[aria-pressed="true"] .fx-knob{
+  left:18px;background:#b8f875;box-shadow:0 0 8px rgba(184,248,117,.8);
+}
+.arcade-site .site-header .fx-toggle:disabled{opacity:.55;cursor:not-allowed}
+.arcade-site .site-header .menu-toggle{
+  display:none;width:43px;height:43px;padding:0;border:1px solid rgba(187,240,187,.17);
+  background:#0e221b;align-items:center;justify-content:center;flex-direction:column;gap:7px;
+}
+.arcade-site .site-header .menu-toggle span{
+  width:20px;height:2px;background:#edffe4;transition:transform .2s;
+}
+.arcade-site .site-header .menu-toggle[aria-expanded="true"] span:first-child{transform:translateY(4.5px) rotate(45deg)}
+.arcade-site .site-header .menu-toggle[aria-expanded="true"] span:last-child{transform:translateY(-4.5px) rotate(-45deg)}
+.arcade-site .site-header a:focus-visible,.arcade-site .site-header button:focus-visible,
+.arcade-site .arcade-site-footer a:focus-visible{outline:3px solid #b8f875;outline-offset:4px}
+.arcade-site .arcade-site-footer{position:relative;z-index:1;border-top:1px solid rgba(187,240,187,.17)}
+.arcade-site .arcade-site-footer .footer-shell{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:60px;
+  width:min(calc(100% - 2 * clamp(20px,4.6vw,76px)),1260px);
+  margin-inline:auto;padding-block:60px;
+}
+.arcade-site .arcade-site-footer .footer-logo{
+  color:#eaf0dd;font:900 36px/.9 'Barlow Condensed',Impact,sans-serif;text-decoration:none;
+}
+.arcade-site .arcade-site-footer .footer-logo strong{color:#b8f875}
+.arcade-site .arcade-site-footer p{color:#a3b4a0;font-size:13px;margin:8px 0 0}
+.arcade-site .arcade-site-footer .footer-links{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:16px}
+.arcade-site .arcade-site-footer .footer-links a{
+  font:700 10px/1.3 'DM Sans',sans-serif;color:#eaf0dd;letter-spacing:.07em;text-decoration:none;
+}
+.arcade-site .arcade-site-footer .footer-links a:hover{color:#b8f875}
+.arcade-site .arcade-site-footer .footer-links small{display:block;width:100%;text-align:right;font-size:10px;color:#a3b4a0}
+.arcade-site .arcade-site-footer .arcade-disclaimer{max-width:400px;line-height:1.5}
+:root.fx-off .arcade-site .animate-marquee{animation:none!important}
+/* The homepage's tablet header already uses independent translate.
+   React's mobile header uses transform; never stack both translations. */
+@media(min-width:761px) and (max-width:1050px){
+  .arcade-site .site-header .header-shell .logo.brand-lockup{
+    position:absolute;left:50%;top:50%;
+    translate:-50% -50%;transform:none;
+  }
+}
+@media(max-width:760px){
+  .arcade-site .site-header .header-shell .logo.brand-lockup{
+    position:absolute;left:50%;top:50%;
+    translate:none;transform:translate(-50%,-50%);
+  }
+}
+@media(min-width:761px) and (max-width:1050px){
+  .arcade-site .site-header .header-shell{position:relative;justify-content:center;gap:0}
+  .arcade-site .site-header .header-actions{display:contents}
+  .arcade-site .site-header .menu-toggle{display:flex;position:absolute;left:0;top:50%;translate:0 -50%;z-index:15}
+  .arcade-site .site-header .fx-toggle{position:absolute;right:0;top:50%;translate:0 -50%;z-index:15}
+  .arcade-site .site-header .desktop-nav:not(.open){display:none}
+  .arcade-site .site-header .desktop-nav.open{
+    display:flex;position:absolute;top:100%;left:0;right:0;z-index:30;
+    flex-direction:column;align-items:stretch;gap:0;padding:14px clamp(20px,3vw,34px) 22px;
+    background:#0b1b14;border:1px solid rgba(187,240,187,.17);box-shadow:0 20px 40px #0009;
+  }
+  .arcade-site .site-header .desktop-nav a{display:block;min-height:44px;padding:14px 10px;font-size:12px}
+}
+@media(max-width:760px){
+  .arcade-site .site-header,.arcade-site .site-header .header-shell{min-height:72px;height:72px}
+  .arcade-site .site-header .header-shell{position:relative;isolation:isolate;justify-content:center;gap:0}
+  .arcade-site .site-header .header-actions{display:contents}
+  .arcade-site .site-header .menu-toggle{display:flex;position:absolute;left:0;top:50%;translate:0 -50%;z-index:15}
+  .arcade-site .site-header .fx-toggle{position:absolute;right:0;top:50%;translate:0 -50%;z-index:15;padding-inline:6px}
+  .arcade-site .site-header .desktop-nav:not(.open){display:none}
+  .arcade-site .site-header .desktop-nav.open{
+    display:flex;position:absolute;top:100%;left:0;right:0;z-index:30;
+    flex-direction:column;align-items:stretch;gap:0;
+    padding:12px clamp(17px,5vw,28px) 23px;
+    background:#0b1b14;border-bottom:1px solid rgba(187,240,187,.17);
+  }
+  .arcade-site .site-header .desktop-nav.open a{display:block;padding:12px 6px;font-size:13px;min-height:44px}
+  .arcade-site .arcade-site-footer .footer-shell{flex-direction:column;gap:20px;padding-block:40px}
+  .arcade-site .arcade-site-footer .footer-links{justify-content:flex-start}
+  .arcade-site .arcade-site-footer .footer-links small{text-align:left}
+}
+@media(max-width:420px){
+  .arcade-site .site-header .fx-toggle{font-size:0;gap:0;width:42px;height:42px;justify-content:center}
+  .arcade-site .site-header .fx-toggle .fx-switch{width:28px;height:18px}
+  .arcade-site .site-header .fx-toggle[aria-pressed="true"] .fx-knob{left:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  .arcade-site .site-header .fx-knob,.arcade-site .site-header .menu-toggle span{transition:none}
+  .arcade-site .animate-marquee{animation:none!important}
+}

@@ -52,6 +52,8 @@ jobs:
         run: |
           npm install --no-save playwright@1.56.1
           npx playwright install --with-deps chromium firefox webkit
+      - name: New React arcade integration
+        run: node tests/new-arcade-browser.mjs
       - name: Cross-browser compatibility (Chromium, Firefox, WebKit)
         run: node tests/cross-browser.mjs
       - name: Arcade authentication and gameplay browser tests
@@ -60,8 +62,6 @@ jobs:
         run: node tests/spark-relay-browser.mjs
       - name: Responsive browser smoke tests
         run: node tests/browser-smoke.mjs
-      - name: New React arcade integration
-        run: node tests/new-arcade-browser.mjs
       - name: Save browser previews
         if: always()
         uses: actions/upload-artifact@v4

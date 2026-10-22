@@ -6,7 +6,7 @@ import CannaRunner from './components/CannaRunner.tsx';
 import LeaderboardView from './components/LeaderboardView.tsx';
 import DiscordSuite from './components/DiscordSuite.tsx';
 import TrophyShelf from './components/TrophyShelf.tsx';
-import LeafEmblem from './components/LeafEmblem.tsx';
+import SiteHeader from './components/SiteHeader.tsx';
 import { GameId, GameDifficulty, ScoreRecord, UserProfile, Achievement, RunResult } from './game/types.ts';
 import { INITIAL_ACHIEVEMENTS, evaluateRunAchievements, getDifficultyConfig } from './game/rules.ts';
 import { sounds } from './game/audio.ts';
@@ -152,7 +152,7 @@ const showToast = (msg: string) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#080f0e] text-[#eaf0dd] flex flex-col font-sans">
+    <div className="arcade-site min-h-screen bg-[#080f0e] text-[#eaf0dd] flex flex-col font-sans">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-4 right-4 z-50 bg-[#10211b] border border-[#b8f875] text-[#b8f875] px-4 py-2.5 rounded shadow-2xl flex items-center space-x-2 animate-bounce">
@@ -161,87 +161,10 @@ const showToast = (msg: string) => {
         </div>
       )}
 
-      {/* Website Header exactly matching the420lobby.com/arcade.html */}
-      <header className="border-b border-[#294637] bg-[#080f0eed] sticky top-0 z-40 backdrop-blur-md">
-        <div className="max-w-[1376px] w-[calc(100%-48px)] sm:w-[calc(100%-96px)] mx-auto min-h-[86px] flex items-center justify-between gap-4">
-          {/* Brand Wordmark */}
-          <div
-            className="flex items-center gap-1 text-[17px] font-heading font-black tracking-tight cursor-pointer select-none"
-            onClick={() => setActiveTab('main')}
-          >
-            <span>THE</span>
-            <LeafEmblem className="w-5 h-5 mx-0.5 inline-block" />
-            <span>420</span>
-            <span>LOBBY<span className="text-[#b8f875]">.</span></span>
-            <b className="text-[8px] font-mono tracking-widest text-[#87dcca] px-1.5 py-0.5 border border-[#8ea79a] rounded ml-2 hidden sm:inline-block">
-              ARCADE
-            </b>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8 text-[11px] font-mono tracking-wider text-[#b7c5b5]">
-            <button
-              onClick={() => {
-                setActiveTab('main');
-                const el = document.getElementById('games');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="hover:text-[#b8f875] transition"
-            >
-              GAMES
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab('main');
-                const el = document.getElementById('leaderboard');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="hover:text-[#b8f875] transition"
-            >
-              LEADERBOARD
-            </button>
-            <button
-              onClick={() => setActiveTab('discord')}
-              className={`hover:text-[#87dcca] transition ${activeTab === 'discord' ? 'text-[#87dcca] font-bold' : ''}`}
-            >
-              DISCORD SUITE
-            </button>
-            <a
-              href="https://discord.gg/the420lobby"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white transition flex items-center space-x-1"
-            >
-              <span>DISCORD</span>
-              <span aria-hidden="true">↗</span>
-            </a>
-          </nav>
-
-          {/* Header Actions */}
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={handleToggleMute}
-              className={`p-2 rounded border border-[#294637] text-xs transition ${
-                !isMuted ? 'text-[#b8f875] bg-[#b8f875]/5' : 'text-[#b7c5b5] bg-[#10211b]'
-              }`}
-              title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
-            >
-              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </button>
-
-            <button
-              onClick={() => setActiveTab('discord')}
-              className="flex items-center space-x-2 px-3 py-1.5 bg-[#87dcca] hover:bg-[#6bcdb8] text-[#080f0e] rounded text-xs font-heading font-bold tracking-wider transition"
-            >
-              <span>{currentUser.isDiscordConnected ? currentUser.username : 'Connect Discord'}</span>
-              <span>↗</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Main Body */}
-      <main className="flex-1">
+      <main id="main" className="flex-1">
         {activeTab === 'main' && (
           <div className="space-y-16 pb-20">
             {/* HERO SECTION matching the420lobby.com/arcade.html */}
@@ -282,6 +205,19 @@ const showToast = (msg: string) => {
                   >
                     View high scores ↗
                   </button>
+                  <button type="button"
+                    onClick={() => {setActiveTab('discord');window.scrollTo({top:0,behavior:'instant'});}}
+                    className="text-xs font-mono text-[#87dcca] hover:text-[#b8f875] transition underline underline-offset-4">
+                    {currentUser.isDiscordConnected ? 'My Discord Profile ↗' : 'Connect Discord ↗'}
+                  </button>
+                  <button type="button" onClick={handleToggleMute}
+                    aria-label={isMuted?'Unmute arcade sounds':'Mute arcade sounds'}
+                    aria-pressed={!isMuted}
+                    className="inline-flex items-center gap-2 px-4 py-3 border border-[#294637] rounded text-xs font-mono text-[#eaf0dd] hover:border-[#b8f875] transition">
+                    {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                    {isMuted?'SOUND OFF':'SOUND ON'}
+                  </button>
+
                 </div>
 
                 <div className="flex flex-wrap gap-4 text-[9px] font-mono text-[#b7c5b5] mt-10 pt-6 border-t border-[#294637]">
@@ -290,6 +226,15 @@ const showToast = (msg: string) => {
                   <span>✦ NO PAY-TO-WIN</span>
                   <span>✦ GUEST PLAY AVAILABLE</span>
                 </div>
+              </div>
+            </section>
+
+            {/* Official site artwork, shared with the homepage instead of a substitute logo. */}
+            <section className="lobby-brand-banner" aria-label="The 420 Lobby branded lounge artwork">
+              <div className="lobby-brand-banner-frame">
+                <img src="/assets/the420lobby-neon-lounge.webp"
+                  alt="The 420 Lobby smoke-formed 420, game controller, and green gaming lounge"
+                  width={2172} height={724} loading="lazy" decoding="async" />
               </div>
             </section>
 
@@ -627,6 +572,8 @@ const showToast = (msg: string) => {
         {/* TAB 2: Discord Suite */}
         {activeTab === 'discord' && (
           <div className="max-w-[1376px] w-[calc(100%-48px)] sm:w-[calc(100%-96px)] mx-auto py-10">
+            <button type="button" onClick={()=>setActiveTab('main')}
+              className="text-[#b8f875] font-mono text-xs mb-6 hover:underline">← BACK TO THE ARCADE</button>
             <DiscordSuite currentUser={currentUser} csrfToken={session?.csrfToken||null} configured={Boolean(session?.configured)} />
           </div>
         )}
@@ -759,32 +706,21 @@ const showToast = (msg: string) => {
         </div>
       )}
 
-      {/* Footer exactly matching the420lobby.com */}
-      <footer className="border-t border-[#294637] bg-[#080f0e] py-8 text-xs text-[#b7c5b5]">
-        <div className="max-w-[1376px] w-[calc(100%-48px)] sm:w-[calc(100%-96px)] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-mono">
-          <div className="flex items-center space-x-2">
-            <span className="font-heading font-bold text-white tracking-widest text-sm">
-              THE 420 <span className="text-[#b8f875]">LOBBY.</span>
-            </span>
-            <span>•</span>
-            <span>AFTER CHEERS, WE PLAY.</span>
+      <footer className="arcade-site-footer">
+        <div className="footer-shell">
+          <div>
+            <a className="footer-logo" href="/">THE 420 <strong>LOBBY.</strong></a>
+            <p>Game. Sesh. Repeat.</p>
+            <p className="arcade-disclaimer">Just for fun. No real-world prizes or Discord roles. Community scores are account-linked, not replay-verified.</p>
           </div>
-
-          <div className="flex items-center space-x-4">
-            <a
-              href="https://discord.gg/the420lobby"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#87dcca] hover:underline flex items-center space-x-1"
-            >
-              <span>DISCORD SERVER</span>
-              <span aria-hidden="true">↗</span>
-            </a>
+          <div className="footer-links">
+            <a href="/#vibe">THE VIBE</a>
+            <a href="/#experiences">WHAT WE DO</a>
+            <a href="/arcade.html#top">BACK TO TOP ↑</a>
+            <a href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer">JOIN THE SERVER ↗</a>
+            <small>© 2026 THE 420 LOBBY.</small>
           </div>
         </div>
-        <p className="text-[10px] text-center text-[#8ea79a] mt-3 font-mono">
-          Just for fun. No real-world prizes or Discord roles. Community scores are not replay-verified.
-        </p>
       </footer>
     </div>
   );
