@@ -73,6 +73,19 @@ try {
       assert.equal(await menuButton.isVisible(),true,scenario.name+" hamburger is hidden");
       await menuButton.click();
       assert.equal(await nav.isVisible(),true,scenario.name+" menu should open on tap");
+      const joinContrast=await page.locator("#primary-nav .nav-join").evaluate(link=>{
+        const color=getComputedStyle(link).color,background=getComputedStyle(link).backgroundColor;
+        const linear=(part)=>{const v=part/255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;};
+        const luminance=(value)=>{
+          const rgb=value.match(/[\d.]+/g)?.slice(0,3).map(Number)||[0,0,0];
+          return .2126*linear(rgb[0])+.7152*linear(rgb[1])+.0722*linear(rgb[2]);
+        };
+        const a=luminance(color),b=luminance(background);
+        return {color,background,ratio:(Math.max(a,b)+.05)/(Math.min(a,b)+.05)};
+      });
+      assert.ok(joinContrast.ratio>=4.5,
+        scenario.name+" JOIN THE SERVER contrast is unreadable: "+JSON.stringify(joinContrast));
+
       assert.equal(await menuButton.getAttribute("aria-expanded"),"true");
       await page.locator(".logo").click();
       assert.equal(await nav.isVisible(),false,scenario.name+" outside tap should dismiss nav");

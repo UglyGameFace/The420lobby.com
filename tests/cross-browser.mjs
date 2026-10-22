@@ -172,7 +172,9 @@ try{
           assert.ok(await page.locator("#menu-toggle").isVisible(),name+" tablet menu toggle hidden");
           assert.equal(await page.locator("#primary-nav").isVisible(),false,name+" desktop links should collapse on tablet");
           await page.locator("#menu-toggle").click();
-          assert.equal(await page.locator("#primary-nav").isVisible(),true,name+" tablet menu failed to open");
+          await page.locator("#primary-nav").waitFor({state:"visible",timeout:2500});
+          assert.equal(await page.locator("#menu-toggle").getAttribute("aria-expanded"),"true",
+            name+" tablet menu state not expanded");
           await page.locator("#menu-toggle").click();
           const menuState=await page.evaluate(()=>{
             const nav=document.querySelector("#primary-nav"),button=document.querySelector("#menu-toggle");

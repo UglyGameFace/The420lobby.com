@@ -9,10 +9,22 @@ export function json(data, status = 200, headers = {}) {
   });
 }
 
-export function errorResponse(error) {
+export function errorResponse(error, request) {
   if (error instanceof HttpError) return json({error: {code: error.code, message: error.message}}, error.status);
-  // Do not return SQL, OAuth responses, cookie values, or stack traces to browsers.
-  console.error("Arcade request failed", error?.name || "Error");
+  // Log an allowlisted route and sanitized Cloudflare request ID only. Never
+  // include URL queries, Discord authorization codes, sessions, IPs, SQL,
+  // credentials, user IDs, or potentially sensitive exception messages.
+  const path = request ? new URL(request.url).pathname : "";
+  const named = new Set(["/api/session","/api/cheers","/api/cheers/spark","/api/cheers/presence",
+    "/auth/discord","/auth/callback","/auth/claim","/auth/logout",
+    "/api/profile","/api/leaderboards","/api/runs",
+    "/api/arcade-v2/profile","/api/arcade-v2/leaderboards","/api/arcade-v2/runs"]);
+  const route = named.has(path) ? path
+    : /^\/api\/arcade-v2\/runs\/[^/]+\/finish$/.test(path) ? "/api/arcade-v2/runs/:id/finish"
+    : /^\/api\/runs\/[^/]+\/finish$/.test(path) ? "/api/runs/:id/finish" : "/other";
+  const ray = (request?.headers.get("CF-Ray") || "").match(/^[A-Za-z0-9-]{1,48}$/)?.[0] || "unknown";
+  console.error("Arcade request failed", {route, method: ["GET","POST","HEAD"].includes(request?.method) ? request.method : "OTHER",
+    kind: /^[A-Za-z]+Error$/.test(error?.name||"") ? error.name : "Error", ray});
   return json({error: {code: "service_unavailable", message: "The arcade is temporarily unavailable. Please try again."}}, 503);
 }
 
