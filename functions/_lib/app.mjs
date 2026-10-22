@@ -14,7 +14,7 @@ export async function handleRequest(context, options = {}) {
       // Same Pages project/assets, distinct default page by *exact* trusted host.
       // Root domain continues to serve the main website unchanged.
       const page = new URL("/arcade.html", request.url);
-      response = await context.next(new Request(page, request));
+      response = await env.ASSETS.fetch(new Request(page, request));
     } else if (path === "/auth/claim") {
       allowMethod(request, ["GET"]); response = await claimArcadeSession(request, env);
     } else if (path === "/api/session") {

@@ -360,9 +360,12 @@ test("arcade subdomain uses the main OAuth callback with single-use browser-boun
   assert.equal(await home.text(),"home-site");
   assert.equal(requestedAsset,"/", "main website root was rewritten");
 
-  const lobby = await app.request("/", {origin:arcade,next:request=>{
+  app.env.ASSETS={fetch:async request=>{
     requestedAsset=new URL(request.url).pathname;
     return new Response("new-react-arcade", {headers:{"Content-Type":"text/html"}});
+  }};
+  const lobby = await app.request("/", {origin:arcade,next:()=>{
+    throw new Error("Arcade root should use the authoritative Pages ASSETS binding");
   }});
   assert.equal(lobby.status,200);
   assert.equal(await lobby.text(),"new-react-arcade");
