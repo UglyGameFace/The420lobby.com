@@ -490,3 +490,17 @@ test("CHEERS game has its own discoverable section and a usable first-time guide
   assert.doesNotMatch(page,/href="https:\/\/discord\.gg\/the420lobby"[^>]*>[^<]*CALL THE CREW/i,
     "Do not imply the website directly invokes the Discord role ping");
 });
+
+test("homepage navigation contrast and account-linked score copy stay consistent",()=>{
+  const homeCss=read("homepage-consistency.css");
+  assert.match(html,/href="\/homepage-consistency\.css\?v=20261022-mobile-audit1"/);
+  assert.ok(html.indexOf("/homepage-consistency.css")>html.indexOf("/lounge.css"),
+    "homepage overrides must load after competing design layers");
+  assert.match(homeCss,/\.site-header \.header-shell \.desktop-nav \.nav-join/);
+  assert.match(homeCss,/color:#0a1b0e/);
+  assert.match(homeCss,/background:var\(--lime\)/);
+  assert.match(homeCss,/:focus-visible/);
+  assert.match(homeCss,/max-height:min\(75svh,540px\)/);
+  assert.doesNotMatch(html,/Three quick games, real verified high scores/);
+  assert.match(html,/Three quick games, Discord-linked community scores/);
+});

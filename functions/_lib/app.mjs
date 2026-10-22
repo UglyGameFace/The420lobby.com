@@ -70,5 +70,5 @@ export async function handleRequest(context, options = {}) {
     protectedResponse.headers.set("X-Frame-Options", "DENY");
     protectedResponse.headers.set("Cross-Origin-Resource-Policy", "same-origin");
     return protectedResponse;
-  } catch (error) { return errorResponse(error); }
+  } catch (error) { return errorResponse(error, request); }
 }

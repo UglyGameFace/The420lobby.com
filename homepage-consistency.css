@@ -1,0 +1,53 @@
+/* Main homepage consistency fixes, loaded after the legacy and redesign styles.
+   Keep the existing art and palette; resolve only conflicting interactive chrome. */
+
+/* styles.css paints the CTA lime, but lobby-redesign.css later painted its
+   text lime too. The final design needs the original high-contrast dark ink. */
+.site-header .header-shell .desktop-nav .nav-join,
+.site-header .header-shell .desktop-nav .nav-join:visited,
+.site-header .header-shell .desktop-nav .nav-join:hover,
+.site-header .header-shell .desktop-nav .nav-join:focus-visible {
+  background:var(--lime);
+  color:#0a1b0e;
+  border-color:var(--lime);
+  font-weight:800;
+}
+.site-header .header-shell .desktop-nav .nav-join:hover,
+.site-header .header-shell .desktop-nav .nav-join:focus-visible {
+  background:#e0ffbb;
+}
+
+/* In the screenshot the open navigation competes visually with the hero.
+   Dim the page behind the panel without adding another click-trap or scroll
+   listener. The real nav stays above this noninteractive backdrop. */
+@media(max-width:1050px) {
+  .site-header .header-shell {position:relative;z-index:1}
+  .site-header:has(.desktop-nav.open)::after {
+    content:"";
+    display:block;
+    position:absolute;
+    top:100%;left:0;right:0;height:100svh;
+    background:rgba(0,7,4,.56);
+    pointer-events:none;
+    z-index:0;
+  }
+  .site-header .header-shell .desktop-nav.open {
+    max-height:min(75svh,540px);
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    box-shadow:0 24px 52px rgba(0,0,0,.68);
+  }
+  .site-header .header-shell .desktop-nav.open .nav-join {
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    text-align:center;
+    margin-top:13px;
+    border-bottom:1px solid var(--lime);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .site-header .header-shell .desktop-nav.open {scroll-behavior:auto}
+}
