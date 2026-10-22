@@ -105,7 +105,7 @@ try{
       console.error("Arcade viewport "+width+" overflow "+overflow+"px; protruding elements="+JSON.stringify(offenders));
     }
     assert.ok(overflow<=2,"mobile horizontal overflow at "+width+" ("+overflow+"px)");
-    await page.getByRole("button",{name:"Connect Discord ↗"}).click();
+    await page.locator("main section").first().getByRole("button",{name:"Connect Discord ↗"}).click();
     await page.getByText("YOUR DISCORD IDENTITY").waitFor();
     assert.equal(await page.locator('a[href="/auth/discord"]').isVisible(),true,"discord login was inaccessible after header restoration");
     await page.getByRole("button",{name:"← BACK TO THE ARCADE"}).click();
