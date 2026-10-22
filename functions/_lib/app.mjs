@@ -1,7 +1,7 @@
 import {allowMethod, errorResponse, HttpError, json} from "./http.mjs";
 import {beginDiscord, completeDiscord, getSession, isConfigured, logout, requireSession} from "./auth.mjs";
 import {finishRun, leaderboards, profile, startRun} from "./arcade.mjs";
-import {startArcadeV2Run, finishArcadeV2Run, arcadeV2Leaderboards} from "./arcade-v2.mjs";
+import {startArcadeV2Run, finishArcadeV2Run, arcadeV2Leaderboards, ARCADE_V2_RULES} from "./arcade-v2.mjs";
 import {getCheers, joinCheers, sparkCheers, cheersPresence} from "./cheers.mjs";
 
 export async function handleRequest(context, options = {}) {
@@ -28,6 +28,8 @@ export async function handleRequest(context, options = {}) {
     } else if (path === "/api/cheers/presence") {
       allowMethod(request, ["POST"]);
       response = await cheersPresence(request, env);
+    } else if (path === "/api/arcade-v2/profile") {
+      allowMethod(request, ["GET"]); response = await profile(request, env, ARCADE_V2_RULES);
     } else if (path === "/api/arcade-v2/leaderboards") {
       allowMethod(request, ["GET"]); response = await arcadeV2Leaderboards(request, env);
     } else if (path === "/api/arcade-v2/runs") {

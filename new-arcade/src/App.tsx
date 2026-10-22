@@ -62,7 +62,7 @@ useEffect(() => {
         if(!active)return;
         setSession(s);
         if(s.user){
-          const p=await arcadeRequest<ArcadeProfile>('/api/profile');
+          const p=await arcadeRequest<ArcadeProfile>('/api/arcade-v2/profile');
           if(active)setCurrentUser(prev=>({...prev,id:p.user.id,username:p.user.username,
             avatarUrl:p.user.avatarUrl,tag:'',isDiscordConnected:true,roles:[],
             totalGamesPlayed:p.stats.runs,totalScore:p.stats.totalScore}));
@@ -113,7 +113,7 @@ const showToast = (msg: string) => {
         setRecordStatus('Saved to the Discord community leaderboard. Full replay verification is not enabled.');
         setRecentRun(prev=>prev?.id===newRecord.id?{...prev,score:saved.score}:prev);
         window.dispatchEvent(new Event('arcade:v2:saved'));
-        const p=await arcadeRequest<ArcadeProfile>('/api/profile');
+        const p=await arcadeRequest<ArcadeProfile>('/api/arcade-v2/profile');
         setCurrentUser(prev=>({...prev,totalGamesPlayed:p.stats.runs,totalScore:p.stats.totalScore}));
       }catch(error){
         setRecordStatus('Could not publish this score. '+(error instanceof Error?error.message:'Please try another round.'));

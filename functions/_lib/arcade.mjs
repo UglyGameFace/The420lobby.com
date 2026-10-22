@@ -5,14 +5,14 @@ import {hash, publicUser, randomToken, rateLimit, requireCsrf, requireSession} f
 const RUN_LIFETIME_MS = 15 * 60 * 1000;
 const isGame = value => GAME_IDS.includes(value);
 
-export async function profile(request, env) {
+export async function profile(request, env, ruleVersion = RULES_VERSION) {
   const {user} = await requireSession(request, env);
   const [stats, bests, achievements] = await Promise.all([
-    env.DB.prepare("SELECT COUNT(*) AS runs, COALESCE(SUM(score), 0) AS totalScore, COUNT(DISTINCT game) AS gamesPlayed FROM scores WHERE user_id = ?").bind(user.id).first(),
+    env.DB.prepare("SELECT COUNT(*) AS runs, COALESCE(SUM(s.score), 0) AS totalScore, COUNT(DISTINCT s.game) AS gamesPlayed FROM scores s JOIN game_runs r ON r.id=s.run_id WHERE s.user_id = ? AND r.rules_version = ?").bind(user.id, ruleVersion).first(),
     env.DB.prepare(`SELECT game, score, played_at AS playedAt FROM (
-      SELECT game, score, played_at, ROW_NUMBER() OVER (PARTITION BY game ORDER BY score DESC, played_at ASC, run_id ASC) AS position
-      FROM scores WHERE user_id = ?) WHERE position = 1 ORDER BY game`).bind(user.id).all(),
-    env.DB.prepare("SELECT achievement_id AS id, unlocked_at AS unlockedAt FROM achievements WHERE user_id = ? ORDER BY unlocked_at, achievement_id").bind(user.id).all()
+      SELECT s.game, s.score, s.played_at, ROW_NUMBER() OVER (PARTITION BY s.game ORDER BY s.score DESC, s.played_at ASC, s.run_id ASC) AS position
+      FROM scores s JOIN game_runs r ON r.id=s.run_id WHERE s.user_id = ? AND r.rules_version = ?) WHERE position = 1 ORDER BY game`).bind(user.id, ruleVersion).all(),
+    ruleVersion === RULES_VERSION ? env.DB.prepare("SELECT achievement_id AS id, unlocked_at AS unlockedAt FROM achievements WHERE user_id = ? ORDER BY unlocked_at, achievement_id").bind(user.id).all() : Promise.resolve({results:[]})
   ]);
   return json({user, stats, bests: bests.results, achievements: achievements.results});
 }

@@ -25,7 +25,7 @@ async function wire(page,loggedIn){
     const req=route.request(),url=new URL(req.url());
     let body,status=200;
     if(url.pathname==="/api/session")body={user:loggedIn?member:null,csrfToken:loggedIn?"browser-fixture-csrf":null,configured:true};
-    else if(url.pathname==="/api/profile")body={user:member,stats:{runs:4,totalScore:1240,gamesPlayed:2},achievements:[],bests:[]};
+    else if(url.pathname==="/api/arcade-v2/profile")body={user:member,stats:{runs:4,totalScore:1240,gamesPlayed:2},achievements:[],bests:[]};
     else if(url.pathname==="/api/arcade-v2/leaderboards")body={entries:loggedIn?[{rank:1,game:"sesh-invaders",score:1240,user:member,playedAt:Date.now()}]:[],verification:"discord-account-and-plausibility-only"};
     else if(url.pathname==="/api/arcade-v2/runs"&&req.method()==="POST"){
       assert.equal(req.headers()["x-csrf-token"],"browser-fixture-csrf");
