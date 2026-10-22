@@ -205,6 +205,11 @@ const showToast = (msg: string) => {
                   >
                     View high scores ↗
                   </button>
+                  <button type="button"
+                    onClick={() => {setActiveTab('discord');window.scrollTo({top:0,behavior:'instant'});}}
+                    className="text-xs font-mono text-[#87dcca] hover:text-[#b8f875] transition underline underline-offset-4">
+                    {currentUser.isDiscordConnected ? 'My Discord Profile ↗' : 'Connect Discord ↗'}
+                  </button>
                   <button type="button" onClick={handleToggleMute}
                     aria-label={isMuted?'Unmute arcade sounds':'Mute arcade sounds'}
                     aria-pressed={!isMuted}
@@ -567,6 +572,8 @@ const showToast = (msg: string) => {
         {/* TAB 2: Discord Suite */}
         {activeTab === 'discord' && (
           <div className="max-w-[1376px] w-[calc(100%-48px)] sm:w-[calc(100%-96px)] mx-auto py-10">
+            <button type="button" onClick={()=>setActiveTab('main')}
+              className="text-[#b8f875] font-mono text-xs mb-6 hover:underline">← BACK TO THE ARCADE</button>
             <DiscordSuite currentUser={currentUser} csrfToken={session?.csrfToken||null} configured={Boolean(session?.configured)} />
           </div>
         )}

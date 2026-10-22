@@ -93,7 +93,7 @@
   .arcade-site .site-header .desktop-nav a{display:block;min-height:44px;padding:14px 10px;font-size:12px}
 }
 @media(max-width:760px){
-  .arcade-site .site-header,.arcade-site .site-header .header-shell{min-height:72px}
+  .arcade-site .site-header,.arcade-site .site-header .header-shell{min-height:72px;height:72px}
   .arcade-site .site-header .header-shell{position:relative;isolation:isolate;justify-content:center;gap:0}
   .arcade-site .site-header .header-actions{display:contents}
   .arcade-site .site-header .menu-toggle{display:flex;position:absolute;left:0;top:50%;translate:0 -50%;z-index:15}

@@ -88,6 +88,11 @@ try{
     assert.equal(await page.locator("button").filter({hasText:"Launch Canna-Runner"}).count(),1);
     assert.equal(await page.locator("body").evaluate(el=>getComputedStyle(el).backgroundColor),"rgb(8, 15, 14)");
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth<=2),"mobile horizontal overflow at "+width);
+    await page.getByRole("button",{name:"Connect Discord ↗"}).click();
+    await page.getByText("YOUR DISCORD IDENTITY").waitFor();
+    assert.equal(await page.locator('a[href="/auth/discord"]').isVisible(),true,"discord login was inaccessible after header restoration");
+    await page.getByRole("button",{name:"← BACK TO THE ARCADE"}).click();
+    await page.getByText("CHOOSE YOUR SESH").waitFor();
     await page.getByRole("button",{name:/Launch Sesh Invaders/i}).click();
     await page.getByText("THE GAME ROOM").waitFor();
     assert.deepEqual(calls,[],"guest should not create an authenticated scoring run");
