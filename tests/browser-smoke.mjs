@@ -77,7 +77,7 @@ try {
         const color=getComputedStyle(link).color,background=getComputedStyle(link).backgroundColor;
         const linear=(part)=>{const v=part/255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;};
         const luminance=(value)=>{
-          const rgb=value.match(/[\\d.]+/g)?.slice(0,3).map(Number)||[0,0,0];
+          const rgb=value.match(/[\d.]+/g)?.slice(0,3).map(Number)||[0,0,0];
           return .2126*linear(rgb[0])+.7152*linear(rgb[1])+.0722*linear(rgb[2]);
         };
         const a=luminance(color),b=luminance(background);
