@@ -79,9 +79,15 @@
 .arcade-site .arcade-site-footer .footer-links small{display:block;width:100%;text-align:right;font-size:10px;color:#a3b4a0}
 .arcade-site .arcade-site-footer .arcade-disclaimer{max-width:400px;line-height:1.5}
 :root.fx-off .arcade-site .animate-marquee{animation:none!important}
-/* Tailwind's compiled base resets independent translate on the React surface.
-   The homepage's absolute-centering contract must be explicit on this page. */
-@media(max-width:1050px){
+/* The homepage's tablet header already uses independent translate.
+   React's mobile header uses transform; never stack both translations. */
+@media(min-width:761px) and (max-width:1050px){
+  .arcade-site .site-header .header-shell .logo.brand-lockup{
+    position:absolute;left:50%;top:50%;
+    translate:-50% -50%;transform:none;
+  }
+}
+@media(max-width:760px){
   .arcade-site .site-header .header-shell .logo.brand-lockup{
     position:absolute;left:50%;top:50%;
     translate:none;transform:translate(-50%,-50%);
