@@ -6,8 +6,8 @@ import {HttpError} from "../functions/_lib/http.mjs";
 const bong={score:520,difficulty:"Normal",elapsedMs:35000,stats:{perfectHits:3,niceHits:1,misses:4,accuracy:50,durationSeconds:35}};
 const runner={score:850,difficulty:"Normal",elapsedMs:11000,stats:{trichomes:4,distance:180,durationSeconds:11}};
 const invaders={score:3400,difficulty:"Fever",elapsedMs:24000,stats:{wave:2,cleanKills:9,durationSeconds:24}};
-function rejects(game,body,wall=40000){
-  assert.throws(()=>validateCommunityResult(game,body,wall),e=>e instanceof HttpError&&e.status===422);
+function rejects(game,body,wall=40000,status=422){
+  assert.throws(()=>validateCommunityResult(game,body,wall),e=>e instanceof HttpError&&e.status===status);
 }
 
 test("the new Arcade has a distinct rules-version namespace to protect replay-verified historical rankings",()=>{
@@ -30,6 +30,6 @@ test("community score checks reject fabricated timing, inflated results, and mal
   rejects("sesh-invaders",{...invaders,stats:{wave:2,cleanKills:"9"}});
   rejects("sesh-invaders",{...invaders,elapsedMs:50000},20000);
   rejects("sesh-invaders",{...invaders,difficulty:"Impossible"});
-  rejects("sesh-invaders",{...invaders,extra:"untrusted"});
+  rejects("sesh-invaders",{...invaders,extra:"untrusted"},40000,400);
   rejects("bong-blitz",{...bong,stats:{...bong.stats,__proto__:null,evil:Infinity}});
 });

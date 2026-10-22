@@ -2,7 +2,6 @@
 import {cp, mkdir, readdir, rm, lstat} from 'node:fs/promises';
 import {resolve, dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {execFileSync} from 'node:child_process';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = join(root, 'dist');
 export const publicFiles = [
@@ -24,6 +23,4 @@ for (const path of publicFiles) await copyPublic(path);
 for (const asset of await readdir(join(root,'assets'),{withFileTypes:true})) {
   if (asset.isFile() && /\.(?:svg|png|avif|webp|jpe?g|gif|ico)$/i.test(asset.name)) await copyPublic('assets/'+asset.name);
 }
-// Build the new React arcade into the same Pages output, without removing the static site.
-execFileSync(process.execPath,[join(root,'node_modules/vite/bin/vite.js'),'build','--config','arcade-vite.config.mjs'],{cwd:root,stdio:'inherit'});
-console.log('Prepared dist/ with new arcade bundle and public assets only. No deployment performed.');
+console.log('Prepared dist/ with curated static assets. No deployment performed.');
