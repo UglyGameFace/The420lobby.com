@@ -4,8 +4,8 @@
 .indie-spotlight__title{font:900 clamp(36px,5vw,58px)/.98 'Barlow Condensed',Impact,sans-serif;letter-spacing:-.025em;margin:8px 0 0;text-transform:uppercase}
 .indie-spotlight__title span{color:#b8f875}
 .indie-spotlight__intro{max-width:340px;font:400 13px/1.6 'DM Sans',sans-serif;color:#b7c5b5}
-.indie-spotlight__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
-.indie-spotlight__card{--tint:#b8f875;position:relative;display:block;isolation:isolate;overflow:hidden;aspect-ratio:1.56;border:1px solid #365949;border-radius:17px;background:#10211b;text-decoration:none;color:#fff;box-shadow:0 14px 35px #0004;transition:transform .23s,border-color .23s,box-shadow .23s}
+.indie-spotlight__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));min-width:0;gap:22px}
+.indie-spotlight__card{--tint:#b8f875;position:relative;display:block;min-width:0;width:100%;max-width:100%;isolation:isolate;overflow:hidden;aspect-ratio:1.56;border:1px solid #365949;border-radius:17px;background:#10211b;text-decoration:none;color:#fff;box-shadow:0 14px 35px #0004;transition:transform .23s,border-color .23s,box-shadow .23s}
 .indie-spotlight__card--friday{--tint:#87dcca}
 /* Character portraits are sourced from the creators' real game rosters.
    The old fictional-character poster files are intentionally not displayed. */
@@ -19,7 +19,7 @@
 .indie-spotlight__card--friday .indie-spotlight__fighter-name{background:#1a142ee5;color:#f6d8ff}
 
 .indie-spotlight__card::after{content:"";position:absolute;z-index:0;inset:0;background:linear-gradient(180deg,rgba(4,12,10,.54) 0%,transparent 24%,transparent 54%,rgba(5,12,10,.9) 100%);pointer-events:none}
-.indie-spotlight__top,.indie-spotlight__bottom{position:absolute;left:20px;right:20px;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.indie-spotlight__top,.indie-spotlight__bottom{position:absolute;left:20px;right:20px;z-index:1;min-width:0;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .indie-spotlight__top{top:18px}
 .indie-spotlight__badge{padding:8px 11px;border:1px solid #ffffff46;border-radius:999px;background:#071510bd;backdrop-filter:blur(12px);color:var(--tint);font:800 10px/1 'DM Sans',sans-serif;letter-spacing:.12em}
 .indie-spotlight__external{font:700 10px/1.4 'DM Sans',sans-serif;letter-spacing:.06em;color:#edf7e8;text-shadow:0 2px 5px #000}
@@ -33,5 +33,16 @@
 .indie-spotlight__card:hover .indie-spotlight__play{transform:translateX(3px)}
 .indie-spotlight__card:focus-visible{outline:3px solid var(--tint);outline-offset:4px}
 @media(max-width:900px){.indie-spotlight__head{align-items:start;flex-direction:column}.indie-spotlight__grid{grid-template-columns:1fr}.indie-spotlight__card{aspect-ratio:1.7}}
-@media(max-width:600px){.indie-spotlight{width:calc(100% - 36px)}.indie-spotlight__card{aspect-ratio:1.14;min-height:340px}.indie-spotlight__top,.indie-spotlight__bottom{left:14px;right:14px}.indie-spotlight__bottom{bottom:16px}.indie-spotlight__name{font-size:32px}.indie-spotlight__play{padding:12px 9px;font-size:10px}.indie-spotlight__description{font-size:11px}.indie-spotlight__portrait-grid{padding:56px 12px 104px;gap:9px}.indie-spotlight__fighter{border-radius:9px}.indie-spotlight__fighter-name{font-size:10px;padding:5px}.indie-spotlight__badge{font-size:9px;padding:8px}.indie-spotlight__external{font-size:9px}}
+@media(max-width:600px){.indie-spotlight{width:calc(100% - 36px)}.indie-spotlight__grid{grid-template-columns:minmax(0,1fr)}.indie-spotlight__card{aspect-ratio:1.14;min-height:390px}.indie-spotlight__top,.indie-spotlight__bottom{left:14px;right:14px}.indie-spotlight__bottom{bottom:16px}.indie-spotlight__name{font-size:32px}.indie-spotlight__play{padding:12px 9px;font-size:10px}.indie-spotlight__description{font-size:11px}.indie-spotlight__portrait-grid{padding:56px 12px 104px;gap:9px}.indie-spotlight__fighter{border-radius:9px}.indie-spotlight__fighter-name{font-size:10px;padding:5px}.indie-spotlight__badge{font-size:9px;padding:8px}.indie-spotlight__external{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.indie-spotlight__card,.indie-spotlight__portrait,.indie-spotlight__play{transition:none}}
+
+/* At 320px the CTA + long fighter title used to impose 388px intrinsic
+   min-content width on a 284px card. Text wraps, never the page itself. */
+@media(max-width:420px){
+  .indie-spotlight__top{flex-wrap:wrap;align-items:flex-start;gap:7px}
+  .indie-spotlight__bottom{flex-wrap:wrap;align-items:flex-end;gap:8px}
+  .indie-spotlight__bottom>div{min-width:0;flex:1 1 148px}
+  .indie-spotlight__name{overflow-wrap:anywhere;font-size:clamp(24px,8.5vw,32px)}
+  .indie-spotlight__play{margin-left:auto}
+  .indie-spotlight__portrait-grid{padding-bottom:123px}
+}
