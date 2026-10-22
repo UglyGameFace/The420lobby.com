@@ -4,14 +4,14 @@ const fighters = [
   {
     title: 'Boondocks Brawl',
     url: 'https://boondocksbrawl.com/',
-    image: '/assets/indie/boondocks-brawl.webp',
+    image: '/assets/boondocks-brawl.webp',
     subtitle: 'Neighborhood battles, arcade & online fights',
     className: '',
   },
   {
     title: 'Friday Fighters',
     url: 'https://fridayfighters.com/',
-    image: '/assets/indie/friday-fighters.webp',
+    image: '/assets/friday-fighters.webp',
     subtitle: 'Retro Friday-inspired showdowns',
     className: 'indie-spotlight__card--friday',
   },
