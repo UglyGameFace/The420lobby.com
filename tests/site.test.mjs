@@ -15,7 +15,7 @@ const leaf = read("assets/approved-leaf.svg");
 const lounge = read("assets/haunted-lounge.svg");
 const icon = read("favicon.svg");
 const smokeLogo = read("assets/approved-smoke-420.svg");
-const arcadePage=read("arcade.html");
+const arcadePage=read("arcade-classic.html");
 const brandCss=read("brand-header.css");
 const cheersArt = read("assets/approved-smoke-cheers.svg");
 const game = read("sesh-signal.js");
@@ -297,7 +297,7 @@ test("arcade CSS is independently versioned and not hidden in stale global style
 test("all Arcade game accessories are represented by photographs, not SVG props", () => {
   const media=read("shared/arcade-media.mjs");
   const mini=read("arcade-games.js");
-  const arcade=read("arcade.html");
+  const arcade=read("arcade-classic.html");
   const polish=read("arcade-premium.css");
   for(const id of ["lighter","grinder","papers","clean-glass","broken-bong","broken-pipe","leaf","bong"]){
     assert.ok(media.includes(id+":" )||media.includes('"'+id+'":'),"missing photograph: "+id);
@@ -332,7 +332,7 @@ test("shared verified rules preserve Sesh Signal kit bonuses and glass hazards",
 });
 
 test("the full arcade preserves community links and provides accessible Discord gates", () => {
-  const page = read("arcade.html");
+  const page = read("arcade-classic.html");
   for (const feature of ["THE", "LOBBY", "Discord", "Sesh Signal", "Green Room", "Bong Blitz", "Minecraft", "Cinema"]) {
     assert.ok(page.toLowerCase().includes(feature.toLowerCase()), "arcade missing " + feature);
   }
@@ -350,7 +350,7 @@ test("the full arcade preserves community links and provides accessible Discord 
 });
 
 test("frontend code never contains Discord secrets or stores authentication tokens", () => {
-  for (const path of ["index.html", "arcade.html", "arcade-app.js", "arcade-api.js", "arcade-games.js", "sesh-signal.js", "sesh-loader.js", "script.js"]) {
+  for (const path of ["index.html", "arcade.html", "arcade-classic.html", "arcade-app.js", "arcade-api.js", "arcade-games.js", "sesh-signal.js", "sesh-loader.js", "script.js"]) {
     const source = read(path);
     assert.doesNotMatch(source, /DISCORD_CLIENT_SECRET|client_secret\s*[:=]|discordAccessToken|access_token\s*[:=]|refresh_token\s*[:=]/i, path + " exposes an OAuth secret or token");
     assert.doesNotMatch(source, /(?:localStorage|sessionStorage)\.(?:setItem|getItem)\([^)]*(?:token|session|auth)/i, path + " stores browser-readable authentication state");
@@ -427,7 +427,7 @@ test("Green Room's six pair photos are visually unique, including glass pipe vs 
 
 
 test("Arcade artwork preserves complete source proportions on every device",()=>{
-  const page=read("arcade.html"),visual=read("arcade-premium.css");
+  const page=read("arcade-classic.html"),visual=read("arcade-premium.css");
   assert.match(page,/href="\/arcade-premium\.css\?v=20261018-full-artwork3"/);
   assert.match(visual,/\.hero-art img\{[^}]*height:auto;[^}]*object-fit:contain/);
   assert.match(visual,/\.arcade-hero \.hero-art img\{[^}]*height:auto;object-fit:contain/);

@@ -24,12 +24,13 @@ export async function leaderboards(request, env) {
   await rateLimit(env, `boards:${request.headers.get("CF-Connecting-IP") || "local"}`, 90, 60);
   const since = period === "week" ? Date.now() - 7 * 24 * 60 * 60 * 1000 : 0;
   const result = await env.DB.prepare(`WITH personal_bests AS (
-      SELECT user_id, score, played_at, run_id,
-        ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY score DESC, played_at ASC, run_id ASC) AS position
-      FROM scores WHERE game = ? AND played_at >= ?
+      SELECT s.user_id, s.score, s.played_at, s.run_id,
+        ROW_NUMBER() OVER (PARTITION BY s.user_id ORDER BY s.score DESC, s.played_at ASC, s.run_id ASC) AS position
+      FROM scores s JOIN game_runs r ON r.id = s.run_id
+      WHERE s.game = ? AND s.played_at >= ? AND r.rules_version = ?
     ) SELECT u.id, u.username, u.avatar_url, b.score, b.played_at
       FROM personal_bests b JOIN users u ON b.user_id = u.id WHERE b.position = 1
-      ORDER BY b.score DESC, b.played_at ASC, b.run_id ASC LIMIT 50`).bind(game, since).all();
+      ORDER BY b.score DESC, b.played_at ASC, b.run_id ASC LIMIT 50`).bind(game, since, RULES_VERSION).all();
   return json({game, period, entries: result.results.map((row, index) => ({rank: index + 1, user: publicUser(row), score: row.score, playedAt: row.played_at})), updatedAt: Date.now()});
 }
 
@@ -77,7 +78,7 @@ export async function finishRun(request, env, runId) {
   try { verified = validateRun(run.game, run.seed, body.events, {elapsedMs: body.elapsedMs, wallElapsedMs: now - run.started_at}); }
   catch { throw new HttpError(422, "invalid_run", "This round could not be verified. Start a new round and try again."); }
   if (!Number.isSafeInteger(verified.score) || verified.score < 0 || verified.score > 1000000) throw new HttpError(422, "invalid_run", "This round could not be verified.");
-  const previous = await env.DB.prepare("SELECT COALESCE(MAX(score), 0) AS best FROM scores WHERE user_id = ? AND game = ?").bind(session.user.id, run.game).first();
+  const previous = await env.DB.prepare("SELECT COALESCE(MAX(s.score), 0) AS best FROM scores s JOIN game_runs r ON r.id = s.run_id WHERE s.user_id = ? AND s.game = ? AND r.rules_version = ?").bind(session.user.id, run.game, RULES_VERSION).first();
   const result = {id: run.id, game: run.game, score: verified.score, stats: verified.stats, achievements: verified.achievements,
     best: Math.max(previous.best, verified.score), isPersonalBest: verified.score > previous.best};
   const statements = [

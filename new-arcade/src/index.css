@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --bg: #080f0e;
+  --panel: #10211b;
+  --ink: #eaf0dd;
+  --muted: #b7c5b5;
+  --lime: #b8f875;
+  --purple: #87dcca;
+  --line: #294637;
+  font: 400 14px/1.6 'DM Sans', system-ui, sans-serif;
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-heading {
+    font-family: 'Barlow Condensed', Impact, 'Arial Narrow', sans-serif;
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .font-arcade {
+    font-family: 'Barlow Condensed', Impact, monospace;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .font-mono-numbers {
+    font-family: 'DM Sans', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Authentic Website Typography & Accents */
+.text-lime {
+  color: var(--lime);
+}
+
+.text-purple {
+  color: var(--purple);
+}
+
+.bg-panel {
+  background-color: var(--panel);
+}
+
+.border-line {
+  border-color: var(--line);
+}
+
+/* Marquee Ticker Animation */
+@keyframes marqueeScroll {
+  from { transform: translateX(0%); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 22s linear infinite;
+}
+
+/* Subtle Glows matching the420lobby */
+.glow-lime {
+  text-shadow: 0 0 14px rgba(187, 255, 100, 0.45);
+}
+
+.glow-purple {
+  text-shadow: 0 0 14px rgba(179, 138, 249, 0.45);
+}
+
+.box-glow-lime {
+  box-shadow: 0 0 30px -5px rgba(187, 255, 100, 0.25), inset 0 0 15px -3px rgba(187, 255, 100, 0.08);
+}
+
+.box-glow-purple {
+  box-shadow: 0 0 30px -5px rgba(179, 138, 249, 0.25), inset 0 0 15px -3px rgba(179, 138, 249, 0.08);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #080f0e;
+}
+::-webkit-scrollbar-thumb {
+  background: #294637;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--lime);
+}
+
+/* Shared The 420 Lobby palette and accessibility */
+:root{--bg:#080f0e;--panel:#10211b;--ink:#eaf0dd;--muted:#b7c5b5;--lime:#b8f875;--purple:#87dcca;--line:#294637}
+body{background:var(--bg)}
+:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.animate-marquee{animation:none}}

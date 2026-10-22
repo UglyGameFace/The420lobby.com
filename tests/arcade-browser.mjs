@@ -73,7 +73,7 @@ try {
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
     const state = await fixture(page, false);
-    await page.goto(address + "/arcade.html", {waitUntil:"domcontentloaded"});
+    await page.goto(address + "/arcade-classic.html", {waitUntil:"domcontentloaded"});
     await page.waitForFunction(() => document.querySelector("#auth-status")?.textContent !== "Checking sign-in availability…");
     assert.equal(await page.locator(".game-card-photo").count(),3,
       width+"px landing game cards must use photographs instead of SVG collages");
@@ -139,7 +139,7 @@ try {
   page.on("pageerror", error => errors.push(error.message));
   await page.clock.install();
   const state = await fixture(page, true);
-  await page.goto(address + "/arcade.html", {waitUntil:"domcontentloaded"});
+  await page.goto(address + "/arcade-classic.html", {waitUntil:"domcontentloaded"});
   await page.locator("#account-chip").waitFor({state:"visible"});
   assert.equal(await page.locator("#account-name").textContent(), player.username);
   assert.equal(await page.locator("#account-avatar").getAttribute("src"), player.avatarUrl);
