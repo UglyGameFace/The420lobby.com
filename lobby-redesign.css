@@ -22,7 +22,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .logo-type{font-size:clamp(12px,1.3vw,16px);line-height:1;white-space:nowrap}
 .desktop-nav{display:flex;align-items:center;gap:clamp(13px,2vw,29px);margin-left:auto}
 .desktop-nav a{font-size:clamp(9px,.82vw,11px);white-space:nowrap;letter-spacing:.09em}
-.desktop-nav .nav-join{padding:14px 17px;border:1px solid rgba(184,240,147,.36);border-radius:10px;color:var(--leaf)}
+.desktop-nav .nav-join{padding:14px 17px;border:1px solid var(--lime);border-radius:10px;color:#0a1b0e;background:var(--lime);font-weight:800}
 .header-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .hero{position:relative;min-height:clamp(680px,84svh,970px);isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 80% 36%,#234339 0%,transparent 50%),linear-gradient(140deg,#101e19,#07110e 64%)}
 .hero-content{min-height:clamp(680px,84svh,970px);display:flex;align-items:center;padding-block:clamp(115px,13vw,180px);position:relative;z-index:6}
@@ -242,5 +242,31 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   }
   .site-header .header-shell .desktop-nav a{
     display:block;min-height:44px;padding:14px 10px;font-size:12px;
+  }
+}
+
+// Homepage navigation quality: the CTA's dark ink must remain legible in every
+// theme and interaction state, even when ambient accent variables change.
+.site-header .desktop-nav .nav-join:is(:hover,:focus-visible) {
+  color:#0a1b0e;
+  background:#e0ffbb;
+}
+@media(max-width:1050px) {
+  /* Keep the real menu above a noninteractive dimmer rather than allowing it
+     to visually fight with the smoke and headline behind it. */
+  .site-header .header-shell {position:relative;z-index:1}
+  .site-header:has(.desktop-nav.open)::after {
+    content:"";display:block;position:absolute;top:100%;left:0;right:0;
+    height:100svh;background:rgba(0,7,4,.56);
+    pointer-events:none;z-index:0;
+  }
+  .site-header .header-shell .desktop-nav.open {
+    max-height:min(75svh,540px);overflow-y:auto;overscroll-behavior:contain;
+    box-shadow:0 24px 52px rgba(0,0,0,.68);
+  }
+  .site-header .header-shell .desktop-nav.open .nav-join {
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    min-height:48px;margin-top:13px;text-align:center;
+    border-bottom:1px solid var(--lime);
   }
 }

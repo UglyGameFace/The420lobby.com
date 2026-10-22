@@ -492,11 +492,11 @@ test("CHEERS game has its own discoverable section and a usable first-time guide
 });
 
 test("homepage navigation contrast and account-linked score copy stay consistent",()=>{
-  const homeCss=read("homepage-consistency.css");
-  assert.match(html,/href="\/homepage-consistency\.css\?v=20261022-mobile-audit1"/);
-  assert.ok(html.indexOf("/homepage-consistency.css")>html.indexOf("/lounge.css"),
-    "homepage overrides must load after competing design layers");
-  assert.match(homeCss,/\.site-header \.header-shell \.desktop-nav \.nav-join/);
+  const homeCss=read("lobby-redesign.css");
+  assert.match(html,/href="\/lobby-redesign\.css\?v=20261022-home-audit1"/);
+  assert.ok(html.indexOf("/lobby-redesign.css")>html.indexOf("/styles.css"),
+    "authoritative redesign sheet should load after the legacy base");
+  assert.match(homeCss,/\.desktop-nav \.nav-join\{/);
   assert.match(homeCss,/color:#0a1b0e/);
   assert.match(homeCss,/background:var\(--lime\)/);
   assert.match(homeCss,/:focus-visible/);
