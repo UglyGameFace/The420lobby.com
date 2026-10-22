@@ -20,6 +20,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+      - name: Install website and arcade dependencies
+        run: npm install --no-audit --no-fund
+      - name: Typecheck new React arcade
+        run: npm run typecheck
       - name: JavaScript syntax
         run: |
           node --check script.js
@@ -28,6 +32,8 @@ jobs:
           node --check sesh-signal.js
           node --check sesh-loader.js
           node --check arcade-api.js
+          node --check arcade-vite.config.mjs
+          node --check functions/_lib/arcade-v2.mjs
           node --check scripts/build-static.mjs
           node --check arcade-app.js
           node --check arcade-games.js
@@ -36,6 +42,8 @@ jobs:
           find functions -type f \( -name '*.mjs' -o -name '*.js' \) -exec node --check {} \;
       - name: Site, gameplay, authentication and persistence regression tests
         run: node --test tests/*.test.mjs
+      - name: Build website and new arcade
+        run: npm run build
       - name: Compile Cloudflare Pages Functions without deploying
         run: npx --yes wrangler@4 pages functions build --outdir=.wrangler/functions-build
       - name: Install browser smoke-test tooling
