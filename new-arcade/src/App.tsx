@@ -7,6 +7,7 @@ import LeaderboardView from './components/LeaderboardView.tsx';
 import DiscordSuite from './components/DiscordSuite.tsx';
 import TrophyShelf from './components/TrophyShelf.tsx';
 import SiteHeader from './components/SiteHeader.tsx';
+import IndieSpotlight from './components/IndieSpotlight.tsx';
 import {siteLinks} from './site-links.ts';
 import { GameId, GameDifficulty, ScoreRecord, UserProfile, Achievement, RunResult } from './game/types.ts';
 import { INITIAL_ACHIEVEMENTS, evaluateRunAchievements, getDifficultyConfig } from './game/rules.ts';
@@ -439,6 +440,8 @@ const showToast = (msg: string) => {
                 </button>
               </div>
             </section>
+
+            <IndieSpotlight />
 
             {/* TWO-COLUMN PLAYER GRID: Leaderboard + Trophy Shelf */}
             <section className="max-w-[1376px] w-[calc(100%-48px)] sm:w-[calc(100%-96px)] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
