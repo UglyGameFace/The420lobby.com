@@ -134,14 +134,14 @@ try {
       "keyboard navigation must change the scene image");
     assert.match(await loungeImage.getAttribute("src"),/Man_playing_video_games/);
     assert.equal(await page.locator("#lounge-preview-title").textContent(),"YOUR PLAYER CORNER");
-    assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"/arcade.html#profile");
+    assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"https://arcade.the420lobby.com/#profile");
     assert.equal(await page.locator(".lounge-hotspot--profile").getAttribute("aria-pressed"),"true");
     await page.locator(".lounge-hotspot--crew").click();
     assert.match(await loungeImage.getAttribute("src"),/Gamer_friends_playing_video_game/);
     assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"#join");
     await page.locator(".lounge-hotspot--arcade").click();
     assert.equal(await loungeImage.getAttribute("src"),arcadeImage,"arcade image should restore");
-    assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"/arcade.html");
+    assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"https://arcade.the420lobby.com/");
     const loungeBox=await page.locator(".lounge-layout").boundingBox();
     assert.ok(loungeBox && loungeBox.x>=-2 && loungeBox.x+loungeBox.width<=scenario.size.width+2,
       "interactive lounge overflows "+scenario.name+": "+JSON.stringify(loungeBox));

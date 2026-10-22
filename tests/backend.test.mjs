@@ -43,15 +43,15 @@ function fixture() {
   const env = {DB: new TestD1(), SITE_ORIGIN: "https://arcade.test", DISCORD_CLIENT_ID: "123456789012345678", DISCORD_CLIENT_SECRET: "test-server-only-secret"};
   return {
     env,
-    async request(path, {method = "GET", body, rawBody, headers = {}, session, fetcher, next} = {}) {
+    async request(path, {method = "GET", body, rawBody, headers = {}, session, fetcher, next, origin = env.SITE_ORIGIN} = {}) {
       const requestHeaders = new Headers(headers);
       if (session) requestHeaders.set("Cookie", `${SESSION_COOKIE}=${session.token}`);
       if (method !== "GET" && method !== "HEAD") {
-        if (!requestHeaders.has("Origin")) requestHeaders.set("Origin", env.SITE_ORIGIN);
+        if (!requestHeaders.has("Origin")) requestHeaders.set("Origin", origin);
         if (session?.csrf && !requestHeaders.has("X-CSRF-Token")) requestHeaders.set("X-CSRF-Token", session.csrf);
       }
       if (body !== undefined && !requestHeaders.has("Content-Type")) requestHeaders.set("Content-Type", "application/json");
-      const request = new Request(`${env.SITE_ORIGIN}${path}`, {method, headers: requestHeaders, body: rawBody ?? (body === undefined ? undefined : JSON.stringify(body))});
+      const request = new Request(`${origin}${path}`, {method, headers: requestHeaders, body: rawBody ?? (body === undefined ? undefined : JSON.stringify(body))});
       return handleRequest({request, env, next: next || (() => new Response("game module"))}, {fetcher});
     },
     async login(id = "123456789012345679", username = "lobby_friend") {
@@ -345,4 +345,108 @@ test("new arcade persists CSRF-authenticated scores, isolates classic records, a
   } finally {
     Date.now=originalNow;
   }
+});
+
+
+test("arcade subdomain uses the main OAuth callback with single-use browser-bound handoff and host-only cookies", async () => {
+  const app = fixture(), primary = "https://the420lobby.com", arcade = "https://arcade.the420lobby.com";
+  app.env.SITE_ORIGIN = primary;
+
+  let requestedAsset = null;
+  const home = await app.request("/", {origin:primary, next:request=>{
+    requestedAsset=new URL(request?.url||primary+"/").pathname;
+    return new Response("home-site");
+  }});
+  assert.equal(await home.text(),"home-site");
+  assert.equal(requestedAsset,"/", "main website root was rewritten");
+
+  const lobby = await app.request("/", {origin:arcade,next:request=>{
+    requestedAsset=new URL(request.url).pathname;
+    return new Response("new-react-arcade", {headers:{"Content-Type":"text/html"}});
+  }});
+  assert.equal(lobby.status,200);
+  assert.equal(await lobby.text(),"new-react-arcade");
+  assert.equal(requestedAsset,"/arcade.html");
+
+  const begin = await app.request("/auth/discord", {origin:arcade});
+  assert.equal(begin.status,302);
+  const nonceCookie=begin.headers.getSetCookie().find(c=>c.startsWith("__Host-420_arcade_browser="));
+  assert.ok(nonceCookie);
+  assert.match(nonceCookie,/Path=\/; HttpOnly; Secure; SameSite=Lax; Max-Age=600/);
+  assert.equal(nonceCookie.includes("Domain="),false);
+  const loginAtRoot=new URL(begin.headers.get("Location"));
+  assert.equal(loginAtRoot.origin,primary);
+  assert.equal(loginAtRoot.pathname,"/auth/discord");
+  assert.match(loginAtRoot.searchParams.get("arcade_nonce_hash"),/^[a-f0-9]{64}$/);
+
+  const rootBegin=await app.request(loginAtRoot.pathname+loginAtRoot.search,{origin:primary});
+  const authorize=new URL(rootBegin.headers.get("Location"));
+  assert.equal(authorize.origin,"https://discord.com");
+  assert.equal(authorize.searchParams.get("redirect_uri"),primary+"/auth/callback");
+  const rootOAuthCookie=oauthBrowserCookie(rootBegin);
+  const continuationCookie=rootBegin.headers.getSetCookie().find(c=>c.startsWith("__Host-420_arcade_flow=")).split(";")[0];
+  const state=authorize.searchParams.get("state");
+  const fetcher=async url=>{
+    if(url.endsWith("/oauth2/token"))return Response.json({token_type:"Bearer",access_token:"test-token"});
+    if(url.endsWith("/users/@me"))return Response.json({id:"123456789012345679",username:"arcade_guest",avatar:null});
+    throw new Error("Unexpected Discord endpoint");
+  };
+  const callbackPath="/auth/callback?state="+encodeURIComponent(state)+"&code=sample-code";
+  const rootReturn=await app.request(callbackPath,{origin:primary,headers:{Cookie:rootOAuthCookie+"; "+continuationCookie},fetcher});
+  const claimUrl=new URL(rootReturn.headers.get("Location"));
+  assert.equal(claimUrl.origin,arcade);
+  assert.equal(claimUrl.pathname,"/auth/claim");
+  assert.match(claimUrl.searchParams.get("ticket"),/^[A-Za-z0-9_-]{43}$/);
+  assert.equal(rootReturn.headers.getSetCookie().some(c=>c.includes("Domain=")),false);
+
+  const claimPath=claimUrl.pathname+claimUrl.search;
+  assert.equal((await app.request(claimPath,{origin:arcade})).headers.get("Location"),arcade+"/?auth=expired","claim without nonce worked");
+  const falseNonce="__Host-420_arcade_browser="+randomToken();
+  assert.equal((await app.request(claimPath,{origin:arcade,headers:{Cookie:falseNonce}})).headers.get("Location"),arcade+"/?auth=expired","another browser redeemed ticket");
+  assert.equal((await app.request(claimPath,{origin:primary,headers:{Cookie:nonceCookie.split(";")[0]}})).status,404,"main origin redeemed arcade ticket");
+  const redeemed=await app.request(claimPath,{origin:arcade,headers:{Cookie:nonceCookie.split(";")[0]}});
+  assert.equal(redeemed.headers.get("Location"),arcade+"/");
+  const newCookie=redeemed.headers.getSetCookie().find(c=>c.startsWith(SESSION_COOKIE+"="));
+  assert.match(newCookie,/Path=\/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800/);
+  assert.equal(newCookie.includes("Domain="),false);
+  const secondUse=await app.request(claimPath,{origin:arcade,headers:{Cookie:nonceCookie.split(";")[0]}});
+  assert.equal(secondUse.headers.get("Location"),arcade+"/?auth=expired");
+
+  const userState=await data(await app.request("/api/session",{origin:arcade,headers:{Cookie:newCookie.split(";")[0]}}));
+  assert.equal(userState.user.username,"arcade_guest");
+  assert.ok(userState.csrfToken);
+  const run=await app.request("/api/arcade-v2/runs",{origin:arcade,method:"POST",headers:{Cookie:newCookie.split(";")[0],"X-CSRF-Token":userState.csrfToken},body:{game:"sesh-invaders"}});
+  assert.equal(run.status,201,"arcade host could not create an authenticated run");
+  const forged=await app.request("/api/arcade-v2/runs",{origin:arcade,method:"POST",headers:{Cookie:newCookie.split(";")[0],Origin:primary,"X-CSRF-Token":userState.csrfToken},body:{game:"sesh-invaders"}});
+  assert.equal(await errorCode(forged),"invalid_origin");
+  const different=await app.request("/api/arcade-v2/runs",{origin:arcade,method:"POST",headers:{Cookie:newCookie.split(";")[0],"X-CSRF-Token":"invalid"},body:{game:"sesh-invaders"}});
+  assert.equal(await errorCode(different),"invalid_csrf");
+});
+
+test("arcade login handoff cannot be replayed after expiration or mismatched callback binding", async () => {
+  const app=fixture(),primary="https://the420lobby.com",arcade="https://arcade.the420lobby.com";
+  app.env.SITE_ORIGIN=primary;
+  const incoming=await app.request("/auth/discord",{origin:arcade});
+  const nonce=incoming.headers.getSetCookie().find(c=>c.startsWith("__Host-420_arcade_browser=")).split(";")[0];
+  const rootBegin=await app.request(new URL(incoming.headers.get("Location")).pathname+new URL(incoming.headers.get("Location")).search,{origin:primary});
+  const authorization=new URL(rootBegin.headers.get("Location"));
+  const state=authorization.searchParams.get("state");
+  const oauthCookie=oauthBrowserCookie(rootBegin);
+  const flow=rootBegin.headers.getSetCookie().find(c=>c.startsWith("__Host-420_arcade_flow=")).split(";")[0];
+  const path="/auth/callback?state="+encodeURIComponent(state)+"&code=x";
+  const missingFlow=await app.request(path,{origin:primary,headers:{Cookie:oauthCookie}});
+  assert.equal(missingFlow.headers.get("Location"),primary+"/arcade.html?auth=expired");
+  const fakeFetcher=async url=>url.endsWith("/oauth2/token")
+    ? Response.json({token_type:"Bearer",access_token:"token"})
+    : Response.json({id:"123456789012345679",username:"trusted_user",avatar:null});
+  const success=await app.request(path,{origin:primary,headers:{Cookie:oauthCookie+"; "+flow},fetcher:fakeFetcher});
+  const url=new URL(success.headers.get("Location")),ticket=url.searchParams.get("ticket");
+  assert.ok(ticket);
+  const nonceHash=await hash(nonce.split("=")[1]);
+  app.env.DB.sqlite.prepare("UPDATE sessions SET expires_at=0 WHERE token_hash=?")
+    .run(await hash("arcade-ticket:"+ticket+":"+nonceHash));
+  const expired=await app.request("/auth/claim?ticket="+ticket,{origin:arcade,headers:{Cookie:nonce}});
+  assert.equal(expired.headers.get("Location"),arcade+"/?auth=expired");
+  assert.equal((await app.request(path,{origin:primary,headers:{Cookie:oauthCookie+"; "+flow},fetcher:fakeFetcher})).headers.get("Location"),
+    arcade+"/?auth=expired","replayed callback created another ticket");
 });

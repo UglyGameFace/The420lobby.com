@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {ShieldCheck, ExternalLink, LogOut} from "lucide-react";
 import type {UserProfile} from "../game/types.ts";
 import {arcadeRequest} from "../services/arcade-api.ts";
+import {siteLinks} from "../site-links.ts";
 interface Props {currentUser:UserProfile;csrfToken:string|null;configured:boolean}
 export default function DiscordSuite({currentUser,csrfToken,configured}:Props){
   const [busy,setBusy]=useState(false),[error,setError]=useState("");
@@ -9,7 +10,7 @@ export default function DiscordSuite({currentUser,csrfToken,configured}:Props){
   async function logout(){
     if(!csrfToken)return;
     setBusy(true);setError("");
-    try{await arcadeRequest("/auth/logout",{},csrfToken);window.location.assign("/arcade.html");}
+    try{await arcadeRequest("/auth/logout",{},csrfToken);window.location.assign(siteLinks().arcade.split("#")[0]);}
     catch(e){setError(e instanceof Error?e.message:"Could not sign out.");setBusy(false);}
   }
   return <section className="bg-[#10211b] border border-[#294637] rounded-xl p-6 max-w-3xl mx-auto space-y-5">

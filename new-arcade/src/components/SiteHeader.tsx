@@ -1,8 +1,10 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {siteLinks} from "../site-links.ts";
 
 type Connection = {saveData?:boolean;addEventListener?:(type:string,listener:()=>void)=>void;removeEventListener?:(type:string,listener:()=>void)=>void};
 
 export default function SiteHeader() {
+  const links=siteLinks();
   const [menuOpen,setMenuOpen]=useState(false);
   const [effectsEnabled,setEffectsEnabled]=useState(true);
   const [reducedEffects,setReducedEffects]=useState(false);
@@ -53,7 +55,7 @@ export default function SiteHeader() {
 
   return <header className="site-header" id="top">
     <div className="header-shell shell" ref={shellRef}>
-      <a className="logo brand-lockup" href="/" aria-label="The 420 Lobby home">
+      <a className="logo brand-lockup" href={links.home} aria-label="The 420 Lobby home">
         <span className="logo-type logo-prefix brand-lockup__the">THE</span>
         <span className="brand-lockup__smoke">
           <img className="brand-smoke-image"
@@ -65,10 +67,10 @@ export default function SiteHeader() {
         <span className="logo-type logo-suffix brand-lockup__lobby">LOBBY</span>
       </a>
       <nav className={'desktop-nav'+(menuOpen?' open':'')} id="primary-nav" aria-label="Main navigation">
-        <a href="/#vibe" onClick={closeMenu}>THE VIBE</a>
-        <a href="/#experiences" onClick={closeMenu}>WHAT WE DO</a>
-        <a href="/arcade.html#games" aria-current="page" onClick={closeMenu}>PLAY THE ARCADE</a>
-        <a href="/#after-dark" onClick={closeMenu}>AFTER DARK</a>
+        <a href={links.vibe} onClick={closeMenu}>THE VIBE</a>
+        <a href={links.experiences} onClick={closeMenu}>WHAT WE DO</a>
+        <a href={links.arcade} aria-current="page" onClick={closeMenu}>PLAY THE ARCADE</a>
+        <a href={links.afterDark} onClick={closeMenu}>AFTER DARK</a>
         <a className="nav-join" href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
           JOIN THE SERVER <span aria-hidden="true">↗</span>
         </a>

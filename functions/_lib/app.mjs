@@ -1,5 +1,5 @@
 import {allowMethod, errorResponse, HttpError, json} from "./http.mjs";
-import {beginDiscord, completeDiscord, getSession, isConfigured, logout, requireSession} from "./auth.mjs";
+import {beginDiscord, completeDiscord, claimArcadeSession, isArcadeHost, getSession, isConfigured, logout, requireSession} from "./auth.mjs";
 import {finishRun, leaderboards, profile, startRun} from "./arcade.mjs";
 import {startArcadeV2Run, finishArcadeV2Run, arcadeV2Leaderboards, ARCADE_V2_RULES} from "./arcade-v2.mjs";
 import {getCheers, joinCheers, sparkCheers, cheersPresence} from "./cheers.mjs";
@@ -9,7 +9,15 @@ export async function handleRequest(context, options = {}) {
   const path = new URL(request.url).pathname;
   try {
     let response;
-    if (path === "/api/session") {
+    if ((path === "/" || path === "/index.html") && isArcadeHost(request, env)) {
+      allowMethod(request, ["GET", "HEAD"]);
+      // Same Pages project/assets, distinct default page by *exact* trusted host.
+      // Root domain continues to serve the main website unchanged.
+      const page = new URL("/arcade.html", request.url);
+      response = await context.next(new Request(page, request));
+    } else if (path === "/auth/claim") {
+      allowMethod(request, ["GET"]); response = await claimArcadeSession(request, env);
+    } else if (path === "/api/session") {
       allowMethod(request, ["GET"]);
       const session = isConfigured(env) ? await getSession(request, env) : null;
       response = json({user: session?.user || null, csrfToken: session?.csrfToken || null, configured: isConfigured(env)});

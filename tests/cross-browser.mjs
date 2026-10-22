@@ -90,7 +90,7 @@ try{
         assert.notEqual(await roomImage.getAttribute("src"),originalRoomImage,
           name+" profile room image must change");
         assert.match(await roomImage.getAttribute("alt"),/gamer playing/i);
-        assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"/arcade.html#profile",
+        assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"https://arcade.the420lobby.com/#profile",
           name+" cannot select the player profile room");
         const profileRoomImage=await roomImage.getAttribute("src");
         await page.locator(".lounge-hotspot--profile").press("End");
@@ -99,7 +99,7 @@ try{
         assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"#join",
           name+" End key does not select the final room");
         await page.locator(".lounge-hotspot--crew").press("Home");
-        assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"/arcade.html",
+        assert.equal(await page.locator("#lounge-preview-link").getAttribute("href"),"https://arcade.the420lobby.com/",
           name+" Home key does not select the first room");
         const hitboxes=await page.locator(".lounge-hotspot").evaluateAll(buttons=>buttons.map(button=>{
           const b=button.getBoundingClientRect();return {width:b.width,height:b.height};
