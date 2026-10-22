@@ -42,13 +42,47 @@ let browser;
 try{
   browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||undefined,args:["--no-sandbox"]});
   await mkdir("artifacts",{recursive:true});
-  for(const width of [390,1440]){
+  for(const width of [320,390,820,1440]){
     const page=await browser.newPage({viewport:{width,height:width===390?844:900},reducedMotion:"reduce"});
     const errors=[];
     page.on("pageerror",error=>errors.push(error.message));
     const calls=await wire(page,false);
     await page.goto(host+"/arcade.html",{waitUntil:"domcontentloaded"});
     await page.getByText("CHOOSE YOUR SESH").waitFor();
+    // The arcade must display the actual homepage smoke lockup and navigation,
+    // not merely match colors or substitute the old leaf logo.
+    const logo=page.locator(".site-header .logo.brand-lockup");
+    assert.equal(await logo.getAttribute("href"),"/");
+    const mark=logo.locator("img.brand-smoke-image");
+    assert.equal(await mark.getAttribute("src"),"/assets/lobby-smoke-420-still.webp?v=20261017-smoke-flow4");
+    await mark.evaluate(async img=>{await img.decode();});
+    assert.ok(await mark.evaluate(img=>img.naturalWidth>0),"main site logo did not load at "+width);
+    assert.ok((await logo.locator(".brand-lockup__the").evaluate(el=>getComputedStyle(el).fontFamily)).includes("Unbounded"),"homepage brand font missing");
+    assert.equal(await logo.locator(".brand-lockup__the").innerText(),"THE");
+    assert.equal(await logo.locator(".brand-lockup__lobby").innerText(),"LOBBY");
+    const menu=page.locator("#menu-toggle");
+    const nav=page.locator("#primary-nav");
+    if(width<=1050){
+      assert.equal(await menu.isVisible(),true,"mobile/tablet navigation toggle absent");
+      assert.equal(await nav.isVisible(),false,"mobile/tablet nav started open");
+      await menu.click();
+      assert.equal(await nav.isVisible(),true,"nav did not open");
+      assert.equal(await menu.getAttribute("aria-expanded"),"true");
+      await page.keyboard.press("Escape");
+      assert.equal(await nav.isVisible(),false,"Escape failed to dismiss navigation");
+    }else{
+      assert.equal(await nav.isVisible(),true,"desktop navigation missing");
+      assert.equal(await menu.isVisible(),false,"desktop menu toggle should be hidden");
+    }
+    assert.equal(await page.locator("#fx-toggle").isDisabled(),true,"reduced-motion preference should disable decorative effects");
+    const banner=page.locator(".lobby-brand-banner-frame img");
+    assert.ok((await banner.getAttribute("src"))?.includes("the420lobby-neon-lounge.webp"),"site branded banner missing");
+    await banner.scrollIntoViewIfNeeded();
+    await banner.evaluate(async img=>{await img.decode();});
+    assert.ok(await banner.evaluate(img=>img.naturalWidth>0),"real lounge artwork failed to load");
+    assert.equal(await page.locator(".arcade-site-footer .footer-logo").getAttribute("href"),"/");
+    assert.ok((await page.locator(".arcade-site-footer .footer-links").innerText()).includes("THE VIBE"));
+
     assert.equal(await page.locator("button").filter({hasText:"Launch Sesh Invaders"}).count(),1);
     assert.equal(await page.locator("button").filter({hasText:"Play Bong Blitz"}).count(),1);
     assert.equal(await page.locator("button").filter({hasText:"Launch Canna-Runner"}).count(),1);
@@ -73,5 +107,20 @@ try{
   assert.deepEqual(calls,[{game:"bong-blitz"}],"signed-in game should start a server-issued round");
   assert.deepEqual(errors,[],"signed-in browser errors: "+errors.join(","));
   await page.close();
-  console.log("PASS new arcade: real-session fixtures, new cabinets, signed-in run creation, guest fallback, palette and responsiveness");
+  // Preserve the shared smoke controller on the client-rendered header.
+  const motion=await browser.newPage({viewport:{width:1200,height:900},reducedMotion:"no-preference"});
+  await wire(motion,false);
+  await motion.goto(host+"/arcade.html",{waitUntil:"domcontentloaded"});
+  const toggle=motion.locator("#fx-toggle");
+  const mark=motion.locator(".site-header .brand-smoke-image");
+  await mark.waitFor();
+  await motion.waitForFunction(()=>document.querySelector(".brand-smoke-image")?.getAttribute("src")?.includes("lobby-smoke-420-loop.webp"));
+  assert.equal(await toggle.getAttribute("aria-pressed"),"true");
+  await toggle.click();
+  assert.equal(await toggle.getAttribute("aria-pressed"),"false");
+  assert.ok((await mark.getAttribute("src"))?.includes("lobby-smoke-420-still.webp"),"FX off did not restore the real still image");
+  await toggle.click();
+  assert.ok((await mark.getAttribute("src"))?.includes("lobby-smoke-420-loop.webp"),"FX on did not restore the original motion image");
+  await motion.close();
+  console.log("PASS new arcade: original smoke logo/header, responsive navigation, shared image banner, footer, effects, Discord game launch and leaderboards");
 }finally{await browser?.close();server.close();}
