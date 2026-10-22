@@ -8,6 +8,7 @@ import DiscordSuite from './components/DiscordSuite.tsx';
 import TrophyShelf from './components/TrophyShelf.tsx';
 import SiteHeader from './components/SiteHeader.tsx';
 import IndieSpotlight from './components/IndieSpotlight.tsx';
+import {siteLinks} from './site-links.ts';
 import { GameId, GameDifficulty, ScoreRecord, UserProfile, Achievement, RunResult } from './game/types.ts';
 import { INITIAL_ACHIEVEMENTS, evaluateRunAchievements, getDifficultyConfig } from './game/rules.ts';
 import { sounds } from './game/audio.ts';
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react';
 
 export default function App() {
+  const links = siteLinks();
   const [activeGameModal, setActiveGameModal] = useState<GameId | null>(null);
   const [gameDifficulty, setGameDifficulty] = useState<GameDifficulty>('Normal');
   const [activeTab, setActiveTab] = useState<'main' | 'discord'>('main');
@@ -518,7 +520,7 @@ const showToast = (msg: string) => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <a
-                  href="/#experiences"
+                  href={links.experiences}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-[#10211b] border border-[#294637] hover:border-[#b8f875]/50 p-5 rounded-xl flex items-center space-x-4 transition group"
@@ -712,14 +714,14 @@ const showToast = (msg: string) => {
       <footer className="arcade-site-footer">
         <div className="footer-shell">
           <div>
-            <a className="footer-logo" href="/">THE 420 <strong>LOBBY.</strong></a>
+            <a className="footer-logo" href={links.home}>THE 420 <strong>LOBBY.</strong></a>
             <p>Game. Sesh. Repeat.</p>
             <p className="arcade-disclaimer">Just for fun. No real-world prizes or Discord roles. Community scores are account-linked, not replay-verified.</p>
           </div>
           <div className="footer-links">
-            <a href="/#vibe">THE VIBE</a>
+            <a href={links.vibe}>THE VIBE</a>
             <a href="/#experiences">WHAT WE DO</a>
-            <a href="/arcade.html#top">BACK TO TOP ↑</a>
+            <a href={links.top}>BACK TO TOP ↑</a>
             <a href="https://discord.gg/the420lobby" target="_blank" rel="noopener noreferrer">JOIN THE SERVER ↗</a>
             <small>© 2026 THE 420 LOBBY.</small>
           </div>

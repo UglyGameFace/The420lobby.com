@@ -163,16 +163,19 @@ test("internal anchors resolve and IDs are unique", () => {
   for(const [,id] of html.matchAll(/\bhref="#([^"]+)"/g)) assert.ok(ids.includes(id),"missing #"+id);
 });
 
-test("website outbound links use only the official Discord invitation, never the source repository", () => {
+test("website outbound links go only to Discord and the owned arcade hostname", () => {
   const outgoing=[...html.matchAll(/<a\b[^>]*\bhref="(https?:[^"]+)"[^>]*>/g)];
   const urls=outgoing.map(([,url])=>url);
-  assert.equal(urls.filter(url=>url==="https://discord.gg/the420lobby").length,8);
-  assert.doesNotMatch(html,/https:\/\/github\.com\//i,"source repository must not appear on the public website");
-  assert.equal(urls.length,8,"unexpected external destination");
+  const discord="https://discord.gg/the420lobby", arcade="https://arcade.the420lobby.com/";
+  assert.equal(urls.filter(url=>url===discord).length,8);
+  assert.ok(urls.includes(arcade),"main navigation must reach the arcade hostname");
+  assert.doesNotMatch(html,/https:\/\/github\.com\//i,"source repository must not appear on public website");
   for(const [tag,url] of outgoing){
-    assert.equal(url,"https://discord.gg/the420lobby");
-    assert.match(tag,/target="_blank"/);
-    assert.match(tag,/rel="noopener noreferrer"/);
+    assert.ok([discord,arcade,arcade+"#leaderboard"].includes(url),"unexpected external destination: "+url);
+    if(url===discord){
+      assert.match(tag,/target="_blank"/);
+      assert.match(tag,/rel="noopener noreferrer"/);
+    }
   }
 });
 
@@ -238,7 +241,7 @@ test("Sesh Signal is an actual arcade game section, not a placeholder", () => {
   assert.match(html,/id="sesh-best"/);
   assert.match(html,/id="sesh-score"/);
   assert.match(html,/id="sesh-announcement"[^>]*role="status"/);
-  assert.match(html,/href="\/arcade\.html"/);
+  assert.match(html,/href="https:\/\/arcade\.the420lobby\.com\/"/);
   assert.match(html,/src="\/sesh-loader.js"/);
   assert.doesNotMatch(html, /<script[^>]*src="\/sesh-signal\.js"/);
   assert.match(html,/No real-world prizes or Discord roles/);
@@ -346,7 +349,7 @@ test("the full arcade preserves community links and provides accessible Discord 
   assert.match(page, /<dialog/);
   assert.match(page, /href="\/auth\/discord/);
   assert.match(page, /src="\/arcade-app\.js\?v=20261018-arcade-upgrade2"/);
-  assert.match(html, /href="\/arcade\.html"/);
+  assert.match(html, /href="https:\/\/arcade\.the420lobby\.com\/"/);
 });
 
 test("frontend code never contains Discord secrets or stores authentication tokens", () => {

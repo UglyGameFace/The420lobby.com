@@ -2,6 +2,10 @@ import {HttpError, json, redirect} from "./http.mjs";
 
 export const SESSION_COOKIE = "__Host-420_session";
 export const OAUTH_COOKIE = "__Host-420_oauth";
+export const ARCADE_ORIGIN = "https://arcade.the420lobby.com";
+export const ARCADE_BROWSER_COOKIE = "__Host-420_arcade_browser";
+const ARCADE_FLOW_COOKIE = "__Host-420_arcade_flow";
+const HANDOFF_SECONDS = 90;
 export const SESSION_SECONDS = 60 * 60 * 24 * 7;
 const OAUTH_SECONDS = 600;
 
@@ -36,6 +40,19 @@ export function siteOrigin(env) {
   return url.origin;
 }
 
+export function isArcadeHost(request, env) {
+  // Static homepage must remain independent of OAuth configuration.
+  if (new URL(request.url).origin !== ARCADE_ORIGIN) return false;
+  return siteOrigin(env) === "https://the420lobby.com";
+}
+
+function readHexCookie(request, name) {
+  const values = (request.headers.get("cookie") || "").split(";").map(s => s.trim()).filter(s => s.startsWith(name + "="));
+  if (values.length !== 1) return null;
+  const value = values[0].slice(name.length + 1);
+  return /^[a-f0-9]{64}$/.test(value) ? value : null;
+}
+
 export function isConfigured(env) {
   try { return Boolean(env.DB && /^\d{17,20}$/.test(env.DISCORD_CLIENT_ID || "") && env.DISCORD_CLIENT_SECRET && siteOrigin(env)); }
   catch { return false; }
@@ -65,8 +82,7 @@ export async function requireSession(request, env) {
 }
 
 export function requireCsrf(request, env, session) {
-  const expected = siteOrigin(env);
-  // Reject aliased hosts and opaque/missing origins. OAuth callback uses state instead.
+  const expected = isArcadeHost(request, env) ? ARCADE_ORIGIN : siteOrigin(env);
   if (new URL(request.url).origin !== expected || request.headers.get("Origin") !== expected) {
     throw new HttpError(403, "invalid_origin", "Reload the arcade and try again.");
   }
@@ -87,18 +103,33 @@ export async function rateLimit(env, key, limit, seconds, now = Date.now()) {
 
 export async function beginDiscord(request, env) {
   requireConfiguration(env);
-  if (new URL(request.url).origin !== siteOrigin(env)) return redirect(`${siteOrigin(env)}/auth/discord`);
-  await rateLimit(env, `oauth:${request.headers.get("CF-Connecting-IP") || "local"}`, 20, 60);
+  const url = new URL(request.url);
+  if (isArcadeHost(request, env)) {
+    const nonce = randomToken();
+    return redirect(siteOrigin(env) + "/auth/discord?arcade_nonce_hash=" + await hash(nonce),
+      [cookie(ARCADE_BROWSER_COOKIE, nonce, OAUTH_SECONDS)]);
+  }
+  if (url.origin !== siteOrigin(env)) return redirect(siteOrigin(env) + "/auth/discord");
+  await rateLimit(env, "oauth:" + (request.headers.get("CF-Connecting-IP") || "local"), 20, 60);
+  const nonceHash = url.searchParams.get("arcade_nonce_hash");
+  const returning = /^[a-f0-9]{64}$/.test(nonceHash || "") && siteOrigin(env) === "https://the420lobby.com";
   const state = randomToken(), browser = randomToken(), now = Date.now();
   await env.DB.batch([
     env.DB.prepare("DELETE FROM oauth_states WHERE expires_at <= ?").bind(now),
     env.DB.prepare("DELETE FROM sessions WHERE expires_at <= ?").bind(now),
     env.DB.prepare("DELETE FROM rate_limits WHERE expires_at < ?").bind(now - 60000),
-    env.DB.prepare("INSERT INTO oauth_states (state_hash, browser_hash, expires_at) VALUES (?, ?, ?)").bind(await hash(state), await hash(browser), now + OAUTH_SECONDS * 1000)
+    env.DB.prepare("INSERT INTO oauth_states (state_hash, browser_hash, expires_at) VALUES (?, ?, ?)")
+      .bind(await hash(state), await hash(browser + (returning ? ":" + nonceHash : "")), now + OAUTH_SECONDS * 1000)
   ]);
   const target = new URL("https://discord.com/oauth2/authorize");
-  target.search = new URLSearchParams({client_id: env.DISCORD_CLIENT_ID, redirect_uri: `${siteOrigin(env)}/auth/callback`, response_type: "code", scope: "identify", state}).toString();
-  return redirect(target.href, [cookie(OAUTH_COOKIE, browser, OAUTH_SECONDS)]);
+  target.search = new URLSearchParams({
+    client_id: env.DISCORD_CLIENT_ID, redirect_uri: siteOrigin(env) + "/auth/callback",
+    response_type: "code", scope: "identify", state
+  }).toString();
+  return redirect(target.href, [
+    cookie(OAUTH_COOKIE, browser, OAUTH_SECONDS),
+    cookie(ARCADE_FLOW_COOKIE, returning ? nonceHash : "", returning ? OAUTH_SECONDS : 0)
+  ]);
 }
 
 export function discordIdentity(data) {
@@ -113,18 +144,20 @@ export function discordIdentity(data) {
 
 export async function completeDiscord(request, env, fetcher = fetch) {
   requireConfiguration(env);
-  const destination = `${siteOrigin(env)}/arcade.html`;
-  const cleared = cookie(OAUTH_COOKIE, "", 0);
-  if (new URL(request.url).origin !== siteOrigin(env)) return redirect(`${destination}?auth=expired`, [cleared]);
+  const destination = siteOrigin(env) + "/arcade.html";
+  const nonceHash = siteOrigin(env) === "https://the420lobby.com" ? readHexCookie(request, ARCADE_FLOW_COOKIE) : null;
+  const finalDestination = nonceHash ? ARCADE_ORIGIN + "/" : destination;
+  const cleared = [cookie(OAUTH_COOKIE, "", 0), cookie(ARCADE_FLOW_COOKIE, "", 0)];
+  if (new URL(request.url).origin !== siteOrigin(env)) return redirect(finalDestination + "?auth=expired", cleared);
   const url = new URL(request.url), state = url.searchParams.get("state"), browser = readCookie(request, OAUTH_COOKIE);
-  if (!state || !/^[A-Za-z0-9_-]{43}$/.test(state) || !browser) return redirect(`${destination}?auth=expired`, [cleared]);
+  if (!state || !/^[A-Za-z0-9_-]{43}$/.test(state) || !browser) return redirect(finalDestination + "?auth=expired", cleared);
   // Atomic consume prevents callback replay, including simultaneous requests.
   const claim = await env.DB.prepare(`DELETE FROM oauth_states WHERE state_hash = ? AND browser_hash = ? AND expires_at > ? RETURNING state_hash`)
-    .bind(await hash(state), await hash(browser), Date.now()).first();
-  if (!claim) return redirect(`${destination}?auth=expired`, [cleared]);
-  if (url.searchParams.has("error")) return redirect(`${destination}?auth=cancelled`, [cleared]);
+    .bind(await hash(state), await hash(browser + (nonceHash ? ":" + nonceHash : "")), Date.now()).first();
+  if (!claim) return redirect(finalDestination + "?auth=expired", cleared);
+  if (url.searchParams.has("error")) return redirect(finalDestination + "?auth=cancelled", cleared);
   const code = url.searchParams.get("code");
-  if (!code || code.length > 2048) return redirect(`${destination}?auth=failed`, [cleared]);
+  if (!code || code.length > 2048) return redirect(finalDestination + "?auth=failed", cleared);
   try {
     const exchange = await fetcher("https://discord.com/api/v10/oauth2/token", {
       method: "POST", headers: {"Content-Type": "application/x-www-form-urlencoded"}, signal: AbortSignal.timeout(8000),
@@ -135,7 +168,7 @@ export async function completeDiscord(request, env, fetcher = fetch) {
     if (tokens.token_type?.toLowerCase() !== "bearer" || typeof tokens.access_token !== "string" || tokens.access_token.length > 2048) throw new Error("Invalid token response");
     const identity = await fetcher("https://discord.com/api/v10/users/@me", {headers: {Authorization: `Bearer ${tokens.access_token}`}, signal: AbortSignal.timeout(8000)});
     if (!identity.ok) throw new Error("Discord identity request failed");
-    const user = discordIdentity(await identity.json()), now = Date.now(), token = randomToken();
+    const user = discordIdentity(await identity.json()), now = Date.now(), token = randomToken(), handoffTicket = nonceHash ? randomToken() : null;
     const oldToken = readCookie(request, SESSION_COOKIE);
     const statements = [env.DB.prepare(`INSERT INTO users (id, username, avatar_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET username = excluded.username, avatar_url = excluded.avatar_url, updated_at = excluded.updated_at`)
@@ -143,12 +176,40 @@ export async function completeDiscord(request, env, fetcher = fetch) {
     if (oldToken) statements.push(env.DB.prepare("DELETE FROM sessions WHERE token_hash = ?").bind(await hash(oldToken)));
     statements.push(env.DB.prepare("INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)")
       .bind(await hash(token), user.id, now, now + SESSION_SECONDS * 1000));
+    if (handoffTicket) {
+      // The ticket is a single-use, short-lived server-side record. Knowledge of the
+      // ticket alone is insufficient: redemption also requires the arcade host's
+      // original HttpOnly nonce cookie, which never leaves that host.
+      statements.push(env.DB.prepare("INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)")
+        .bind(await hash("arcade-ticket:" + handoffTicket + ":" + nonceHash), user.id, now, now + HANDOFF_SECONDS * 1000));
+    }
     await env.DB.batch(statements);
-    // OAuth tokens are deliberately discarded. No Discord secret/token enters storage or a browser response.
-    return redirect(destination, [cleared, cookie(SESSION_COOKIE, token, SESSION_SECONDS)]);
+    // Never domain-scope either real session cookie or store Discord tokens.
+    return redirect(handoffTicket ? ARCADE_ORIGIN + "/auth/claim?ticket=" + handoffTicket : destination,
+      [...cleared, cookie(SESSION_COOKIE, token, SESSION_SECONDS)]);
   } catch {
-    return redirect(`${destination}?auth=failed`, [cleared]);
+    return redirect(finalDestination + "?auth=failed", cleared);
   }
+}
+
+export async function claimArcadeSession(request, env) {
+  requireConfiguration(env);
+  if (!isArcadeHost(request, env)) throw new HttpError(404, "not_found", "This sign-in endpoint is unavailable.");
+  const ticket = new URL(request.url).searchParams.get("ticket");
+  const nonce = readCookie(request, ARCADE_BROWSER_COOKIE);
+  const cleared = cookie(ARCADE_BROWSER_COOKIE, "", 0);
+  if (!ticket || !/^[A-Za-z0-9_-]{43}$/.test(ticket) || !nonce) {
+    return redirect(ARCADE_ORIGIN + "/?auth=expired", [cleared]);
+  }
+  await rateLimit(env, "arcade-claim:" + (request.headers.get("CF-Connecting-IP") || "local"), 40, 60);
+  const tokenHash = await hash("arcade-ticket:" + ticket + ":" + await hash(nonce));
+  const row = await env.DB.prepare("DELETE FROM sessions WHERE token_hash = ? AND expires_at > ? RETURNING user_id")
+    .bind(tokenHash, Date.now()).first();
+  if (!row) return redirect(ARCADE_ORIGIN + "/?auth=expired", [cleared]);
+  const token = randomToken(), now = Date.now();
+  await env.DB.prepare("INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)")
+    .bind(await hash(token), row.user_id, now, now + SESSION_SECONDS * 1000).run();
+  return redirect(ARCADE_ORIGIN + "/", [cleared, cookie(SESSION_COOKIE, token, SESSION_SECONDS)]);
 }
 
 export async function logout(request, env, session) {

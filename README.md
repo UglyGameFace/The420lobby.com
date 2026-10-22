@@ -6,6 +6,11 @@ GitHub: https://github.com/UglyGameFace/The420lobby.com
 
 ## Main arcade (October 2026)
 
+Preferred public address: **https://arcade.the420lobby.com/**, mapped to the existing Cloudflare Pages project. The main site remains at `https://the420lobby.com/`. `/arcade.html` remains accessible as a compatibility URL; the homepage's arcade link uses the subdomain.
+
+Discord OAuth still registers and uses only `https://the420lobby.com/auth/callback`. The arcade host has an independent Secure, HttpOnly, `__Host-` session cookie. A 90-second, single-use handoff stored as a hashed temporary D1 session record, bound to a 256-bit nonce cookie originally set by the arcade host, carries the authenticated Discord identity back after the main-site callback. No Domain-wide authentication cookies, new credentials, new Discord redirect URLs, or D1 migrations. The additional Pages function invocation at `/` serves the same compiled React arcade assets on this hostname; the main website's `/` is unaffected. See `docs/ARCADE_BACKEND.md` for the authorization and rollback contract.
+
+
 The public `/arcade.html` is built from the separate `UglyGameFace/Arcade` React game sources under `new-arcade/src`. It includes **Sesh Invaders**, **Bong Blitz: Terp Master**, and **Canna-Runner**, using the website's dark green, lime, mint, and Barlow Condensed visual design. The homepage, Dank Shield, Dank Cinema, Minecraft hub, Cheers and Sesh Signal stay in place.
 
 The original arcade page is retained at `/arcade-classic.html` for compatibility/regression testing; it is not promoted as the primary arcade. Old leaderboard records are preserved in D1. Both editions share the same Discord OAuth session and scores storage, with separate rules-version namespaces for the overlapping Bong Blitz title.
