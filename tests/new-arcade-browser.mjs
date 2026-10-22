@@ -63,6 +63,9 @@ try{
     const menu=page.locator("#menu-toggle");
     const nav=page.locator("#primary-nav");
     if(width<=1050){
+      const bounds=await logo.boundingBox();
+      assert.ok(bounds && Math.abs(bounds.x+bounds.width/2-width/2)<=3,
+        "official smoke logo is not centered at "+width+"px: "+JSON.stringify(bounds));
       assert.equal(await menu.isVisible(),true,"mobile/tablet navigation toggle absent");
       assert.equal(await nav.isVisible(),false,"mobile/tablet nav started open");
       await menu.click();
