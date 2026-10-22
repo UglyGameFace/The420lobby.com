@@ -87,7 +87,21 @@ try{
     assert.equal(await page.locator("button").filter({hasText:"Play Bong Blitz"}).count(),1);
     assert.equal(await page.locator("button").filter({hasText:"Launch Canna-Runner"}).count(),1);
     assert.equal(await page.locator("body").evaluate(el=>getComputedStyle(el).backgroundColor),"rgb(8, 15, 14)");
-    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth<=2),"mobile horizontal overflow at "+width);
+    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+    if(overflow>2){
+      const offenders=await page.evaluate(()=>{
+        const w=innerWidth;
+        return [...document.body.querySelectorAll("*")].map(el=>{
+          const r=el.getBoundingClientRect(),css=getComputedStyle(el);
+          const clipped=!!el.closest(".overflow-hidden,[style*='overflow: hidden']");
+          return {tag:el.tagName,id:el.id,classes:String(el.className).slice(0,130),
+            left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),
+            overflowX:css.overflowX,clipped};
+        }).filter(x=>x.right>w+2||x.left < -2).sort((a,b)=>b.right-a.right).slice(0,30);
+      });
+      console.error("Arcade viewport "+width+" overflow "+overflow+"px; protruding elements="+JSON.stringify(offenders));
+    }
+    assert.ok(overflow<=2,"mobile horizontal overflow at "+width+" ("+overflow+"px)");
     await page.getByRole("button",{name:"Connect Discord ↗"}).click();
     await page.getByText("YOUR DISCORD IDENTITY").waitFor();
     assert.equal(await page.locator('a[href="/auth/discord"]').isVisible(),true,"discord login was inaccessible after header restoration");
