@@ -131,7 +131,7 @@ test("Dank Shield is semantic responsive content, not a stretched poster", () =>
   assert.ok(html.includes("02 // PROTECTION · VERIFICATION · MODERATION"));
   assert.ok(html.includes("PROTECT THE LOBBY"));
   assert.ok(html.includes('class="card-link shield-card-link" href="https://discord.gg/the420lobby"'));
-  assert.ok(html.includes('href="/lobby-redesign.css?v=20261018-tablet-nav3"'));
+  assert.ok(html.includes('href="/lobby-redesign.css?v=20261022-home-audit1"'));
   for (const rule of [".experience-grid>.shield-card{display:flex!important",
     ".hero-content", ".arcade-layout", ".community-proof .proof-grid",
     "@media(max-width:1100px)", "@media(max-width:760px)", "@media(max-width:460px)"])
@@ -407,7 +407,7 @@ test("tablet nav cannot appear open by CSS alone or remain open on browser resto
   assert.match(reset,/window\.addEventListener\("pageshow", closeMenu\)/);
   assert.match(reset,/document\.addEventListener\("pointerdown"/);
   assert.match(html,/src="\/script\.js\?v=20261018-tablet-nav3"/);
-  assert.match(html,/lobby-redesign\.css\?v=20261018-tablet-nav3/);
+  assert.match(html,/lobby-redesign\.css\?v=20261022-home-audit1/);
 });
 
 test("Green Room's six pair photos are visually unique, including glass pipe vs bong",async()=>{
