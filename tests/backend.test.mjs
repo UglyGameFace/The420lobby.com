@@ -289,3 +289,60 @@ test("leaderboards retain one best per player, filter the rolling week, and use 
   assert.equal((await app.request("/api/leaderboards?game=unknown")).status, 400);
   assert.equal((await app.request("/api/leaderboards?period=year")).status, 400);
 });
+
+
+test("new arcade persists CSRF-authenticated scores, isolates classic records, and rejects replay tampering", async () => {
+  const app = fixture(), owner = await app.login(), other = await app.login("123456789012345680", "second_friend"), originalNow = Date.now;
+  let now = originalNow();
+  Date.now = () => now;
+  try {
+    assert.equal((await app.request("/api/arcade-v2/runs", {method:"POST", body:{game:"bong-blitz"}})).status, 401);
+    const csrf = await app.request("/api/arcade-v2/runs", {method:"POST", body:{game:"bong-blitz"},session:owner,headers:{"X-CSRF-Token":"bad"}});
+    assert.equal(await errorCode(csrf),"invalid_csrf");
+    assert.equal((await app.request("/api/arcade-v2/runs", {method:"POST",session:owner,body:{game:"unknown"}})).status,400);
+
+    const started = await app.request("/api/arcade-v2/runs", {method:"POST",session:owner,body:{game:"bong-blitz"}});
+    assert.equal(started.status,201);
+    const run = await data(started);
+    assert.equal(run.game,"bong-blitz");
+    assert.ok(/^[A-Za-z0-9_-]{43}$/.test(run.id));
+    assert.equal(app.env.DB.sqlite.prepare("SELECT rules_version FROM game_runs WHERE id=?").get(run.id).rules_version,"arcade-v2:1");
+
+    const resultBody={score:520,elapsedMs:35000,difficulty:"Normal",stats:{perfectHits:3,niceHits:1,misses:4,accuracy:50,durationSeconds:35}};
+    const path="/api/arcade-v2/runs/"+run.id+"/finish";
+    assert.equal((await app.request(path,{method:"POST",session:other,body:resultBody})).status,404);
+    assert.equal((await app.request(path,{method:"POST",session:owner,body:resultBody})).status,422,"premature finish accepted");
+    now += 36000;
+    const submitted=await app.request(path,{method:"POST",session:owner,body:resultBody});
+    assert.equal(submitted.status,200);
+    const saved=await data(submitted);
+    assert.equal(saved.score,520);
+    assert.equal(saved.verification,"discord-account-and-plausibility-only");
+    assert.equal(saved.isPersonalBest,true);
+
+    const replay=await app.request(path,{method:"POST",session:owner,body:resultBody});
+    assert.deepEqual(await data(replay),saved,"idempotent submission changed result");
+    assert.equal((await app.request(path,{method:"POST",session:owner,body:{...resultBody,score:999999}})).status,409);
+    assert.equal(app.env.DB.sqlite.prepare("SELECT COUNT(*) AS n FROM scores WHERE run_id=?").get(run.id).n,1);
+
+    const board=await data(await app.request("/api/arcade-v2/leaderboards?game=bong-blitz&period=all"));
+    assert.equal(board.entries.length,1);
+    assert.equal(board.entries[0].user.id,owner.id);
+    assert.equal(board.entries[0].score,520);
+    const profile=await data(await app.request("/api/arcade-v2/profile",{session:owner}));
+    assert.equal(profile.stats.runs,1);
+    assert.equal(profile.stats.totalScore,520);
+    assert.equal(profile.bests[0].score,520);
+
+    const classicBoard=await data(await app.request("/api/leaderboards?game=bong-blitz&period=all"));
+    assert.equal(classicBoard.entries.length,0,"v2 scores leaked into classic leaderboard");
+    const classicProfile=await data(await app.request("/api/profile",{session:owner}));
+    assert.equal(classicProfile.stats.runs,0,"v2 scores leaked into classic profile");
+    assert.equal(classicProfile.stats.totalScore,0);
+
+    assert.equal((await app.request("/api/arcade-v2/leaderboards?game=invalid")).status,400);
+    assert.equal((await app.request("/api/arcade-v2/leaderboards?period=year")).status,400);
+  } finally {
+    Date.now=originalNow;
+  }
+});
