@@ -83,6 +83,36 @@ try{
     await banner.scrollIntoViewIfNeeded();
     await banner.evaluate(async img=>{await img.decode();});
     assert.ok(await banner.evaluate(img=>img.naturalWidth>0),"real lounge artwork failed to load");
+    // The owner provided a ZIP with exact, embedded game artwork. Both complete
+    // compositions (including their own title graphics) must remain visible.
+    const zipArt=[
+      {src:"/assets/boondocks-brawl-user-zip-20261022.webp",width:1100,height:619},
+      {src:"/assets/friday-fighters-user-zip-20261022.webp",width:765,height:620}
+    ];
+    const cards=page.locator(".indie-spotlight__card");
+    assert.equal(await cards.count(),2,"expected two clickable indie-fighter cards");
+    for(const [i,asset] of zipArt.entries()){
+      const card=cards.nth(i),img=card.locator("img.indie-spotlight__image");
+      assert.equal(await img.getAttribute("src"),asset.src);
+      await img.scrollIntoViewIfNeeded();
+      await img.evaluate(async element=>{await element.decode();});
+      const info=await img.evaluate(element=>{
+        const imgRect=element.getBoundingClientRect();
+        const cardRect=element.closest("a").getBoundingClientRect();
+        const css=getComputedStyle(element);
+        return {naturalWidth:element.naturalWidth,naturalHeight:element.naturalHeight,
+          width:imgRect.width,height:imgRect.height,
+          cardWidth:cardRect.width,objectFit:css.objectFit};
+      });
+      assert.equal(info.naturalWidth,asset.width,"wrong owner artwork dimensions");
+      assert.equal(info.naturalHeight,asset.height,"wrong owner artwork dimensions");
+      assert.equal(info.objectFit,"contain","ZIP artwork should not be cropped");
+      assert.ok(Math.abs(info.width/info.height-asset.width/asset.height)<0.015,
+        "full ZIP art is stretched or cropped at "+width+"px: "+JSON.stringify(info));
+      assert.ok(info.width<=info.cardWidth+2,
+        "ZIP image extends outside clickable card at "+width+"px");
+    }
+
     assert.equal(await page.locator(".arcade-site-footer .footer-logo").getAttribute("href"),"/");
     assert.ok((await page.locator(".arcade-site-footer .footer-links").innerText()).includes("THE VIBE"));
 

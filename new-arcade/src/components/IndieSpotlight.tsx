@@ -1,20 +1,23 @@
 import './indie-spotlight.css';
 
-// These are the user's ORIGINAL October 22 ChatGPT splash images,
-// compressed losslessly in layout (WebP, unchanged composition).
-// Do not replace them with stock posters, portraits, or creator hotlinks.
+// Use the exact two WebP files from the owner's indie-fighter-splash-links.zip.
+// These source bytes must not be replaced by generated art or creator hotlinks.
 const fighters = [
   {
     title: 'Boondock Brawlers',
     url: 'https://boondocksbrawl.com/',
-    image: '/assets/boondock-brawlers-original-420-lobby.webp',
+    image: '/assets/boondocks-brawl-user-zip-20261022.webp',
+    width: 1100,
+    height: 619,
     subtitle: 'Free indie browser fighter',
     className: '',
   },
   {
     title: 'Friday Fighters',
     url: 'https://fridayfighters.com/',
-    image: '/assets/friday-fighters-original-420-lobby.webp',
+    image: '/assets/friday-fighters-user-zip-20261022.webp',
+    width: 765,
+    height: 620,
     subtitle: 'Free indie browser fighter',
     className: 'indie-spotlight__card--friday',
   },
@@ -28,7 +31,7 @@ export default function IndieSpotlight() {
           <p className="indie-spotlight__eyebrow">Community picks / free browser games</p>
           <h2 id="indie-spotlight-heading" className="indie-spotlight__title">INDIE FIGHTERS<span>.</span></h2>
         </div>
-        <p className="indie-spotlight__intro">Two indie fighting games. Tap the original 420 Lobby splash artwork to visit their creators.</p>
+        <p className="indie-spotlight__intro">Two indie fighting games. Tap the original splash images to play on their creators' sites.</p>
       </div>
       <div className="indie-spotlight__grid">
         {fighters.map(game => (
@@ -37,8 +40,8 @@ export default function IndieSpotlight() {
              aria-label={`Play ${game.title} on the creator's website (opens in new tab)`}
              key={game.url}>
             <img className="indie-spotlight__image"
-                 src={game.image} width={1672} height={941}
-                 alt={`The 420 Lobby's original neon green ${game.title} arcade splash art with Tap to Play graphics`}
+                 src={game.image} width={game.width} height={game.height}
+                 alt={`Original ${game.title} promotional splash from the owner's Indie Fighters ZIP`}
                  loading="lazy" decoding="async" />
             <span className="indie-spotlight__meta">
               <span className="indie-spotlight__meta-title">{game.title}</span>
@@ -48,7 +51,7 @@ export default function IndieSpotlight() {
         ))}
       </div>
       <p className="indie-spotlight__note">
-        Original promotional splash artwork created for The 420 Lobby Arcade, not official game art.
+        Promotional artwork supplied for The 420 Lobby Arcade, not official game art.
         These external games have separate accounts and do not share our Discord scores or leaderboards.
       </p>
     </section>

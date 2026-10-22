@@ -3,57 +3,56 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 
-const read=(path)=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
+const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const assets=[
   {
-    game:'Boondock Brawlers',
+    game:'Boondocks Brawl',
     href:'https://boondocksbrawl.com/',
-    path:'assets/boondock-brawlers-original-420-lobby.webp',
-    sha256:'cf9af29d79f45835773800be62dd34344fdb995183311576d7576b8ad87e2a1b',
-    bytes:426360,
+    path:'assets/boondocks-brawl-user-zip-20261022.webp',
+    sha256:'0267ae32ee1c5646d54ea2a93c12432f6a9d104121da96d7d4ded580436ae901',
+    bytes:97932, width:1100, height:619
   },
   {
     game:'Friday Fighters',
     href:'https://fridayfighters.com/',
-    path:'assets/friday-fighters-original-420-lobby.webp',
-    sha256:'ac7986901489d631fc42885d1e570302d7c8cacb042a85957a2acc1f49855265',
-    bytes:416692,
-  },
+    path:'assets/friday-fighters-user-zip-20261022.webp',
+    sha256:'cc07e227aa6cd58ba4f8fa24cd35f7d00bf6e4ec5d75c3c6a7745af41f8e128a',
+    bytes:78260, width:765, height:620
+  }
 ];
 
-test('arcade uses precisely the original October 22 splash-image files',()=>{
+test('Indie Fighters uses only the exact two images from the owner-uploaded ZIP',()=>{
   const source=read('new-arcade/src/components/IndieSpotlight.tsx');
   for(const item of assets){
-    const bytes=readFileSync(new URL('../'+item.path,import.meta.url));
-    assert.equal(bytes.byteLength,item.bytes,'wrong source asset size: '+item.path);
-    assert.equal(createHash('sha256').update(bytes).digest('hex'),item.sha256,
-      'original art was replaced: '+item.path);
-    assert.ok(source.includes('/'+item.path),'original art is not actually referenced');
-    assert.ok(source.includes(item.href),'expected creator URL absent: '+item.game);
+    const data=readFileSync(new URL('../'+item.path,import.meta.url));
+    assert.equal(data.length,item.bytes, 'unexpected archive artwork size: '+item.path);
+    assert.equal(createHash('sha256').update(data).digest('hex'),item.sha256,
+      'artwork differs from the owner-supplied ZIP: '+item.path);
+    assert.ok(source.includes('/'+item.path), 'card must display uploaded image');
+    assert.ok(source.includes(item.href), 'creator game link must be preserved');
   }
-  assert.doesNotMatch(source,/\/portraits\/|__portrait-grid|boondocks-brawl\.webp|friday-fighters\.webp['"]/,
-    'replaced visual with game portraits or invented posters');
-  assert.match(source,/width=\{1672\} height=\{941\}/);
+  assert.doesNotMatch(source,/\/portraits\/|__portrait-grid|original-420-lobby\.webp/,
+    'do not silently replace owner-supplied splash art');
+  assert.match(source,/width=\{game.width\} height=\{game.height\}/);
   assert.match(source,/target="_blank" rel="noopener noreferrer"/);
   assert.match(source,/aria-label=/);
 });
 
-test('whole splash must fit responsive card without title-covering overlays',()=>{
-  const source=read('new-arcade/src/components/IndieSpotlight.tsx');
+test('show whole ZIP art on mobile without cropping or duplicate text covering its characters',()=>{
   const css=read('new-arcade/src/components/indie-spotlight.css');
-  assert.match(css,/aspect-ratio:1672\/941/);
+  assert.match(css,/\.indie-spotlight__image\{[^}]*height:auto/);
   assert.match(css,/object-fit:contain/);
+  assert.doesNotMatch(css,/\.indie-spotlight__image\{[^}]*aspect-ratio:/,
+    'fixed image ratio would crop or distort one of the uploaded files');
+  assert.doesNotMatch(css,/\.indie-spotlight__card::after|\.indie-spotlight__portrait-grid/,
+    'overlay would cover embedded artwork');
   assert.match(css,/\.indie-spotlight__meta\{/);
   assert.match(css,/@media\(max-width:600px\)/);
   assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
-  assert.doesNotMatch(css,/\.indie-spotlight__card::after|\.indie-spotlight__portrait-grid/,
-    'overlays or cropped portraits hide original title and play graphic');
-  assert.match(source,/Original promotional splash artwork created for The 420 Lobby Arcade/);
 });
 
-test('no external portrait origin is needed in CSP now images are local',()=>{
+test('owner ZIP art stays local without external image CSP exceptions',()=>{
   const headers=read('_headers');
   assert.match(headers,/Content-Security-Policy:/);
-  assert.doesNotMatch(headers,/https:\/\/boondocksbrawl\.com|https:\/\/fridayfighters\.com/,
-    'creator portrait hotlink exception should not survive');
+  assert.doesNotMatch(headers,/https:\/\/boondocksbrawl\.com|https:\/\/fridayfighters\.com/);
 });
