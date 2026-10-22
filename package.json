@@ -1,0 +1,25 @@
+{
+  "name": "the420lobby-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-static.mjs && vite build --config arcade-vite.config.mjs",
+    "typecheck": "tsc --noEmit -p new-arcade/tsconfig.json",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "@vitejs/plugin-react": "6.1.1",
+    "lucide-react": "0.546.0",
+    "react": "19.0.1",
+    "react-dom": "19.0.1",
+    "tailwindcss": "4.3.3",
+    "vite": "8.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.14.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "7.0.2"
+  }
+}

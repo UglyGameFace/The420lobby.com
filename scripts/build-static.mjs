@@ -5,7 +5,7 @@ import {fileURLToPath} from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = join(root, 'dist');
 export const publicFiles = [
-  'index.html','arcade.html','credits.html','favicon.svg','styles.css','cheers-hero-v1.css',
+  'index.html','arcade.html','arcade-classic.html','credits.html','favicon.svg','styles.css','cheers-hero-v1.css',
   'lobby-redesign.css','brand-header.css','lounge.css','sesh-signal-v3.css','arcade.css','arcade-games.css','arcade-premium.css','sesh-photo.css',
   'script.js','smoke-brand.js','lounge.js','visual-engine.js','sesh-loader.js','sesh-signal.js',
   'arcade-app.js','arcade-api.js','arcade-games.js','_headers','_routes.json',
@@ -23,4 +23,4 @@ for (const path of publicFiles) await copyPublic(path);
 for (const asset of await readdir(join(root,'assets'),{withFileTypes:true})) {
   if (asset.isFile() && /\.(?:svg|png|avif|webp|jpe?g|gif|ico)$/i.test(asset.name)) await copyPublic('assets/'+asset.name);
 }
-console.log('Prepared dist/ with public assets only. No deployment performed.');
+console.log('Prepared dist/ with curated static assets. No deployment performed.');
