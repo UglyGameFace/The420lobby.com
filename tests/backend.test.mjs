@@ -362,6 +362,8 @@ test("arcade subdomain uses the main OAuth callback with single-use browser-boun
 
   app.env.ASSETS={fetch:async request=>{
     requestedAsset=new URL(request.url).pathname;
+    // Cloudflare Pages redirects a direct .html asset fetch to its pretty URL.
+    if (requestedAsset === "/arcade.html") return new Response(null, {status:308,headers:{Location:"/arcade"}});
     return new Response("new-react-arcade", {headers:{"Content-Type":"text/html"}});
   }};
   const lobby = await app.request("/", {origin:arcade,next:()=>{
@@ -369,7 +371,8 @@ test("arcade subdomain uses the main OAuth callback with single-use browser-boun
   }});
   assert.equal(lobby.status,200);
   assert.equal(await lobby.text(),"new-react-arcade");
-  assert.equal(requestedAsset,"/arcade.html");
+  assert.equal(requestedAsset,"/arcade", "the asset fetch must not invoke the Pages .html redirect");
+  assert.equal(lobby.headers.get("Location"),null, "arcade root must render without redirecting");
 
   const begin = await app.request("/auth/discord", {origin:arcade});
   assert.equal(begin.status,302);
