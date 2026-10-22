@@ -22,6 +22,8 @@ jobs:
           node-version: "24"
       - name: Install website and arcade dependencies
         run: npm install --no-audit --no-fund
+      - name: Dependency security audit
+        run: npm audit --audit-level=high
       - name: Typecheck new React arcade
         run: npm run typecheck
       - name: JavaScript syntax
