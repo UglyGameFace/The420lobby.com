@@ -1,59 +1,78 @@
 import './indie-spotlight.css';
 
-// Source of truth: user-uploaded indie-fighter-splash-links.zip.
-// These are the byte-exact two WebP files shipped in that archive.
-// No creator portraits, alternate generations, stock art, or overlays.
-const fighters = [
+// These portraits come from the games' published character rosters.
+// Do not substitute stock fighters, generated faces, or the old ZIP posters.
+const games = [
   {
     title: 'Boondocks Brawl',
-    url: 'https://boondocksbrawl.com/',
-    image: '/assets/boondocks-brawl.webp',
-    width: 1100,
-    height: 619,
-    subtitle: 'Free indie browser fighter',
-    className: '',
+    href: 'https://boondocksbrawl.com/',
+    tagline: 'WOODCREST SHOWDOWN',
+    accent: 'green',
+    roster: [
+      {name:'Huey', image:'https://boondocksbrawl.com/portraits/huey.webp'},
+      {name:'Riley', image:'https://boondocksbrawl.com/portraits/riley.webp'},
+      {name:'Granddad', image:'https://boondocksbrawl.com/portraits/granddad.webp'},
+    ],
   },
   {
     title: 'Friday Fighters',
-    url: 'https://fridayfighters.com/',
-    image: '/assets/friday-fighters.webp',
-    width: 765,
-    height: 620,
-    subtitle: 'Free indie browser fighter',
-    className: 'indie-spotlight__card--friday',
+    href: 'https://fridayfighters.com/',
+    tagline: 'NEIGHBORHOOD SHOWDOWN',
+    accent: 'purple',
+    roster: [
+      {name:'Craig', image:'https://fridayfighters.com/portraits/craig.webp'},
+      {name:'Smokey', image:'https://fridayfighters.com/portraits/smokey.webp'},
+      {name:'Deebo', image:'https://fridayfighters.com/portraits/deebo.webp'},
+    ],
   },
 ] as const;
 
 export default function IndieSpotlight() {
   return (
     <section className="indie-spotlight" aria-labelledby="indie-spotlight-heading">
-      <div className="indie-spotlight__head">
+      <header className="indie-spotlight__head">
         <div>
           <p className="indie-spotlight__eyebrow">Community picks / free browser games</p>
-          <h2 id="indie-spotlight-heading" className="indie-spotlight__title">INDIE FIGHTERS<span>.</span></h2>
+          <h2 className="indie-spotlight__title" id="indie-spotlight-heading">INDIE FIGHTERS<span>.</span></h2>
         </div>
-        <p className="indie-spotlight__intro">Two indie fighting games. Tap the artwork from The 420 Lobby splash-link pack to visit the creators.</p>
-      </div>
+        <p className="indie-spotlight__intro">Choose your fighter. These are real characters featured by each game's creator.</p>
+      </header>
       <div className="indie-spotlight__grid">
-        {fighters.map(game => (
-          <a className={`indie-spotlight__card ${game.className}`}
-             href={game.url} target="_blank" rel="noopener noreferrer"
-             aria-label={`Play ${game.title} on the creator's website (opens in new tab)`}
-             key={game.url}>
-            <img className="indie-spotlight__image"
-                 src={game.image} width={game.width} height={game.height}
-                 alt={`${game.title} promotional poster from The 420 Lobby's indie-fighter splash-links pack`}
-                 loading="lazy" decoding="async" />
-            <span className="indie-spotlight__meta">
-              <span className="indie-spotlight__meta-title">{game.title}</span>
-              <span className="indie-spotlight__meta-hint">{game.subtitle} ↗</span>
-            </span>
+        {games.map(game => (
+          <a className={`indie-spotlight__card indie-spotlight__card--${game.accent}`}
+             key={game.href} href={game.href} target="_blank" rel="noopener noreferrer"
+             aria-label={`Play ${game.title} on the creator's website (opens in a new tab)`}>
+            <div className="indie-spotlight__topline">
+              <span className="indie-spotlight__kicker">REAL GAME ROSTER</span>
+              <span className="indie-spotlight__external">FREE TO PLAY ↗</span>
+            </div>
+            <div className="indie-spotlight__masthead">
+              <span className="indie-spotlight__tagline">{game.tagline}</span>
+              <h3 className="indie-spotlight__game-name">{game.title}</h3>
+            </div>
+            <div className="indie-spotlight__roster" aria-label={`Featured ${game.title} characters`}>
+              {game.roster.map((fighter, i) => (
+                <figure className="indie-spotlight__fighter" key={fighter.name}>
+                  <img className="indie-spotlight__fighter-image"
+                       src={fighter.image} alt={`${fighter.name} as depicted in ${game.title}`}
+                       loading="lazy" decoding="async" width={640} height={640} referrerPolicy="no-referrer" />
+                  <figcaption className="indie-spotlight__fighter-name">
+                    <span className="indie-spotlight__fighter-number">{String(i+1).padStart(2,'0')}</span>
+                    {fighter.name}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+            <div className="indie-spotlight__card-footer">
+              <span className="indie-spotlight__footer-copy">3 REAL FIGHTERS <span aria-hidden="true">✦</span> MORE IN GAME</span>
+              <span className="indie-spotlight__play">PLAY FREE <span aria-hidden="true">↗</span></span>
+            </div>
           </a>
         ))}
       </div>
       <p className="indie-spotlight__note">
-        User-provided promotional splash artwork for The 420 Lobby Arcade, not official game art.
-        These external games have separate accounts and do not share our Discord scores or leaderboards.
+        Character portraits are provided by the games' own websites. Both games are external fan projects;
+        they do not share The 420 Lobby's Discord accounts or arcade rankings.
       </p>
     </section>
   );

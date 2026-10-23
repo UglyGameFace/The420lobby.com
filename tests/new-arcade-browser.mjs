@@ -83,6 +83,25 @@ try{
     await banner.scrollIntoViewIfNeeded();
     await banner.evaluate(async img=>{await img.decode();});
     assert.ok(await banner.evaluate(img=>img.naturalWidth>0),"real lounge artwork failed to load");
+    const roster=page.locator(".indie-spotlight__fighter-image");
+    assert.equal(await roster.count(),6,"arcade should show six game-creator portraits");
+    const realSources=[
+      "https://boondocksbrawl.com/portraits/huey.webp",
+      "https://boondocksbrawl.com/portraits/riley.webp",
+      "https://boondocksbrawl.com/portraits/granddad.webp",
+      "https://fridayfighters.com/portraits/craig.webp",
+      "https://fridayfighters.com/portraits/smokey.webp",
+      "https://fridayfighters.com/portraits/deebo.webp"
+    ];
+    assert.deepEqual(await roster.evaluateAll(images=>images.map(img=>img.getAttribute("src"))),realSources);
+    assert.equal(await page.locator(".indie-spotlight__fighter-name").count(),6);
+    assert.deepEqual(await page.locator(".indie-spotlight__card").evaluateAll(links=>links.map(a=>a.href)),
+      ["https://boondocksbrawl.com/","https://fridayfighters.com/"]);
+    // Layout must not rely on third-party portrait load timing, but the actual
+    // source and grid fit are checked at every mobile and desktop breakpoint.
+    const rosterWidth=await page.locator(".indie-spotlight__roster").first().boundingBox();
+    assert.ok(rosterWidth && rosterWidth.x>=0 && rosterWidth.x+rosterWidth.width<=width+2,
+      "indie fighter roster spills past "+width+"px viewport");
     assert.equal(await page.locator(".arcade-site-footer .footer-logo").getAttribute("href"),"/");
     assert.ok((await page.locator(".arcade-site-footer .footer-links").innerText()).includes("THE VIBE"));
 
