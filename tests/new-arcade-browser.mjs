@@ -89,11 +89,23 @@ try{
       "https://boondocksbrawl.com/portraits/huey.webp",
       "https://boondocksbrawl.com/portraits/riley.webp",
       "https://boondocksbrawl.com/portraits/granddad.webp",
-      "https://fridayfighters.com/portraits/craig.webp",
-      "https://fridayfighters.com/portraits/smokey.webp",
-      "https://fridayfighters.com/portraits/deebo.webp"
+      "/assets/friday-roster-craig.webp",
+      "/assets/friday-roster-smokey.webp",
+      "/assets/friday-roster-deebo.webp"
     ];
     assert.deepEqual(await roster.evaluateAll(images=>images.map(img=>img.getAttribute("src"))),realSources);
+    // The previous implementation checked URLs only, allowing all three Friday
+    // characters to render as broken images. Assert actual decoding of the
+    // same-origin assets from the compiled Pages static output.
+    const fridayImages=page.locator(".indie-spotlight__card--purple .indie-spotlight__fighter-image");
+    assert.equal(await fridayImages.count(),3);
+    for(let i=0;i<3;i++){
+      const image=fridayImages.nth(i);
+      await image.scrollIntoViewIfNeeded();
+      await image.evaluate(async el=>{await el.decode();});
+      assert.ok(await image.evaluate(el=>el.complete && el.naturalWidth>0 && el.naturalHeight>0),
+        "Friday Fighters portrait "+i+" failed to decode");
+    }
     assert.equal(await page.locator(".indie-spotlight__fighter-name").count(),6);
     assert.deepEqual(await page.locator(".indie-spotlight__card").evaluateAll(links=>links.map(a=>a.href)),
       ["https://boondocksbrawl.com/","https://fridayfighters.com/"]);
