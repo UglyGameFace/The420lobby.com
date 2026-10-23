@@ -5,7 +5,7 @@ import {readFileSync} from 'node:fs';
 const read=(path)=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const approved={
   'Boondocks Brawl':{url:'https://boondocksbrawl.com/',names:['Huey','Riley','Granddad'],prefix:'https://boondocksbrawl.com/portraits/'},
-  'Friday Fighters':{url:'https://fridayfighters.com/',names:['Craig','Smokey','Deebo'],prefix:'https://fridayfighters.com/portraits/'}
+  'Friday Fighters':{url:'https://fridayfighters.com/',names:['Craig','Smokey','Deebo'],prefix:'/assets/friday-roster-'}
 };
 
 test('indie arcade uses character portraits from each published game roster',()=>{
@@ -38,11 +38,13 @@ test('real fighter select cards keep recognisable faces and titles visible on ph
     'do not layer invented original posters on top of real roster art');
 });
 
-test('only the two game creator origins are added to Content Security Policy image-src',()=>{
+test('only the still-needed Boondocks source remains in CSP; Friday portraits are same origin',()=>{
   const headers=read('_headers');
   const img=headers.match(/img-src ([^;]+);/)?.[1];
   assert.ok(img,'missing image CSP');
   assert.ok(img.includes('https://boondocksbrawl.com'));
-  assert.ok(img.includes('https://fridayfighters.com'));
+  assert.ok(!img.includes('https://fridayfighters.com'));
+  assert.ok(read('new-arcade/src/components/IndieSpotlight.tsx').includes('/assets/friday-roster-craig.webp'));
+  assert.match(read('scripts/build-static.mjs'),/buildFridayPortraits/);
   assert.doesNotMatch(img,/https?:\/\/\*/,'do not authorize arbitrary image hosts');
 });

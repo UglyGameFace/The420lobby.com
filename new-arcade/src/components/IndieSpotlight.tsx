@@ -20,9 +20,9 @@ const games = [
     tagline: 'NEIGHBORHOOD SHOWDOWN',
     accent: 'purple',
     roster: [
-      {name:'Craig', image:'https://fridayfighters.com/portraits/craig.webp'},
-      {name:'Smokey', image:'https://fridayfighters.com/portraits/smokey.webp'},
-      {name:'Deebo', image:'https://fridayfighters.com/portraits/deebo.webp'},
+      {name:'Craig', image:'/assets/friday-roster-craig.webp'},
+      {name:'Smokey', image:'/assets/friday-roster-smokey.webp'},
+      {name:'Deebo', image:'/assets/friday-roster-deebo.webp'},
     ],
   },
 ] as const;
@@ -71,7 +71,7 @@ export default function IndieSpotlight() {
         ))}
       </div>
       <p className="indie-spotlight__note">
-        Character portraits are provided by the games' own websites. Both games are external fan projects;
+        Portraits are drawn from public game-roster artwork, served locally for reliable loading. Both games are external fan projects;
         they do not share The 420 Lobby's Discord accounts or arcade rankings.
       </p>
     </section>

@@ -1,5 +1,6 @@
 /* Curated Pages asset output. Backend source and local configuration stay out. */
 import {cp, mkdir, readdir, rm, lstat} from 'node:fs/promises';
+import {buildFridayPortraits} from './friday-portraits.mjs';
 import {resolve, dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -23,4 +24,5 @@ for (const path of publicFiles) await copyPublic(path);
 for (const asset of await readdir(join(root,'assets'),{withFileTypes:true})) {
   if (asset.isFile() && /\.(?:svg|png|avif|webp|jpe?g|gif|ico)$/i.test(asset.name)) await copyPublic('assets/'+asset.name);
 }
+await buildFridayPortraits(join(output,'assets'));
 console.log('Prepared dist/ with curated static assets. No deployment performed.');
