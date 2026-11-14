@@ -37,6 +37,8 @@ jobs:
           node --check arcade-vite.config.mjs
           node --check functions/_lib/arcade-v2.mjs
           node --check scripts/build-static.mjs
+          node --check bump-manager.js
+          node --check workers/bump-scheduler.mjs
           node --check arcade-app.js
           node --check arcade-games.js
           node --check shared/arcade-rules.mjs
@@ -48,6 +50,8 @@ jobs:
         run: npm run build
       - name: Compile Cloudflare Pages Functions without deploying
         run: npx --yes wrangler@4 pages functions build --outdir=.wrangler/functions-build
+      - name: Compile bump scheduler without deploying
+        run: npx --yes wrangler@4 deploy --dry-run --config wrangler.bump.jsonc
       - name: Install browser smoke-test tooling
         run: |
           npm install --no-save playwright@1.56.1
