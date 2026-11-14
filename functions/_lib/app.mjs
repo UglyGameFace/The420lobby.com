@@ -3,6 +3,7 @@ import {beginDiscord, completeDiscord, claimArcadeSession, isArcadeHost, getSess
 import {finishRun, leaderboards, profile, startRun} from "./arcade.mjs";
 import {startArcadeV2Run, finishArcadeV2Run, arcadeV2Leaderboards, ARCADE_V2_RULES} from "./arcade-v2.mjs";
 import {getCheers, joinCheers, sparkCheers, cheersPresence} from "./cheers.mjs";
+import {handleBumpManager} from "./bump-manager.mjs";
 
 export async function handleRequest(context, options = {}) {
   const {request, env} = context;
@@ -29,6 +30,9 @@ export async function handleRequest(context, options = {}) {
       allowMethod(request, ["GET"]); response = await completeDiscord(request, env, options.fetcher);
     } else if (path === "/auth/logout") {
       allowMethod(request, ["POST"]); response = await logout(request, env, await requireSession(request, env));
+    } else if (path === "/api/bump-manager" || path.startsWith("/api/bump-manager/")) {
+      allowMethod(request, ["GET", "POST"]);
+      response = await handleBumpManager(request, env, path);
     } else if (path === "/api/cheers") {
       allowMethod(request, ["GET", "POST"]);
       response = request.method === "GET" ? await getCheers(request, env) : await joinCheers(request, env);
