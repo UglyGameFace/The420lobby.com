@@ -83,15 +83,15 @@ export async function handleBumpManager(request, env, path) {
   if (path === "/api/bump-manager/services" && request.method === "POST") {
     const valid = validateInput(await readJson(request,512));
     const now = Date.now(), id = crypto.randomUUID();
-    // Newly added services start due, never imply that a bump occurred.
+    // Start conservatively after one cooldown. Do not assume a prior bump was successful.
     try {
       await env.DB.prepare("INSERT INTO bump_services(id,name,channel_url,cooldown_minutes,enabled,next_due_at,created_at,updated_at) VALUES(?,?,?,?,1,?,?,?)")
-        .bind(id,valid.name,valid.channelUrl,valid.cooldownMinutes,now,now,now).run();
+        .bind(id,valid.name,valid.channelUrl,valid.cooldownMinutes,now + valid.cooldownMinutes * 60000,now,now).run();
     } catch (error) {
       if (/UNIQUE|constraint/i.test(String(error))) throw new HttpError(409,"service_exists","A service with that name already exists.");
       throw error;
     }
-    await audit(env,id,"created",now,"Awaiting first owner-reported action; no automated bump.");
+    await audit(env,id,"created",now,"Initial schedule estimated from registration, not evidence of a completed bump.");
     return json({ok:true,id},201);
   }
   const match = /^\/api\/bump-manager\/services\/([^/]+)\/(complete|state|edit|archive)$/.exec(path);
