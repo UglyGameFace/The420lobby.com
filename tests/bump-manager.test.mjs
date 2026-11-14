@@ -31,7 +31,7 @@ function fixture(){
     const token=randomToken(),csrf=await hash("csrf:"+token),now=Date.now();
     await env.DB.prepare("INSERT INTO users(id,username,avatar_url,created_at,updated_at) VALUES(?,?,?,?,?)")
       .bind(id,"owner","https://cdn.discordapp.com/embed/avatars/0.png",now,now).run();
-    await env.DB.prepare("INSERT INTO sessions(token_hash,user_id,created_at,expires_at) VALUES(?,?,?,?,?)".replace("VALUES(?,?,?,?,?)","VALUES(?,?,?,?)"))
+    await env.DB.prepare("INSERT INTO sessions(token_hash,user_id,created_at,expires_at) VALUES(?,?,?,?)")
       .bind(await hash(token),id,now,now+600000).run();
     return {token,csrf};
   }
@@ -105,9 +105,9 @@ test("cron sends only reminders once per due window, not bump commands",async()=
     calls.push({url,body:JSON.parse(options.body)});
     return new Response(null,{status:204});
   };
-  let outcome=await deliverDueReminders(app.env,sender,Date.now()+1000);
+  let outcome=await deliverDueReminders(app.env,sender,Date.now()+121*60000);
   assert.deepEqual([outcome.attempted,outcome.sent,outcome.failed],[1,1,0]);
-  outcome=await deliverDueReminders(app.env,sender,Date.now()+2000);
+  outcome=await deliverDueReminders(app.env,sender,Date.now()+121*60000+2000);
   assert.equal(outcome.attempted,0);assert.equal(calls.length,1);
   assert.match(calls[0].body.content,/Manual bump reminder/);
   assert.doesNotMatch(calls[0].body.content,/\/bump/);
@@ -124,7 +124,7 @@ test("failed or ambiguous webhook delivery is not retried blindly",async()=>{
   await app.request("/api/bump-manager/services",owner,{name:"Discodus",channelUrl:channel,cooldownMinutes:120});
   let count=0;
   const sender=async()=>{count++;throw new Error("network timeout");};
-  const t=Date.now()+1000;
+  const t=Date.now()+121*60000;
   const first=await deliverDueReminders(app.env,sender,t);
   const second=await deliverDueReminders(app.env,sender,t+2000);
   assert.equal(first.failed,1);assert.equal(second.attempted,0);assert.equal(count,1);
