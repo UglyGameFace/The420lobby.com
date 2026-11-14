@@ -116,7 +116,9 @@ export async function handleBumpManager(request, env, path) {
     await audit(env,id,body.enabled?"resumed":"paused",now);
   } else if (action === "edit") {
     const valid = validateInput(body);
-    const due = row.last_completed_at ? Math.max(now,row.last_completed_at+valid.cooldownMinutes*60000):row.next_due_at;
+    // Editing an unanchored service must never shorten its conservative initial wait.
+    const due = row.last_completed_at ? Math.max(now,row.last_completed_at+valid.cooldownMinutes*60000)
+      : Math.max(row.next_due_at,now+valid.cooldownMinutes*60000);
     try {
       await env.DB.prepare("UPDATE bump_services SET name=?,channel_url=?,cooldown_minutes=?,next_due_at=?,updated_at=? WHERE id=?")
         .bind(valid.name,valid.channelUrl,valid.cooldownMinutes,due,now,id).run();
