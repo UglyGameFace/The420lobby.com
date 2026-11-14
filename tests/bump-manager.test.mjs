@@ -79,6 +79,9 @@ test("manager setup, add, edit, pause, completion, archive and truthful audit",a
   const id=created.id;
   assert.equal(await error(await app.request("/api/bump-manager/services",owner,{name:"onebump",channelUrl:channel,cooldownMinutes:120})),"service_exists");
   assert.equal((await data(await app.request("/api/bump-manager",owner))).services.length,1);
+  await app.request("/api/bump-manager/services/"+id+"/edit",owner,{name:"OneBump",channelUrl:channel,cooldownMinutes:180});
+  const conservative=(await data(await app.request("/api/bump-manager",owner))).services[0];
+  assert.ok(conservative.nextDueAt>=Date.now()+179*60000,"Initial unknown state must not trigger an early reminder");
   await app.request("/api/bump-manager/services/"+id+"/state",owner,{enabled:false});
   assert.equal(await error(await app.request("/api/bump-manager/services/"+id+"/complete",owner,{})),"paused");
   await app.request("/api/bump-manager/services/"+id+"/state",owner,{enabled:true});
