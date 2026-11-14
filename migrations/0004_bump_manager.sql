@@ -23,3 +23,12 @@ CREATE TABLE IF NOT EXISTS bump_audit (
   detail TEXT NOT NULL DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS bump_audit_recent ON bump_audit(at DESC);
+
+CREATE TABLE IF NOT EXISTS bump_scheduler_runs (
+  id INTEGER PRIMARY KEY CHECK(id=1),
+  last_tick_at INTEGER NOT NULL,
+  attempted INTEGER NOT NULL,
+  sent INTEGER NOT NULL,
+  failed INTEGER NOT NULL,
+  webhook_configured INTEGER NOT NULL CHECK(webhook_configured IN (0,1))
+);
