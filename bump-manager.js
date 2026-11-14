@@ -123,7 +123,17 @@ async function reload() {
   $("setup-panel").hidden = !state.setupPending;
   $("dashboard").hidden = state.setupPending;
   services = state.services;events = state.events;
-  $("connection").textContent = state.setupPending ? "Setup required" : "Cloud schedule ready";
+  if (state.setupPending) {
+    $("connection").textContent = "Setup required";
+  } else if (!state.scheduler?.lastTickAt) {
+    $("connection").textContent = "Scheduler not yet verified";
+  } else if (Date.now() - state.scheduler.lastTickAt > 15 * 60000) {
+    $("connection").textContent = "Scheduler stale";
+  } else if (!state.scheduler.webhookConfigured) {
+    $("connection").textContent = "Scheduler online · reminder setup pending";
+  } else {
+    $("connection").textContent = "Scheduler online";
+  }
   render();
 }
 async function init() {
