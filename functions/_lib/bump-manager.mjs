@@ -7,7 +7,8 @@ export const BUMP_SCHEMA = [
   "CREATE TABLE IF NOT EXISTS bump_services (id TEXT PRIMARY KEY, name TEXT NOT NULL COLLATE NOCASE UNIQUE, channel_url TEXT NOT NULL, cooldown_minutes INTEGER NOT NULL CHECK(cooldown_minutes BETWEEN 15 AND 10080), enabled INTEGER NOT NULL DEFAULT 1 CHECK(enabled IN (0,1)), next_due_at INTEGER NOT NULL, last_completed_at INTEGER, last_reminder_due_at INTEGER, reminder_status TEXT NOT NULL DEFAULT 'none', archived_at INTEGER, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)",
   "CREATE INDEX IF NOT EXISTS bump_service_due ON bump_services(enabled,next_due_at) WHERE archived_at IS NULL",
   "CREATE TABLE IF NOT EXISTS bump_audit (id INTEGER PRIMARY KEY AUTOINCREMENT, service_id TEXT NOT NULL, event TEXT NOT NULL, at INTEGER NOT NULL, detail TEXT NOT NULL DEFAULT '')",
-  "CREATE INDEX IF NOT EXISTS bump_audit_recent ON bump_audit(at DESC)"
+  "CREATE INDEX IF NOT EXISTS bump_audit_recent ON bump_audit(at DESC)",
+  "CREATE TABLE IF NOT EXISTS bump_scheduler_runs (id INTEGER PRIMARY KEY CHECK(id=1), last_tick_at INTEGER NOT NULL, attempted INTEGER NOT NULL, sent INTEGER NOT NULL, failed INTEGER NOT NULL, webhook_configured INTEGER NOT NULL CHECK(webhook_configured IN (0,1)))"
 ];
 const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const OWNER = /^\d{17,20}$/;
@@ -72,7 +73,9 @@ export async function handleBumpManager(request, env, path) {
     if (!await exists(env)) return json({setupPending:true,services:[],events:[],serverTime:Date.now()});
     const services = await env.DB.prepare("SELECT * FROM bump_services WHERE archived_at IS NULL ORDER BY next_due_at ASC, name ASC LIMIT 100").all();
     const events = await env.DB.prepare("SELECT service_id AS serviceId,event,at,detail FROM bump_audit ORDER BY id DESC LIMIT 60").all();
-    return json({setupPending:false,services:(services.results||[]).map(serialize),events:events.results||[],serverTime:Date.now()});
+    const schedulerTable = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='bump_scheduler_runs'").first();
+    const scheduler = schedulerTable ? await env.DB.prepare("SELECT last_tick_at AS lastTickAt,attempted,sent,failed,webhook_configured AS webhookConfigured FROM bump_scheduler_runs WHERE id=1").first() : null;
+    return json({setupPending:false,services:(services.results||[]).map(serialize),events:events.results||[],scheduler,serverTime:Date.now()});
   }
   if (path === "/api/bump-manager/setup" && request.method === "POST") {
     exactFields(await readJson(request,64),[]);
