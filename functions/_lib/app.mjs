@@ -13,7 +13,7 @@ export async function handleRequest(context, options = {}) {
     let response;
     const shieldHost = isShieldHost(request, env);
     const shieldHome = path === "/" || path === "/index.html" || path === "/shield" || path === "/shield.html";
-    const shieldUi = /^\/(?:shield(?:\.(?:html|css|js))?|bump-manager(?:\.(?:html|js|css|webmanifest))?)$/.test(path);
+    const shieldUi = /^\/(?:shield(?:\.(?:html|css|js))?|shield-telemetry\.js|bump-manager(?:\.(?:html|js|css|webmanifest))?|bump-shield\.js)$/.test(path);
     // Prevent direct access to staff UI assets on the public site, even with a guessed URL.
     if (!shieldHost && shieldUi) throw new HttpError(404, "not_found", "Not found.");
     if (shieldHost && (shieldHome || shieldUi || path === "/favicon.svg")) {
