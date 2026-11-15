@@ -60,3 +60,9 @@ Provide versioned source and offline regression coverage for the standalone Andr
 - Updated Cloudflare encrypted production `BUMP_MANAGER_OWNER_ID` to the main account and encrypted `SHIELD_STAFF_IDS` to allow Dank Tested read-only access. Never promote staff to owner simply because both accounts belong to one person.
 - This documentation commit triggers a fresh Git-connected Pages deployment because updating settings alone does not change an already deployed Pages Functions environment.
 - Dank Shield operational health and moderation APIs remain disconnected until a separately tested and authorized read-only integration is deployed.
+
+## Authenticated Dank Shield aggregate bridge
+- Actual Dank Shield database counters for The 420 Lobby are exposed exclusively through a **new read-only Supabase Edge Function** protected by an Ed25519 signature from the Cloudflare private server; the Edge Function's public key is checked into the Dank Shield repository. The signing private key is a Cloudflare **encrypted production secret** only.
+- Shield's authenticated owner/staff `/api/shield/status` adds `dankShield.database` with ticket-status counts and recent 24-hour activity counts, labeling unavailable and unconfigured states explicitly.
+- The source is Dank Shield's existing Supabase project. No individual ticket contents, member IDs, personal information, or administrative operations are proxied. Discloud runtime health and the localhost secured Bot API remain *unconnected*.
+- The endpoint must not be treated as complete until the Supabase Edge Function is deployed, the server-side signing secret is set, and an authenticated response is verified. This is separate from MultiBump's local Termux scheduler.
