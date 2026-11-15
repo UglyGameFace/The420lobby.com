@@ -48,3 +48,9 @@ Provide versioned source and offline regression coverage for the standalone Andr
 - Cloudflare Pages `retry` of an old deployment replayed the deployment's earlier env vars and reverted that setting. A fresh **Git source deployment** is required instead. This documentation update deliberately triggers the Git-connected production rebuild without changing public website behavior.
 - After deployment: confirm the exact production deployment has `BUMP_MANAGER_OWNER_ID`, plus the existing secret Discord OAuth bindings, before reporting the owner sign-in as available.
 - Public Lobby site content remains unchanged. Reminders need an independently configured webhook; Dank Shield's private admin API remains disconnected.
+
+### Production-binding correction
+
+- The Pages site's checked-in `wrangler.jsonc` declares production plaintext `vars` and takes precedence over ad hoc dashboard plaintext bindings. A plaintext `BUMP_MANAGER_OWNER_ID` appeared briefly during builds but was removed from the final deployed settings.
+- The owner-supplied ID is now stored as an **encrypted Pages production binding** (`secret_text`), following the existing Discord OAuth secret pattern, not committed to source. This documentation change triggers a fresh Git-connected production deployment to pick it up.
+- Validate that the final successful production deployment retains the *key*, not just the in-progress deployment. No changes to public content, bot actions, permissions or stored secrets are required.
