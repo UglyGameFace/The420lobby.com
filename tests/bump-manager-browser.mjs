@@ -88,7 +88,7 @@ try {
     assert.ok(!JSON.stringify(calls).includes("TOKEN_NEVER_SEND"),"Login token must never be uploaded");
     assert.ok(!JSON.stringify(calls).includes("ANOTHER_SECRET"),"Service options must not be uploaded");
     page.once("dialog",dialog=>dialog.accept());
-    await page.getByRole("button",{name:"I completed this"}).click();
+    await page.locator(".service").filter({has:page.getByRole("heading",{name:"DISBOARD"})}).getByRole("button",{name:"I completed this"}).click();
     await page.waitForFunction(()=>document.querySelector(".service-meta")?.textContent.includes("Owner marked complete:")&&
       !document.querySelector(".service-meta")?.textContent.includes("Not recorded"));
     assert.ok(calls.some(c=>c.path.endsWith("/complete")));
