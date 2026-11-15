@@ -26,3 +26,6 @@ input{min-width:0;width:100%;border:1px solid #476552;border-radius:9px;padding:
 .history{margin:35px 0}.footnote{max-width:780px;margin:24px 0 44px}footer{border-top:1px solid #2b4633;border-bottom:0;color:#a7bdab;font-size:.75rem;letter-spacing:.04em;margin-top:30px}
 @media(max-width:650px){.shell{padding:0 14px}.masthead{padding:17px 0}.masthead .eyebrow{font-size:.6rem}.hero{display:block;margin:28px 0 23px}.pill{margin-top:4px}.metrics{gap:7px}.metric{padding:12px;border-radius:12px}.metric span{font-size:.7rem}.metric strong{font-size:1.35rem}.section-head{align-items:start}.section-head .action{font-size:.78rem}.service{padding:16px}.service-top{gap:8px}.service-time strong{font-size:1rem}.button-row .action{flex:1 1 auto}.action.danger{flex-grow:0}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+/* Explicitly honor the hidden attribute even on display:flex/grid action controls. */
+[hidden]{display:none!important}
