@@ -32,7 +32,7 @@ export async function readDankShieldDatabase(env, fetcher=fetch) {
       throw Error("Unrecognized source response");
     return {status:"connected",source:"Dank Shield Supabase",capturedAt:data.capturedAt||null,
       configUpdatedAt:data.configUpdatedAt||null,
-      tickets:data.tickets,activity24h:data.activity24h};
+      tickets:data.tickets,activity24h:data.activity24h,runtime:data.runtime||{status:"not_reported"}};
   }catch {
     return {status:"unavailable",note:"The private Dank Shield database snapshot could not be verified."};
   }

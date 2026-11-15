@@ -27,7 +27,15 @@
         box.append(open,recent);
       }
     }
-    if(runtime)runtime.textContent="Discloud bot runtime not connected · Database numbers do not prove bot uptime";
+    if(runtime) {
+      const heartbeat=data.dankShield?.liveBot||{};
+      const age=heartbeat.lastSeenAt ? Math.max(0,Math.floor((Date.now()-Date.parse(heartbeat.lastSeenAt))/60000)) : null;
+      runtime.textContent=heartbeat.status==="heartbeat_recent"
+        ? "Dank Shield heartbeat recent · "+heartbeat.guildCount+" guilds · "+age+"m old (not a direct Discloud probe)"
+        : heartbeat.status==="stale" ? "Dank Shield heartbeat stale · last report "+(age==null?"unknown":age+"m")+" ago"
+        : heartbeat.status==="reported_not_online" ? "Dank Shield heartbeat reports not online"
+        : "Dank Shield live heartbeat not yet verified";
+    }
     if(ci.runUrl && /^https:\/\/github\.com\/UglyGameFace\/Dank-Shield\/actions\/runs\/\d+$/.test(ci.runUrl)) {
       const link=document.createElement("a");
       link.href=ci.runUrl; link.textContent="View evidence";

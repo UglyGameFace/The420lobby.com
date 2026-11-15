@@ -19,9 +19,9 @@ test("Adapter signs exact request and validates an aggregate-only response",asyn
    assert.match(ts,/^\d{13}$/);assert.match(nonce,/^[a-f0-9]{32}$/);assert.match(sig,/^[A-Za-z0-9_-]{86}$/);
    const keyPub=await webcrypto.subtle.importKey("spki",generateKeyPairSync("ed25519").publicKey.export({type:"spki",format:"der"}),{name:"Ed25519"},false,["verify"]);
    assert.ok(keyPub); // signing key import succeeded; signature presence and shape are checked.
-   return new Response(JSON.stringify({ok:true,source:"dank-shield-supabase",kind:"database_snapshot",capturedAt:new Date().toISOString(),tickets:{open:1,claimed:0,closed:2},activity24h:{atLeast:15}}),{status:200});
+   return new Response(JSON.stringify({ok:true,source:"dank-shield-supabase",kind:"database_snapshot",capturedAt:new Date().toISOString(),tickets:{open:1,claimed:0,closed:2},activity24h:{atLeast:15},runtime:{status:"heartbeat_recent",lastSeenAt:new Date().toISOString(),guildCount:10}}),{status:200});
  });
- assert.equal(got,1);assert.equal(result.status,"connected");assert.equal(result.tickets.open,1);
+ assert.equal(got,1);assert.equal(result.status,"connected");assert.equal(result.tickets.open,1);assert.equal(result.runtime.status,"heartbeat_recent");
 });
 test("Adapter fails closed on HTTP errors or unexpected sources",async()=>{
  const env={DANK_SHIELD_SIGNING_KEY:key};

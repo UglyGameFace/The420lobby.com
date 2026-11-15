@@ -40,7 +40,13 @@ export async function readShieldStatus(request, env, fetcher = fetch) {
   return json({
     role,
     dankShield:{
-      liveBot:{status:"not_connected",note:"Discloud runtime health has not been independently connected."},
+      liveBot:database.status==="connected" ? {
+        status:database.runtime?.status||"not_reported",
+        source:"dank-shield-supabase-heartbeat",
+        lastSeenAt:database.runtime?.lastSeenAt||null,
+        guildCount:database.runtime?.guildCount??null,
+        note:"Heartbeat freshness is evidence of the bot's periodic reports, not a live Discloud HTTP probe."
+      } : {status:"not_connected",note:"Discloud runtime health has not been independently connected."},
       structuredApi:{status:"private",note:"Admin API remains local and authenticated on the bot host."},
       sourceCi:ci,
       database
