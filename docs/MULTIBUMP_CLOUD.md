@@ -20,6 +20,10 @@ Do not run the old phone automation and an authorized alternative for the same s
 
 No automatic second reminder for unknown, timed-out or rejected deliveries. The owner can inspect history and mark actions explicitly. Pausing does not discard audit history; archiving excludes a service from future reminders.
 
+## Separate Android v14 companion source
+
+The repository also tracks the standalone v14 Termux client at `tools/multibump-android/` (see `docs/MULTIBUMP_ANDROID.md`). **This client is separate from the cloud manager**. The cloud Worker cannot read its local SQLite database, cannot infer its deadlines, and never sends `/bump` commands. Running the Termux client is subject to Discord's prohibition on user-account self-bots; checking this code into GitHub is not permission from Discord or any directory provider.
+
 ## Infrastructure choices
 
 Existing production site (unchanged until approved merge):

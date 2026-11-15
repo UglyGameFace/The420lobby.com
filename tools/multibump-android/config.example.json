@@ -1,0 +1,9 @@
+{
+  "check_interval_seconds": 30,
+  "confirmation_timeout_seconds": 30,
+  "timing": {
+    "extra_delay_min_seconds": 120,
+    "extra_delay_max_seconds": 1020
+  },
+  "services": []
+}

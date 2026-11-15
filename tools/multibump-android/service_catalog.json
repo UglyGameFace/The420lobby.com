@@ -1,0 +1,136 @@
+{
+  "disboard": {
+    "label": "DISBOARD",
+    "application_id": "302050872383242240",
+    "command_name": "bump",
+    "cooldown_seconds": 7200,
+    "evidence": "Bot ID corroborated by public source code; cooldown from DISBOARD documentation",
+    "help_url": "https://disboard.org/",
+    "success_patterns": [
+      "bump done",
+      "successfully bumped",
+      "bumped successfully",
+      "bump successful"
+    ],
+    "cooldown_patterns": [
+      "cooldown",
+      "try again",
+      "please wait",
+      "already bumped",
+      "wait before"
+    ]
+  },
+  "onebump": {
+    "label": "OneBump",
+    "application_id": "1028956609382199346",
+    "command_name": "bump",
+    "cooldown_seconds": 7200,
+    "evidence": "Previously identified public bot ID; free-tier cooldown from OneBump documentation",
+    "help_url": "https://bump.ltd/compare",
+    "success_patterns": [
+      "successfully bumped",
+      "bump successful",
+      "bumped your server",
+      "bump complete",
+      "first bump done",
+      "shared to [0-9]+% of servers",
+      "bump done"
+    ],
+    "cooldown_patterns": [
+      "cooldown",
+      "try again",
+      "please wait",
+      "already bumped"
+    ]
+  },
+  "discodus": {
+    "label": "Discodus",
+    "application_id": "1159147139960676422",
+    "command_name": "bump",
+    "cooldown_seconds": null,
+    "evidence": "Bot ID and /bump command from Top.gg; cooldown is not reliably verified, enter the value shown by the bot",
+    "help_url": "https://top.gg/bot/1159147139960676422",
+    "success_patterns": [
+      "successfully bumped",
+      "bumped successfully",
+      "bump successful",
+      "bump done"
+    ],
+    "cooldown_patterns": [
+      "cooldown",
+      "try again",
+      "please wait",
+      "already bumped"
+    ]
+  },
+  "discadia": {
+    "label": "Discadia",
+    "application_id": "1222548162741538938",
+    "command_name": "bump",
+    "cooldown_seconds": 86400,
+    "evidence": "Bot ID listed by botlist.me; one daily bump counts toward free Server Boosts, verify current app ID and role permissions",
+    "help_url": "https://discadia.com/",
+    "success_patterns": [
+      "successfully bumped",
+      "bumped successfully",
+      "bump successful",
+      "bump done",
+      "server boost.*added",
+      "bumped\\s*[.!]?\\s*\\+\\s*1\\s+boost\\s+earned"
+    ],
+    "cooldown_patterns": [
+      "cooldown",
+      "try again",
+      "please wait",
+      "already bumped"
+    ]
+  },
+  "discordify": {
+    "label": "Discordify",
+    "application_id": "1326784586696626176",
+    "command_name": "bump",
+    "cooldown_seconds": 7200,
+    "evidence": "Application ID from official Discordify install URL; /bump and 2-hour cooldown in its own guide (August 2026)",
+    "help_url": "https://discordify.net/blog/discordify-the-best-disboard-alternative-for-promoting-your-server/",
+    "success_patterns": [
+      "successfully bumped",
+      "bumped successfully",
+      "bump successful",
+      "bump done",
+      "your server has been bumped",
+      "server bumped",
+      "bump recorded"
+    ],
+    "cooldown_patterns": [
+      "cooldown",
+      "try again",
+      "please wait",
+      "already bumped",
+      "can bump again"
+    ]
+  },
+  "d-invites": {
+    "label": "D-INVITES",
+    "application_id": "678211574183362571",
+    "command_name": "bump",
+    "cooldown_seconds": 7200,
+    "evidence": "Bot ID and /bump verified on DiscordInvites official bot listing. Two-hour timer is a provisional default, not a verified D-INVITES cooldown; adjust when bot shows its interval",
+    "help_url": "https://en.discordinvites.net/bots/678211574183362571",
+    "success_patterns": [
+      "successfully bumped",
+      "bumped successfully",
+      "bump successful",
+      "bump done",
+      "your server has been bumped",
+      "server bumped",
+      "bump recorded"
+    ],
+    "cooldown_patterns": [
+      "cooldown",
+      "try again",
+      "please wait",
+      "already bumped",
+      "can bump again"
+    ]
+  }
+}

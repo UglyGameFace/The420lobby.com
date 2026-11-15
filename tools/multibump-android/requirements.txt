@@ -1,0 +1,5 @@
+# Upstream v2.1.0 has discord_protos<1, but PyPI now only offers 1.2.x.
+# An official upstream v2.2 development commit supports discord_protos<2.
+# Exact SHA prevents silent upgrades from a moving branch.
+# Git is installed inside Debian by setup-debian.sh.
+discord.py-self @ git+https://github.com/dolfies/discord.py-self.git@2ba64a9a997e151a9c259984e0a179b1fdf4aff4
