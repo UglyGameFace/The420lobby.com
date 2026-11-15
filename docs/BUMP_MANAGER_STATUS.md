@@ -41,3 +41,10 @@ Provide versioned source and offline regression coverage for the standalone Andr
 - Optional SHIELD_STAFF_IDS comma-separated allowlist grants **read-only** dashboard and source CI access. BUMP_MANAGER_OWNER_ID still must be configured, and only its holder can change schedules or settings.
 - GET /api/shield/status reports latest Dank Shield main-branch GitHub workflow evidence only (best-effort, cached). It NEVER treats passing CI as live bot uptime or opens the protected localhost admin API.
 - Public website remains untouched, and private assets are routed through the owner/staff session guard. This status is not yet deployed or live-verified.
+
+## 2026-11-15 Shield owner activation deployment
+
+- Configured the production Pages `BUMP_MANAGER_OWNER_ID` with the owner's supplied Discord **user** ID (value intentionally not stored in this public repository).
+- Cloudflare Pages `retry` of an old deployment replayed the deployment's earlier env vars and reverted that setting. A fresh **Git source deployment** is required instead. This documentation update deliberately triggers the Git-connected production rebuild without changing public website behavior.
+- After deployment: confirm the exact production deployment has `BUMP_MANAGER_OWNER_ID`, plus the existing secret Discord OAuth bindings, before reporting the owner sign-in as available.
+- Public Lobby site content remains unchanged. Reminders need an independently configured webhook; Dank Shield's private admin API remains disconnected.
