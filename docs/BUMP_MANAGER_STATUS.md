@@ -66,3 +66,9 @@ Provide versioned source and offline regression coverage for the standalone Andr
 - Shield's authenticated owner/staff `/api/shield/status` adds `dankShield.database` with ticket-status counts and recent 24-hour activity counts, labeling unavailable and unconfigured states explicitly.
 - The source is Dank Shield's existing Supabase project. No individual ticket contents, member IDs, personal information, or administrative operations are proxied. Discloud runtime health and the localhost secured Bot API remain *unconnected*.
 - The endpoint must not be treated as complete until the Supabase Edge Function is deployed, the server-side signing secret is set, and an authenticated response is verified. This is separate from MultiBump's local Termux scheduler.
+
+### Integration verification and staff UI (2026-11-15)
+- The Shield homepage and the MultiBump module now display the same authenticated, read-only Dank Shield snapshot. The standalone cloud scheduler does **not** mirror Termux's local services or automatically send commands. Its D1 service count is independent.
+- Signed connector failures are categorized into safe codes (401, 403, 503, timeout, invalid response) and shown without leaking keys. The browser can refresh evidence, including when returning from Android background, and never equates stale heartbeat with a live bot.
+- GitHub CI and private signed database retrieval are started concurrently to avoid unnecessary serial latency.
+- A production deployment and green CI do not on their own prove an authenticated user opened the new status page or that the Supabase Edge Function responded. Confirm this separately from the actual user session and provider logs.

@@ -1,51 +1,41 @@
-(async function () {
-  const node=document.getElementById("dank-ci");
-  const access=document.getElementById("shield-role");
-  if (!node || !access) return;
+import {fetchShieldTelemetry,friendlyStatus} from "/shield-telemetry.js";
+const node=document.getElementById("dank-ci"),access=document.getElementById("shield-role"),
+  box=document.getElementById("dank-db"),runtime=document.getElementById("dank-runtime"),
+  activity=document.getElementById("dank-activity"),refresher=document.getElementById("dank-refresh");
+async function refresh() {
+  if(refresher)refresher.disabled=true;
+  if(box)box.textContent="Checking live Dank Shield evidence…";
   try {
-    const response=await fetch("/api/shield/status",{credentials:"same-origin",cache:"no-store",headers:{Accept:"application/json"}});
-    if (!response.ok) throw new Error("Read-only source status is unavailable");
-    const data=await response.json();
-    access.textContent=data.role === "owner" ? "OWNER ACCESS" : "STAFF · VIEW ONLY";
-    const ci=data.dankShield?.sourceCi||{};
-    const label=ci.status === "passed" ? "Latest main CI passed" : ci.status === "failed" ? "Latest main CI failed" : ci.status === "running" ? "Latest main CI running" : "GitHub CI unavailable";
-    node.textContent=label+" · Live Discloud bot not verified";
-    const db=data.dankShield?.database||{};
-    const box=document.getElementById("dank-db");
-    const runtime=document.getElementById("dank-runtime");
-    if(box) {
+    const data=await fetchShieldTelemetry();
+    const status=friendlyStatus(data);
+    if(access)access.textContent=data.role==="owner"?"OWNER ACCESS":"STAFF · VIEW ONLY";
+    if(box){
       box.replaceChildren();
-      const status=document.createElement("p");
-      status.textContent=db.status==="connected" ? "Connected to Dank Shield database (read-only)" :
-        db.status==="not_configured" ? "Private database connection not configured" : "Database status unavailable";
-      box.append(status);
-      if(db.status==="connected") {
-        const open=document.createElement("strong");
-        open.textContent=String(db.tickets.open)+(db.tickets.claimed ? " open · "+db.tickets.claimed+" claimed" : " open tickets");
-        const recent=document.createElement("small");
-        recent.textContent=String(db.activity24h.atLeast)+(db.activity24h.truncated?"+":"")+" activity events in the last 24h";
-        box.append(open,recent);
+      const heading=document.createElement("p");heading.textContent=status.dbLine;box.append(heading);
+      if(status.connected&&status.open!==null){
+        const tickets=document.createElement("strong");
+        tickets.textContent=status.open+" open ticket"+(status.open===1?"":"s");
+        box.append(tickets);
+        const detail=document.createElement("small");detail.textContent=status.recentLine;box.append(detail);
       }
     }
-    if(runtime) {
-      const heartbeat=data.dankShield?.liveBot||{};
-      const age=heartbeat.lastSeenAt ? Math.max(0,Math.floor((Date.now()-Date.parse(heartbeat.lastSeenAt))/60000)) : null;
-      runtime.textContent=heartbeat.status==="heartbeat_recent"
-        ? "Dank Shield heartbeat recent · "+heartbeat.guildCount+" guilds · "+age+"m old (not a direct Discloud probe)"
-        : heartbeat.status==="stale" ? "Dank Shield heartbeat stale · last report "+(age==null?"unknown":age+"m")+" ago"
-        : heartbeat.status==="reported_not_online" ? "Dank Shield heartbeat reports not online"
-        : "Dank Shield live heartbeat not yet verified";
+    if(runtime)runtime.textContent=status.heartbeatLine+" · Not a direct Discloud HTTP probe";
+    if(activity)activity.textContent=status.recentLine;
+    if(node) {
+      const ci=data.dankShield?.sourceCi||{};
+      node.textContent=ci.status==="passed"?"Latest main CI passed":
+        ci.status==="failed"?"Latest main CI failed":ci.status==="running"?"Latest main CI running":"GitHub CI unavailable";
+      if(ci.runUrl&&/^https:\/\/github\.com\/UglyGameFace\/Dank-Shield\/actions\/runs\/\d+$/.test(ci.runUrl)){
+        const a=document.createElement("a");a.href=ci.runUrl;a.textContent="View CI";
+        a.rel="noopener noreferrer";a.target="_blank";a.className="ci-link";node.append(" · ",a);
+      }
     }
-    if(ci.runUrl && /^https:\/\/github\.com\/UglyGameFace\/Dank-Shield\/actions\/runs\/\d+$/.test(ci.runUrl)) {
-      const link=document.createElement("a");
-      link.href=ci.runUrl; link.textContent="View evidence";
-      link.rel="noopener noreferrer";link.target="_blank";
-      link.className="ci-link";
-      node.append(" · ",link);
-    }
-  } catch {
-    node.textContent="Source status unavailable · Live bot not verified";
-    const box=document.getElementById("dank-db");
-    if(box)box.textContent="Unable to load private database status.";
-  }
-})();
+  } catch(e) {
+    if(box)box.textContent="Private connection check unavailable.";
+    if(runtime)runtime.textContent=e.message;
+    if(node)node.textContent="GitHub CI status unavailable";
+  } finally {if(refresher)refresher.disabled=false;}
+}
+if(refresher)refres.addEventListener("click",refresh);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)void refresh()});
+void refresh();

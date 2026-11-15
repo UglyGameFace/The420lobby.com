@@ -11,6 +11,7 @@
   <link rel="manifest" href="/bump-manager.webmanifest">
   <link rel="stylesheet" href="/bump-manager.css">
   <script type="module" src="/bump-manager.js"></script>
+  <script type="module" src="/bump-shield.js"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to dashboard</a>
@@ -40,6 +41,16 @@
           <div class="metric"><span>Due for action</span><strong id="due-count">0</strong></div>
           <div class="metric"><span>Next reminder</span><strong id="next-due">—</strong></div>
         </div>
+        <section id="dank-panel" class="panel dank-panel" aria-label="Dank Shield integration">
+          <div class="dank-panel-head"><div>
+            <p class="eyebrow">DANK SHIELD / LIVE EVIDENCE</p>
+            <h2>Bot and server status</h2>
+          </div><button id="dank-check" type="button" class="action">Refresh</button></div>
+          <p id="dank-summary" role="status">Checking secure Dank Shield connection…</p>
+          <p id="dank-heartbeat" class="muted">Heartbeat evidence unavailable</p>
+          <p class="hint">This is Dank Shield database evidence, not control over its private moderation API.</p>
+          <a href="/" class="dank-hub-link">Open Shield Control Center</a>
+        </section>
         <div class="section-head"><div><p class="eyebrow">01 / SCHEDULE</p><h2>Your services</h2></div><button class="action primary" type="button" id="add-toggle">+ Add service</button></div>
         <section id="editor" class="panel" hidden aria-labelledby="edit-title">
           <h3 id="edit-title">Add a bump service</h3>
