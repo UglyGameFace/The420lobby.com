@@ -76,6 +76,17 @@ try {
     assert.equal(await page.locator(".service").count(),1);
     assert.ok((await page.locator(".service").innerText()).includes("DISBOARD"));
     assert.equal(await page.locator("#active-count").innerText(),"1");
+    const exported={token:"TOKEN_NEVER_SEND",services:[
+      {label:"OneBump",guild_id:"1514374173517152418",channel_id:"123456789012345679",cooldown_seconds:7200,enabled:true,options:{login:"ANOTHER_SECRET"}},
+      {label:"Foreign",guild_id:"123456789012345681",channel_id:"123456789012345679",cooldown_seconds:7200,enabled:true},
+      {label:"Disabled",guild_id:"1514374173517152418",channel_id:"123456789012345679",cooldown_seconds:7200,enabled:false}
+    ]};
+    page.once("dialog",dialog=>dialog.accept());
+    await page.locator("#import-config-file").setInputFiles({name:"config.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(exported))});
+    await page.waitForFunction(()=>document.querySelector("#active-count")?.textContent==="2");
+    assert.ok(calls.some(c=>c.body?.name==="OneBump"));
+    assert.ok(!JSON.stringify(calls).includes("TOKEN_NEVER_SEND"),"Login token must never be uploaded");
+    assert.ok(!JSON.stringify(calls).includes("ANOTHER_SECRET"),"Service options must not be uploaded");
     page.once("dialog",dialog=>dialog.accept());
     await page.getByRole("button",{name:"I completed this"}).click();
     await page.waitForFunction(()=>document.querySelector(".service-meta")?.textContent.includes("Owner marked complete:")&&
@@ -97,6 +108,7 @@ try {
   await staff.goto(host+"/bump-manager.html");
   await staff.locator("#dashboard").waitFor({state:"visible"});
   assert.equal(await staff.locator("#add-toggle").isVisible(),false);
+  assert.equal(await staff.locator("#import-config-btn").isVisible(),false);
   assert.equal(await staff.locator("#editor").isVisible(),false);
   await staff.close();
   const guest=await browser.newPage();
