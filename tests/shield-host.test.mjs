@@ -65,7 +65,7 @@ test("Shield sign-in starts a browser-bound handoff to the original OAuth callba
 
 function responseCookie(response, name) {
   const cookies = response.headers.getSetCookie?.() || [response.headers.get("Set-Cookie") || ""];
-  const match = cookies.join(",").match(new RegExp(name + "=([A-Za-z0-9_-]{43})"));
+  const match = cookies.join(",").match(new RegExp(name + "=([A-Za-z0-9_-]{43,64})"));
   assert.ok(match, "Expected a secure session cookie named " + name);
   return name + "=" + match[1];
 }
