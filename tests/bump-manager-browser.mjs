@@ -34,6 +34,12 @@ try {
       let result={},status=200;
       if(path==="/api/session") {
         result={user:{id:"123456789012345678",username:"Tester"},csrfToken:"fixture-csrf",configured:true};
+      } else if(path==="/api/shield/status" && req.method()==="GET") {
+        result={role:"owner",dankShield:{
+          database:{status:"connected",tickets:{open:1},activity24h:{atLeast:15},checkedAt:Date.now()},
+          liveBot:{status:"heartbeat_recent",guildCount:10,lastSeenAt:new Date().toISOString()},
+          sourceCi:{status:"passed"}
+        }};
       } else if(path==="/api/bump-manager" && req.method()==="GET") {
         result={...state,serverTime:Date.now()};
       } else if(req.method()==="POST") {
@@ -58,6 +64,9 @@ try {
     await page.goto(host+"/bump-manager.html",{waitUntil:"domcontentloaded"});
     await page.locator("#dashboard").waitFor({state:"visible"});
     assert.match(await page.locator("#connection").innerText(),/Scheduler online/);
+    await page.waitForFunction(()=>document.getElementById("dank-summary")?.textContent.includes("Connected to Dank Shield database"));
+    assert.match(await page.locator("#dank-summary").innerText(),/1 open tickets/);
+    assert.match(await page.locator("#dank-heartbeat").innerText(),/heartbeat recent/i);
     await page.locator("#add-toggle").click();
     await page.locator("#service-name").fill("DISBOARD");
     await page.locator("#channel-url").fill("https://discord.com/channels/123456789012345678/123456789012345679");
