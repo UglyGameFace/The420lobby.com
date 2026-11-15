@@ -16,6 +16,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Python for the Android companion
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Check MultiBump Android v14 source and regressions
+        working-directory: tools/multibump-android
+        run: |
+          python -m compileall -q .
+          python -m unittest discover -s tests -q
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -37,6 +46,8 @@ jobs:
           node --check arcade-vite.config.mjs
           node --check functions/_lib/arcade-v2.mjs
           node --check scripts/build-static.mjs
+          node --check bump-manager.js
+          node --check workers/bump-scheduler.mjs
           node --check arcade-app.js
           node --check arcade-games.js
           node --check shared/arcade-rules.mjs
@@ -48,10 +59,14 @@ jobs:
         run: npm run build
       - name: Compile Cloudflare Pages Functions without deploying
         run: npx --yes wrangler@4 pages functions build --outdir=.wrangler/functions-build
+      - name: Compile bump scheduler without deploying
+        run: npx --yes wrangler@4 deploy --dry-run --config wrangler.bump.jsonc
       - name: Install browser smoke-test tooling
         run: |
           npm install --no-save playwright@1.56.1
           npx playwright install --with-deps chromium firefox webkit
+      - name: MultiBump manager mobile and auth browser checks
+        run: node tests/bump-manager-browser.mjs
       - name: New React arcade integration
         run: node tests/new-arcade-browser.mjs
       - name: Cross-browser compatibility (Chromium, Firefox, WebKit)

@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "the420lobby-bump-scheduler",
+  "main": "workers/bump-scheduler.mjs",
+  "compatibility_date": "2026-11-14",
+  "workers_dev": false,
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "the420lobby-arcade",
+      "database_id": "7821b56b-0e32-4798-afa8-bf29220d70b1"
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "traces": { "enabled": true }
+  }
+}
