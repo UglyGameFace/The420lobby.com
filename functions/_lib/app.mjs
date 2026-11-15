@@ -18,6 +18,7 @@ export async function handleRequest(context, options = {}) {
     if (!shieldHost && shieldUi) throw new HttpError(404, "not_found", "Not found.");
     if (shieldHost && (shieldHome || shieldUi || path === "/favicon.svg")) {
       allowMethod(request, ["GET", "HEAD"]);
+      if (!isConfigured(env)) throw new HttpError(503, "setup_required", "Shield sign-in is not configured.");
       if (!/^\d{17,20}$/.test(env.BUMP_MANAGER_OWNER_ID || "")) {
         throw new HttpError(503, "owner_setup_required", "Shield access is not configured.");
       }
