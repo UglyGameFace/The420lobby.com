@@ -62,8 +62,8 @@ test("bump-manager routes are private, fail closed and do not mutate public D1 o
 
 test("non-owner cannot initialize, inspect or change services",async()=>{
   const app=fixture(),stranger=await app.login("999999999999999999");
-  assert.equal(await error(await app.request("/api/bump-manager",stranger)),"owner_only");
-  assert.equal(await error(await app.request("/api/bump-manager/setup",stranger,{})),"owner_only");
+  assert.equal(await error(await app.request("/api/bump-manager",stranger)),"staff_only");
+  assert.equal(await error(await app.request("/api/bump-manager/setup",stranger,{})),"staff_only");
   const table=await app.env.DB.prepare("SELECT name FROM sqlite_master WHERE name='bump_services'").first();
   assert.equal(table,null);
 });
