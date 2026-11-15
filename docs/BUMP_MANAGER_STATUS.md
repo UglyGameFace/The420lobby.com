@@ -54,3 +54,9 @@ Provide versioned source and offline regression coverage for the standalone Andr
 - The Pages site's checked-in `wrangler.jsonc` declares production plaintext `vars` and takes precedence over ad hoc dashboard plaintext bindings. A plaintext `BUMP_MANAGER_OWNER_ID` appeared briefly during builds but was removed from the final deployed settings.
 - The owner-supplied ID is now stored as an **encrypted Pages production binding** (`secret_text`), following the existing Discord OAuth secret pattern, not committed to source. This documentation change triggers a fresh Git-connected production deployment to pick it up.
 - Validate that the final successful production deployment retains the *key*, not just the in-progress deployment. No changes to public content, bot actions, permissions or stored secrets are required.
+
+### Correct primary owner account, 2026-11-15
+- Existing Shield owner ID was the Dank Tested alternative account, not the Discord guild owner. Cross-checked The 420 Lobby's `guild_configs.owner_id` (current source updated November 15). The primary owner's numeric ID is not committed to public repository source.
+- Updated Cloudflare encrypted production `BUMP_MANAGER_OWNER_ID` to the main account and encrypted `SHIELD_STAFF_IDS` to allow Dank Tested read-only access. Never promote staff to owner simply because both accounts belong to one person.
+- This documentation commit triggers a fresh Git-connected Pages deployment because updating settings alone does not change an already deployed Pages Functions environment.
+- Dank Shield operational health and moderation APIs remain disconnected until a separately tested and authorized read-only integration is deployed.
