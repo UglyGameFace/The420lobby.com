@@ -17,7 +17,7 @@ const owner="123456789012345679", main="https://the420lobby.com", shield="https:
 function fixture() {
   const env={DB:new DB(), SITE_ORIGIN:main, DISCORD_CLIENT_ID:"123456789012345678", DISCORD_CLIENT_SECRET:"test-not-live",
     BUMP_MANAGER_OWNER_ID:owner, ASSETS:{fetch:async req=>new Response("asset:"+new URL(req.url).pathname)}};
-  const request=async (origin,path,cookie="")=>handleRequest({request:new Request(origin+path,{headers:cookie?{Cookie:cookie}:{}}),env,next:()=>new Response("public-static")});
+  const request=async (origin,path,cookie="",options={})=>handleRequest({request:new Request(origin+path,{headers:cookie?{Cookie:cookie}:{}}),env,next:()=>new Response("public-static")},options);
   const login=async id=>{
     const t=randomToken(),now=Date.now();
     await env.DB.prepare("INSERT INTO users(id,username,avatar_url,created_at,updated_at) VALUES(?,?,?,?,?)")
@@ -61,4 +61,51 @@ test("Shield sign-in starts a browser-bound handoff to the original OAuth callba
   assert.match(set,/Secure/);
   assert.match(set,/HttpOnly/);
   assert.equal((await app.request(main,"/auth/claim")).status,404);
+});
+
+function responseCookie(response, name) {
+  const cookies = response.headers.getSetCookie?.() || [response.headers.get("Set-Cookie") || ""];
+  const match = cookies.join(",").match(new RegExp(name + "=([A-Za-z0-9_-]{43})"));
+  assert.ok(match, "Expected a secure session cookie named " + name);
+  return name + "=" + match[1];
+}
+const identityFetcher = async url => {
+  if (url.endsWith("/oauth2/token")) {
+    return new Response(JSON.stringify({token_type:"Bearer",access_token:"fake-test-token"}),{status:200});
+  }
+  if (url.endsWith("/users/@me")) {
+    return new Response(JSON.stringify({id:owner,username:"staff_owner",avatar:null}),{status:200});
+  }
+  throw Error("Unexpected outgoing request to "+url);
+};
+test("complete Shield OAuth handoff stays browser bound, one-use and host-only",async()=>{
+  const app=fixture();
+  const start=await app.request(shield,"/auth/discord");
+  const shieldBrowser=responseCookie(start,"__Host-420_shield_browser");
+  const mainLink=new URL(start.headers.get("Location"));
+  assert.equal(mainLink.origin,main);
+  const mainStart=await app.request(main,mainLink.pathname+mainLink.search);
+  const oauthCookie=responseCookie(mainStart,"__Host-420_oauth");
+  const shieldFlow=responseCookie(mainStart,"__Host-420_shield_flow");
+  const authorize=new URL(mainStart.headers.get("Location"));
+  const state=authorize.searchParams.get("state");
+  assert.match(state||"",/^[A-Za-z0-9_-]{43}$/);
+  assert.equal(authorize.searchParams.get("redirect_uri"),main+"/auth/callback");
+  const callback=await app.request(main,"/auth/callback?state="+encodeURIComponent(state)+"&code=test",oauthCookie+"; "+shieldFlow,{fetcher:identityFetcher});
+  assert.equal(callback.status,302);
+  const claimUrl=new URL(callback.headers.get("Location"));
+  assert.equal(claimUrl.origin,shield);
+  assert.equal(claimUrl.pathname,"/auth/claim");
+  const unauthClaim=await app.request(shield,claimUrl.pathname+claimUrl.search);
+  assert.equal(unauthClaim.headers.get("Location"),shield+"/?auth=expired");
+  const claim=await app.request(shield,claimUrl.pathname+claimUrl.search,shieldBrowser);
+  assert.equal(claim.status,302);
+  assert.equal(claim.headers.get("Location"),shield+"/");
+  const shieldSession=responseCookie(claim,SESSION_COOKIE);
+  const homepage=await app.request(shield,"/",shieldSession);
+  assert.equal(homepage.status,200);
+  assert.match(await homepage.text(),/asset:\/shield/);
+  const replay=await app.request(shield,claimUrl.pathname+claimUrl.search,shieldBrowser);
+  assert.equal(replay.headers.get("Location"),shield+"/?auth=denied");
+  assert.equal((await app.request(main,"/bump-manager",shieldSession)).status,404);
 });
