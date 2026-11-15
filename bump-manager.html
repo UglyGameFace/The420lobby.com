@@ -51,7 +51,13 @@
           <p class="hint">This is Dank Shield database evidence, not control over its private moderation API.</p>
           <a href="/" class="dank-hub-link">Open Shield Control Center</a>
         </section>
-        <div class="section-head"><div><p class="eyebrow">01 / SCHEDULE</p><h2>Your services</h2></div><button class="action primary" type="button" id="add-toggle">+ Add service</button></div>
+        <div class="section-head"><div><p class="eyebrow">01 / SCHEDULE</p><h2>Your services</h2></div>
+          <div class="button-row">
+            <button class="action" type="button" id="import-config-btn">Import Termux config</button>
+            <button class="action primary" type="button" id="add-toggle">+ Add service</button>
+          </div></div>
+        <input type="file" id="import-config-file" accept=".json,application/json" hidden aria-label="Select Termux MultiBump config JSON">
+        <p class="hint">Import only the service names, channel links and cooldowns from Termux config.json. No token or login is uploaded. Cloud reminders start conservatively after one cooldown and never mirror or trigger automatic commands.</p>
         <section id="editor" class="panel" hidden aria-labelledby="edit-title">
           <h3 id="edit-title">Add a bump service</h3>
           <form id="service-form">
