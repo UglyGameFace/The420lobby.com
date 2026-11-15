@@ -8,7 +8,7 @@
   <title>Shield Control Center | The 420 Lobby</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/shield.css">
-  <script defer src="/shield.js"></script>
+  <script type="module" src="/shield.js"></script>
 </head>
 <body>
   <header><div class="brand"><span class="mark">🛡</span><div><strong>SHIELD</strong><small>THE 420 LOBBY · PRIVATE OPERATIONS</small></div></div><span class="access" id="shield-role">PRIVATE ACCESS</span></header>
@@ -33,12 +33,13 @@
           <p class="state" id="dank-ci">Checking repository CI · Live bot unverified</p>
           <div class="dank-figures" id="dank-db" aria-live="polite"><p>Checking Dank Shield database link...</p></div>
           <p class="state" id="dank-runtime">Discloud bot runtime not connected</p>
+          <button class="action secondary" type="button" id="dank-refresh">Refresh evidence</button>
         </article>
         <article class="card">
           <span class="glyph" aria-hidden="true">📋</span><h3>Staff activity</h3>
           <p>MultiBump reminder history is available now. Dank Shield incidents and moderation logs require a separate authorized bot integration.</p>
-          <p class="state">Future integration</p>
-          <span class="disabled">Not connected</span>
+          <p class="state" id="dank-activity">Activity totals are loading…</p>
+          <span class="disabled">Detailed staff actions remain private to Dank Shield</span>
         </article>
       </div>
     </section>

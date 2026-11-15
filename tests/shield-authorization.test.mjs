@@ -36,12 +36,16 @@ test("Shield staff read-only access never becomes owner mutation",async()=>{
  assert.equal(shieldRole(x.env,VISITOR),null);
  assert.equal((await x.req(shield,"/",staff)).status,200);
  assert.equal((await x.req(shield,"/shield.js",staff)).status,200);
+ assert.equal((await x.req(shield,"/shield-telemetry.js",staff)).status,200);
+ assert.equal((await x.req(shield,"/bump-shield.js",staff)).status,200);
  assert.equal((await x.req(shield,"/bump-manager",staff)).status,200);
  assert.equal((await x.req(shield,"/api/bump-manager",staff)).status,200);
  assert.equal((await x.req(shield,"/api/bump-manager",visitor)).status,403);
  assert.equal((await x.req(shield,"/api/bump-manager/setup",staff,"POST",{})).status,403);
  assert.equal((await x.req(shield,"/api/bump-manager/setup",owner,"POST",{})).status,403); // CSRF not satisfied
  assert.equal((await x.req(main,"/shield.js",owner)).status,404);
+ assert.equal((await x.req(main,"/shield-telemetry.js",owner)).status,404);
+ assert.equal((await x.req(main,"/bump-shield.js",owner)).status,404);
  assert.equal((await x.req(main,"/api/shield/status",owner)).status,404);
 });
 test("Source CI is explicitly not live runtime health and external errors remain unknown",async()=>{

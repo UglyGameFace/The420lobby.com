@@ -13,6 +13,8 @@ export async function readShieldStatus(request, env, fetcher = fetch) {
   const session = await requireSession(request, env);
   const role = shieldRole(env, session.user.id);
   if (!role) throw new HttpError(403, "staff_only", "Shield access denied.");
+  // Start the signed private probe immediately so optional GitHub CI cannot delay it.
+  const databaseProbe = readDankShieldDatabase(env,fetcher);
   let ci = {status:"unavailable", runUrl:null, headSha:null, observedAt:null};
   try {
     const response = await fetcher(ACTIONS, {
@@ -36,7 +38,7 @@ export async function readShieldStatus(request, env, fetcher = fetch) {
   } catch {
     // Source unavailability must not be reported as bot downtime.
   }
-  const database = await readDankShieldDatabase(env,fetcher);
+  const database = await databaseProbe;
   return json({
     role,
     dankShield:{

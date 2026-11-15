@@ -29,3 +29,5 @@ input{min-width:0;width:100%;border:1px solid #476552;border-radius:9px;padding:
 
 /* Explicitly honor the hidden attribute even on display:flex/grid action controls. */
 [hidden]{display:none!important}
+
+.dank-panel{margin:20px 0 35px;border:1px solid #386248}.dank-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.dank-panel-head h2{font-size:1.3rem;margin:0}.dank-panel #dank-summary{font-weight:700;color:#e9f9eb}.dank-hub-link{color:#b6f467;font-size:.9rem;text-underline-offset:3px}.dank-panel p{overflow-wrap:anywhere}

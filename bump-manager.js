@@ -127,6 +127,7 @@ async function reload() {
   $("dashboard").hidden = state.setupPending;
   services = state.services;events = state.events;role = state.role;
   $("add-toggle").hidden = role !== "owner";
+  $("import-config-btn").hidden = role !== "owner";
   $("setup-btn").hidden = role !== "owner";
   if (role !== "owner") closeEditor();
   if (state.setupPending) {
@@ -142,8 +143,49 @@ async function reload() {
   }
   render();
 }
+async function importTermuxConfig(file) {
+  if(role!=="owner")return;
+  if(!file || file.size>256*1024)throw new Error("Choose a Termux config.json smaller than 256 KB.");
+  let config;
+  try {config=JSON.parse(await file.text())}catch {throw new Error("Not a valid Termux config.json file.");}
+  if(!config || !Array.isArray(config.services))throw new Error("This file has no Termux services array.");
+  // Whitelist only the public configuration fields. Never send raw file contents,
+  // login tokens, per-service secrets, options, state, or response patterns.
+  const seen=new Set(services.map(s=>s.name.toLowerCase()));
+  const items=[];
+  for(const service of config.services.slice(0,100)) {
+    if(!service || service.enabled===false || String(service.guild_id)!=="1514374173517152418")continue;
+    const name=typeof service.label==="string"?service.label.trim():"";
+    const channel=String(service.channel_id||"");
+    const seconds=Number(service.cooldown_seconds);
+    const minutes=Math.ceil(seconds/60);
+    if(!/^[a-z0-9][a-z0-9 ._'()-]{1,49}$/i.test(name)
+      || !/^\d{17,20}$/.test(channel) || !Number.isSafeInteger(minutes)
+      || minutes<15 || minutes>10080 || seen.has(name.toLowerCase()))continue;
+    seen.add(name.toLowerCase());
+    items.push({name,channelUrl:"https://discord.com/channels/1514374173517152418/"+channel,
+      cooldownMinutes:minutes});
+  }
+  if(!items.length)throw new Error("No new enabled services for The 420 Lobby were found.");
+  if(!confirm("Import "+items.length+" service reminder(s)? This does not copy live bump state, send /bump commands, or upload credentials."))return;
+  let imported=0,skipped=0,failed=0;
+  for(const body of items) {
+    try {await request("/api/bump-manager/services",{body});imported++;}
+    catch(error){if(error.status===409)skipped++;else failed++;}
+  }
+  await reload();
+  showMessage("Imported "+imported+" cloud reminder(s). "+(skipped?skipped+" already existed. ":"")+
+    (failed?failed+" failed. ":"")+"Current Termux cooldowns were not copied.",failed>0);
+}
 async function init() {
   $("add-toggle").addEventListener("click",() => {if (role === "owner") openEditor();});
+  $("import-config-btn").addEventListener("click",()=>{if(role==="owner")$("import-config-file").click()});
+  $("import-config-file").addEventListener("change",async event=>{
+    const file=event.target.files?.[0];event.target.value="";
+    const button=$("import-config-btn");button.disabled=true;
+    try {await importTermuxConfig(file);}catch(error){showMessage(error.message,true);}
+    finally {button.disabled=false;}
+  });
   $("cancel-edit").addEventListener("click",closeEditor);
   $("refresh-btn").addEventListener("click",async () => {
     try { await reload(); showMessage(""); } catch(e){showMessage(e.message,true);}

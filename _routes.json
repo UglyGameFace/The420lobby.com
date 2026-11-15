@@ -10,7 +10,8 @@
     "/arcade-games.js",
     "/shield*",
     "/bump-manager*",
-    "/favicon.svg"
+    "/favicon.svg",
+    "/bump-shield.js"
   ],
   "exclude": []
 }
