@@ -3,6 +3,9 @@ import {HttpError, json, redirect} from "./http.mjs";
 export const SESSION_COOKIE = "__Host-420_session";
 export const OAUTH_COOKIE = "__Host-420_oauth";
 export const ARCADE_ORIGIN = "https://arcade.the420lobby.com";
+export const SHIELD_ORIGIN = "https://shield.the420lobby.com";
+export const SHIELD_BROWSER_COOKIE = "__Host-420_shield_browser";
+const SHIELD_FLOW_COOKIE = "__Host-420_shield_flow";
 export const ARCADE_BROWSER_COOKIE = "__Host-420_arcade_browser";
 const ARCADE_FLOW_COOKIE = "__Host-420_arcade_flow";
 const HANDOFF_SECONDS = 90;
@@ -46,6 +49,11 @@ export function isArcadeHost(request, env) {
   return siteOrigin(env) === "https://the420lobby.com";
 }
 
+export function isShieldHost(request, env) {
+  return new URL(request.url).origin === SHIELD_ORIGIN &&
+    siteOrigin(env) === "https://the420lobby.com";
+}
+
 function readHexCookie(request, name) {
   const values = (request.headers.get("cookie") || "").split(";").map(s => s.trim()).filter(s => s.startsWith(name + "="));
   if (values.length !== 1) return null;
@@ -82,7 +90,7 @@ export async function requireSession(request, env) {
 }
 
 export function requireCsrf(request, env, session) {
-  const expected = isArcadeHost(request, env) ? ARCADE_ORIGIN : siteOrigin(env);
+  const expected = isArcadeHost(request, env) ? ARCADE_ORIGIN : isShieldHost(request, env) ? SHIELD_ORIGIN : siteOrigin(env);
   if (new URL(request.url).origin !== expected || request.headers.get("Origin") !== expected) {
     throw new HttpError(403, "invalid_origin", "Reload the arcade and try again.");
   }
@@ -109,17 +117,28 @@ export async function beginDiscord(request, env) {
     return redirect(siteOrigin(env) + "/auth/discord?arcade_nonce_hash=" + await hash(nonce),
       [cookie(ARCADE_BROWSER_COOKIE, nonce, OAUTH_SECONDS)]);
   }
+  if (isShieldHost(request, env)) {
+    const nonce = randomToken();
+    return redirect(siteOrigin(env) + "/auth/discord?shield_nonce_hash=" + await hash(nonce),
+      [cookie(SHIELD_BROWSER_COOKIE, nonce, OAUTH_SECONDS)]);
+  }
   if (url.origin !== siteOrigin(env)) return redirect(siteOrigin(env) + "/auth/discord");
   await rateLimit(env, "oauth:" + (request.headers.get("CF-Connecting-IP") || "local"), 20, 60);
-  const nonceHash = url.searchParams.get("arcade_nonce_hash");
-  const returning = /^[a-f0-9]{64}$/.test(nonceHash || "") && siteOrigin(env) === "https://the420lobby.com";
+  const arcadeNonceHash = url.searchParams.get("arcade_nonce_hash");
+  const shieldNonceHash = url.searchParams.get("shield_nonce_hash");
+  const arcadeValid = /^[a-f0-9]{64}$/.test(arcadeNonceHash || "");
+  const shieldValid = /^[a-f0-9]{64}$/.test(shieldNonceHash || "");
+  const trusted = siteOrigin(env) === "https://the420lobby.com";
+  const returningArcade = trusted && arcadeValid && !shieldValid;
+  const returningShield = trusted && shieldValid && !arcadeValid;
+  const binding = returningArcade ? ":" + arcadeNonceHash : returningShield ? ":shield:" + shieldNonceHash : "";
   const state = randomToken(), browser = randomToken(), now = Date.now();
   await env.DB.batch([
     env.DB.prepare("DELETE FROM oauth_states WHERE expires_at <= ?").bind(now),
     env.DB.prepare("DELETE FROM sessions WHERE expires_at <= ?").bind(now),
     env.DB.prepare("DELETE FROM rate_limits WHERE expires_at < ?").bind(now - 60000),
     env.DB.prepare("INSERT INTO oauth_states (state_hash, browser_hash, expires_at) VALUES (?, ?, ?)")
-      .bind(await hash(state), await hash(browser + (returning ? ":" + nonceHash : "")), now + OAUTH_SECONDS * 1000)
+      .bind(await hash(state), await hash(browser + binding), now + OAUTH_SECONDS * 1000)
   ]);
   const target = new URL("https://discord.com/oauth2/authorize");
   target.search = new URLSearchParams({
@@ -128,7 +147,8 @@ export async function beginDiscord(request, env) {
   }).toString();
   return redirect(target.href, [
     cookie(OAUTH_COOKIE, browser, OAUTH_SECONDS),
-    cookie(ARCADE_FLOW_COOKIE, returning ? nonceHash : "", returning ? OAUTH_SECONDS : 0)
+    cookie(ARCADE_FLOW_COOKIE, returningArcade ? arcadeNonceHash : "", returningArcade ? OAUTH_SECONDS : 0),
+    cookie(SHIELD_FLOW_COOKIE, returningShield ? shieldNonceHash : "", returningShield ? OAUTH_SECONDS : 0)
   ]);
 }
 
@@ -145,15 +165,20 @@ export function discordIdentity(data) {
 export async function completeDiscord(request, env, fetcher = fetch) {
   requireConfiguration(env);
   const destination = siteOrigin(env) + "/arcade.html";
-  const nonceHash = siteOrigin(env) === "https://the420lobby.com" ? readHexCookie(request, ARCADE_FLOW_COOKIE) : null;
-  const finalDestination = nonceHash ? ARCADE_ORIGIN + "/" : destination;
-  const cleared = [cookie(OAUTH_COOKIE, "", 0), cookie(ARCADE_FLOW_COOKIE, "", 0)];
+  const trusted = siteOrigin(env) === "https://the420lobby.com";
+  const arcadeNonce = trusted ? readHexCookie(request, ARCADE_FLOW_COOKIE) : null;
+  const shieldNonce = trusted ? readHexCookie(request, SHIELD_FLOW_COOKIE) : null;
+  const mode = arcadeNonce && !shieldNonce ? "arcade" : shieldNonce && !arcadeNonce ? "shield" : null;
+  const nonceHash = mode === "arcade" ? arcadeNonce : mode === "shield" ? shieldNonce : null;
+  const finalDestination = mode === "arcade" ? ARCADE_ORIGIN + "/" : mode === "shield" ? SHIELD_ORIGIN + "/" : destination;
+  const binding = mode === "arcade" ? ":" + nonceHash : mode === "shield" ? ":shield:" + nonceHash : "";
+  const cleared = [cookie(OAUTH_COOKIE, "", 0), cookie(ARCADE_FLOW_COOKIE, "", 0), cookie(SHIELD_FLOW_COOKIE, "", 0)];
   if (new URL(request.url).origin !== siteOrigin(env)) return redirect(finalDestination + "?auth=expired", cleared);
   const url = new URL(request.url), state = url.searchParams.get("state"), browser = readCookie(request, OAUTH_COOKIE);
   if (!state || !/^[A-Za-z0-9_-]{43}$/.test(state) || !browser) return redirect(finalDestination + "?auth=expired", cleared);
   // Atomic consume prevents callback replay, including simultaneous requests.
   const claim = await env.DB.prepare(`DELETE FROM oauth_states WHERE state_hash = ? AND browser_hash = ? AND expires_at > ? RETURNING state_hash`)
-    .bind(await hash(state), await hash(browser + (nonceHash ? ":" + nonceHash : "")), Date.now()).first();
+    .bind(await hash(state), await hash(browser + binding), Date.now()).first();
   if (!claim) return redirect(finalDestination + "?auth=expired", cleared);
   if (url.searchParams.has("error")) return redirect(finalDestination + "?auth=cancelled", cleared);
   const code = url.searchParams.get("code");
@@ -181,11 +206,11 @@ export async function completeDiscord(request, env, fetcher = fetch) {
       // ticket alone is insufficient: redemption also requires the arcade host's
       // original HttpOnly nonce cookie, which never leaves that host.
       statements.push(env.DB.prepare("INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)")
-        .bind(await hash("arcade-ticket:" + handoffTicket + ":" + nonceHash), user.id, now, now + HANDOFF_SECONDS * 1000));
+        .bind(await hash(mode + "-ticket:" + handoffTicket + ":" + nonceHash), user.id, now, now + HANDOFF_SECONDS * 1000));
     }
     await env.DB.batch(statements);
     // Never domain-scope either real session cookie or store Discord tokens.
-    return redirect(handoffTicket ? ARCADE_ORIGIN + "/auth/claim?ticket=" + handoffTicket : destination,
+    return redirect(handoffTicket ? finalDestination + "auth/claim?ticket=" + handoffTicket : destination,
       [...cleared, cookie(SESSION_COOKIE, token, SESSION_SECONDS)]);
   } catch {
     return redirect(finalDestination + "?auth=failed", cleared);
@@ -216,4 +241,30 @@ export async function logout(request, env, session) {
   requireCsrf(request, env, session);
   await env.DB.prepare("DELETE FROM sessions WHERE token_hash = ?").bind(session.tokenHash).run();
   return json({ok: true}, 200, {"Set-Cookie": cookie(SESSION_COOKIE, "", 0)});
+}
+
+/** Redeem a single-use, browser-bound login transfer into the Shield subdomain. */
+export async function claimShieldSession(request, env) {
+  requireConfiguration(env);
+  if (!isShieldHost(request, env)) throw new HttpError(404, "not_found", "This endpoint is unavailable.");
+  const ticket = new URL(request.url).searchParams.get("ticket");
+  const nonce = readCookie(request, SHIELD_BROWSER_COOKIE);
+  const cleared = cookie(SHIELD_BROWSER_COOKIE, "", 0);
+  if (!ticket || !/^[A-Za-z0-9_-]{43}$/.test(ticket) || !nonce) {
+    return redirect(SHIELD_ORIGIN + "/?auth=expired", [cleared]);
+  }
+  if (!/^\d{17,20}$/.test(env.BUMP_MANAGER_OWNER_ID || "")) {
+    throw new HttpError(503, "owner_setup_required", "Shield access is not configured.");
+  }
+  await rateLimit(env, "shield-claim:" + (request.headers.get("CF-Connecting-IP") || "local"), 40, 60);
+  const tokenHash = await hash("shield-ticket:" + ticket + ":" + await hash(nonce));
+  const row = await env.DB.prepare("DELETE FROM sessions WHERE token_hash = ? AND expires_at > ? RETURNING user_id")
+    .bind(tokenHash, Date.now()).first();
+  if (!row || row.user_id !== env.BUMP_MANAGER_OWNER_ID) {
+    return redirect(SHIELD_ORIGIN + "/?auth=denied", [cleared]);
+  }
+  const token = randomToken(), now = Date.now();
+  await env.DB.prepare("INSERT INTO sessions (token_hash,user_id,created_at,expires_at) VALUES(?,?,?,?)")
+    .bind(await hash(token), row.user_id, now, now + SESSION_SECONDS * 1000).run();
+  return redirect(SHIELD_ORIGIN + "/", [cleared, cookie(SESSION_COOKIE, token, SESSION_SECONDS)]);
 }

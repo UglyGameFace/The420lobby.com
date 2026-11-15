@@ -68,3 +68,9 @@ Stop the separate Worker or disable its Cron Trigger first. The old website and 
 ## Evidence and remaining production validation
 
 CI tests can prove the local API access rules, SQL semantics, and mock webhook behavior. They cannot prove Discord OAuth or webhook delivery from a live Cloudflare deployment. The production Worker and webhook secret remain separate installation steps. Do not label the feature live until a real heartbeat and an end-to-end reminder are observed.
+
+## Shield private operations domain
+
+This service is now intended to run inside **Shield Control Center** at `https://shield.the420lobby.com/`, separate from public Lobby navigation. The public root `https://the420lobby.com/` is reserved for community visitors. On Shield, `/bump-manager` is owner-only; guessed staff paths on the public host return 404. Sign-in uses a browser-bound, one-time Discord OAuth handoff from the existing main-site callback, without relaxing HttpOnly host-only cookies. The first release is owner-only, and does not expose Dank Shield moderation operations until authenticated integrations can be reviewed.
+
+The Shield domain must be added to the existing Cloudflare Pages project **after** the host-gating code is merged and deployed. Before then it must remain unconfigured: attaching it to the old public deployment could expose the member homepage on the staff hostname. The existing `BUMP_MANAGER_OWNER_ID` configuration remains mandatory. No Discord user token is transferred to Cloudflare.

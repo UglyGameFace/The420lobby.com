@@ -28,3 +28,10 @@ Provide versioned source and offline regression coverage for the standalone Andr
 - Confirm CI on the exact new PR head, then reconcile review and any deployment blockers.
 - Activate the cloud reminder manager only with production setup and real end-to-end verification.
 - Verify v14's shared-cooldown observer against real public confirmations on the device; retain conservative status for opaque provider outcomes.
+
+## 2026-11-15: Shield private staff host
+- Direction: public Lobby homepage remains untouched; Shield is an **owner-only** administrative subdomain, named `shield.the420lobby.com`.
+- Implementation under PR #64 includes protected Shield landing page and MultiBump UI, exact-host staff asset gating, Discord OAuth browser-bound cross-host handoff, owner-ID authorization, and an explicit denial on the main public hostname.
+- Dank Shield integration will use existing bot operations and separate permission-checked APIs. No production bot connection or moderation commands are claimed for this initial shell.
+- **Not deployed:** do not attach `shield.the420lobby.com` to the Pages project until the tested PR reaches main, otherwise the public homepage could be served under the staff hostname.
+- Staff roles beyond the configured owner are not yet implemented; there is no guessed role permission or exposed member list. The existing cloud reminder-only policy and separate Android client remain unchanged.

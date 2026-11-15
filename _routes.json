@@ -7,7 +7,9 @@
     "/auth/*",
     "/games/*",
     "/sesh-signal.js",
-    "/arcade-games.js"
+    "/arcade-games.js",
+    "/shield*",
+    "/bump-manager*"
   ],
   "exclude": []
 }

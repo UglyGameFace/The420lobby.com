@@ -1,6 +1,6 @@
 /* Owner-only MultiBump coordination. This module never authenticates as a Discord
  * user or sends bump commands. It records reminders and user-reported actions. */
-import {requireSession, requireCsrf, rateLimit} from "./auth.mjs";
+import {requireSession, requireCsrf, rateLimit, isShieldHost} from "./auth.mjs";
 import {HttpError, exactFields, json, readJson} from "./http.mjs";
 
 export const BUMP_SCHEMA = [
@@ -20,7 +20,7 @@ function checkOwner(env, session) {
 async function authorized(request, env, mutation) {
   const session = await requireSession(request, env);
   checkOwner(env, session);
-  if (new URL(request.url).origin !== (env.SITE_ORIGIN || "")) throw new HttpError(403, "wrong_host", "Use the main Lobby website.");
+  if (!isShieldHost(request, env)) throw new HttpError(404, "not_found", "This private manager is only available on Shield.");
   if (mutation) {
     requireCsrf(request, env, session);
     await rateLimit(env, "bump-manager:" + session.user.id, 80, 3600);

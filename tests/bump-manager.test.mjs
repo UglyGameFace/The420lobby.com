@@ -22,10 +22,11 @@ class TestD1 {
     };
   }
 }
-const base = "https://the420lobby.com";
+const base = "https://shield.the420lobby.com";
+const mainSite = "https://the420lobby.com";
 const channel = "https://discord.com/channels/123456789012345678/123456789012345679";
 function fixture(){
-  const env = {DB:new TestD1(),SITE_ORIGIN:base,DISCORD_CLIENT_ID:"123456789012345678",DISCORD_CLIENT_SECRET:"local-test-only",
+  const env = {DB:new TestD1(),SITE_ORIGIN:mainSite,DISCORD_CLIENT_ID:"123456789012345678",DISCORD_CLIENT_SECRET:"local-test-only",
     BUMP_MANAGER_OWNER_ID:"123456789012345679",BUMP_REMINDER_WEBHOOK_URL:"https://discord.com/api/webhooks/123456789012345678/"+ "a".repeat(40)};
   async function login(id = env.BUMP_MANAGER_OWNER_ID) {
     const token=randomToken(),csrf=await hash("csrf:"+token),now=Date.now();
