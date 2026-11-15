@@ -27,7 +27,7 @@ try {
     const page=await browser.newPage({viewport:{width,height:width<500?840:900},reducedMotion:"reduce"});
     const errors=[], calls=[];
     page.on("pageerror",error=>errors.push(error.message));
-    const state={services:[],events:[],setupPending:false,
+    const state={services:[],events:[],setupPending:false,role:"owner",
       scheduler:{lastTickAt:Date.now(),webhookConfigured:1,attempted:0,sent:0,failed:0}};
     await page.route("**/api/**",async route=>{
       const req=route.request(),path=new URL(req.url()).pathname;
@@ -77,6 +77,19 @@ try {
     assert.deepEqual(errors,[],"Browser errors at "+width+"px");
     await page.close();
   }
+  // Staff can inspect service status, but mutations and editor controls are absent.
+  const staff=await browser.newPage({viewport:{width:390,height:840}});
+  await staff.route("**/api/**",route=>{
+    const path=new URL(route.request().url()).pathname;
+    if(path==="/api/session") return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({user:{id:"123456789012345680",username:"Staff"},csrfToken:"test",configured:true})});
+    if(path==="/api/bump-manager") return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({role:"staff",setupPending:false,services:[],events:[],scheduler:null})});
+    return route.fulfill({status:403,contentType:"application/json",body:JSON.stringify({error:{code:"owner_only"}})});
+  });
+  await staff.goto(host+"/bump-manager.html");
+  await staff.locator("#dashboard").waitFor({state:"visible"});
+  assert.equal(await staff.locator("#add-toggle").isVisible(),false);
+  assert.equal(await staff.locator("#editor").isVisible(),false);
+  await staff.close();
   const guest=await browser.newPage();
   await guest.route("**/api/session",route=>route.fulfill({status:200,contentType:"application/json",
     body:JSON.stringify({user:null,csrfToken:null,configured:true})}));
