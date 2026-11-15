@@ -35,3 +35,9 @@ Provide versioned source and offline regression coverage for the standalone Andr
 - Dank Shield integration will use existing bot operations and separate permission-checked APIs. No production bot connection or moderation commands are claimed for this initial shell.
 - **Not deployed:** do not attach `shield.the420lobby.com` to the Pages project until the tested PR reaches main, otherwise the public homepage could be served under the staff hostname.
 - Staff roles beyond the configured owner are not yet implemented; there is no guessed role permission or exposed member list. The existing cloud reminder-only policy and separate Android client remain unchanged.
+
+## Shield integration hardening
+- Shield is recognized by its exact hostname even if SITE_ORIGIN is broken; staff host never falls through to public member homepage.
+- Optional SHIELD_STAFF_IDS comma-separated allowlist grants **read-only** dashboard and source CI access. BUMP_MANAGER_OWNER_ID still must be configured, and only its holder can change schedules or settings.
+- GET /api/shield/status reports latest Dank Shield main-branch GitHub workflow evidence only (best-effort, cached). It NEVER treats passing CI as live bot uptime or opens the protected localhost admin API.
+- Public website remains untouched, and private assets are routed through the owner/staff session guard. This status is not yet deployed or live-verified.

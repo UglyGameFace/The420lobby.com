@@ -49,9 +49,17 @@ export function isArcadeHost(request, env) {
   return siteOrigin(env) === "https://the420lobby.com";
 }
 
-export function isShieldHost(request, env) {
-  return new URL(request.url).origin === SHIELD_ORIGIN &&
-    siteOrigin(env) === "https://the420lobby.com";
+export function isShieldHost(request, _env) {
+  // Host identification must never depend on deployment configuration.
+  // Otherwise an unset SITE_ORIGIN can expose the public site on the staff hostname.
+  return new URL(request.url).origin === SHIELD_ORIGIN;
+}
+
+export function shieldRole(env, userId) {
+  if (!/^\d{17,20}$/.test(env.BUMP_MANAGER_OWNER_ID || "")) return null;
+  if (userId === env.BUMP_MANAGER_OWNER_ID) return "owner";
+  const allowlist = String(env.SHIELD_STAFF_IDS || "").split(",").map(id => id.trim());
+  return allowlist.some(id => /^\d{17,20}$/.test(id) && id === userId) ? "staff" : null;
 }
 
 function readHexCookie(request, name) {
@@ -260,7 +268,7 @@ export async function claimShieldSession(request, env) {
   const tokenHash = await hash("shield-ticket:" + ticket + ":" + await hash(nonce));
   const row = await env.DB.prepare("DELETE FROM sessions WHERE token_hash = ? AND expires_at > ? RETURNING user_id")
     .bind(tokenHash, Date.now()).first();
-  if (!row || row.user_id !== env.BUMP_MANAGER_OWNER_ID) {
+  if (!row || !shieldRole(env, row.user_id)) {
     return redirect(SHIELD_ORIGIN + "/?auth=denied", [cleared]);
   }
   const token = randomToken(), now = Date.now();

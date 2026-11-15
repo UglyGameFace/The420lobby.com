@@ -8,9 +8,10 @@
   <title>Shield Control Center | The 420 Lobby</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/shield.css">
+  <script defer src="/shield.js"></script>
 </head>
 <body>
-  <header><div class="brand"><span class="mark">🛡</span><div><strong>SHIELD</strong><small>THE 420 LOBBY · PRIVATE OPERATIONS</small></div></div><span class="access">OWNER ACCESS</span></header>
+  <header><div class="brand"><span class="mark">🛡</span><div><strong>SHIELD</strong><small>THE 420 LOBBY · PRIVATE OPERATIONS</small></div></div><span class="access" id="shield-role">PRIVATE ACCESS</span></header>
   <main>
     <section class="hero">
       <p class="eyebrow">CONTROL CENTER / STAFF ONLY</p>
@@ -29,18 +30,18 @@
         <article class="card">
           <span class="glyph" aria-hidden="true">🛡</span><h3>Dank Shield</h3>
           <p>Moderation, tickets, verification and bot health will connect through permission-checked integrations.</p>
-          <p class="state">Integration pending · No live bot access yet</p>
+          <p class="state" id="dank-ci">Checking repository CI · Live bot unverified</p>
           <span class="disabled">Not connected</span>
         </article>
         <article class="card">
           <span class="glyph" aria-hidden="true">📋</span><h3>Staff activity</h3>
-          <p>Unified incident history and operations logs, with verified outcomes clearly distinguished from unverified reports.</p>
+          <p>MultiBump reminder history is available now. Dank Shield incidents and moderation logs require a separate authorized bot integration.</p>
           <p class="state">Future integration</p>
           <span class="disabled">Not connected</span>
         </article>
       </div>
     </section>
-    <p class="foot">Only your configured owner account can open this portal. Future staff access requires an explicit permissions policy.</p>
+    <p class="foot">Owner access and optional explicitly allowlisted staff only. Staff views are read-only. Shield does not send third-party slash commands or connect to Dank Shield's private admin API.</p>
   </main>
   <footer><span>SHIELD · INTERNAL TOOL</span><span>NOT THE PUBLIC COMMUNITY SITE</span></footer>
 </body>

@@ -9,7 +9,8 @@
     "/sesh-signal.js",
     "/arcade-games.js",
     "/shield*",
-    "/bump-manager*"
+    "/bump-manager*",
+    "/favicon.svg"
   ],
   "exclude": []
 }

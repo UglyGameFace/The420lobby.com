@@ -3,6 +3,7 @@ let csrfToken = null;
 let services = [];
 let events = [];
 let editorId = null;
+let role = null;
 const fmt = timestamp => timestamp == null ? "Not recorded" :
   new Date(timestamp).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
 const remaining = (timestamp, now = Date.now()) => {
@@ -55,7 +56,7 @@ function render() {
   $("due-count").textContent = String(due.length);
   $("next-due").textContent = active.length ? remaining(Math.min(...active.map(s => s.nextDueAt)),now) : "None";
   const list = $("services"); list.replaceChildren();
-  if (!services.length) list.append(element("p","panel muted","No services yet. Add DISBOARD, OneBump, or another service using its channel URL."));
+  if (!services.length) list.append(element("p","panel muted",role === "owner" ? "No services yet. Add a service using its channel URL." : "No services configured yet. The owner can add services."));
   for (const service of services) {
     const card = element("article","service");
     const top = element("div","service-top");
@@ -77,6 +78,7 @@ function render() {
     const link = element("a","action","Open channel ↗");
     link.href = service.channelUrl;link.target = "_blank";link.rel="noopener noreferrer";
     actions.append(link);
+    if (role === "owner") {
     actions.append(act("I completed this",async () => {
       if (!confirm("Record that you manually completed "+service.name+"? This is not independent confirmation.")) return;
       await request("/api/bump-manager/services/"+service.id+"/complete",{body:{}});
@@ -92,6 +94,7 @@ function render() {
       await request("/api/bump-manager/services/"+service.id+"/archive",{body:{}});
       await reload();
     },"danger"));
+    }
     card.append(actions);list.append(card);
   }
   const history = $("events"); history.replaceChildren();
@@ -122,7 +125,10 @@ async function reload() {
   const state = await request("/api/bump-manager");
   $("setup-panel").hidden = !state.setupPending;
   $("dashboard").hidden = state.setupPending;
-  services = state.services;events = state.events;
+  services = state.services;events = state.events;role = state.role;
+  $("add-toggle").hidden = role !== "owner";
+  $("setup-btn").hidden = role !== "owner";
+  if (role !== "owner") closeEditor();
   if (state.setupPending) {
     $("connection").textContent = "Setup required";
   } else if (!state.scheduler?.lastTickAt) {
@@ -137,17 +143,19 @@ async function reload() {
   render();
 }
 async function init() {
-  $("add-toggle").addEventListener("click",() => openEditor());
+  $("add-toggle").addEventListener("click",() => {if (role === "owner") openEditor();});
   $("cancel-edit").addEventListener("click",closeEditor);
   $("refresh-btn").addEventListener("click",async () => {
     try { await reload(); showMessage(""); } catch(e){showMessage(e.message,true);}
   });
   $("setup-btn").addEventListener("click",async () => {
+    if (role !== "owner") return;
     try { await request("/api/bump-manager/setup",{body:{}}); await reload(); }
     catch(e){showMessage(e.message,true);}
   });
   $("service-form").addEventListener("submit",async event => {
     event.preventDefault();
+    if (role !== "owner") return;
     const submit = $("save-service"); submit.disabled = true;
     try {
       const body = {name:$("service-name").value,channelUrl:$("channel-url").value,
