@@ -17,6 +17,7 @@ import time
 from typing import Any, Callable
 
 from response_reader import message_body
+from tdl_voting import TDL_KEY, active_guilds
 
 DAY = 86400
 MAX_HISTORY = 200
@@ -49,39 +50,50 @@ class VoteNotice:
 
 
 def configured_webhooks(raw: dict) -> tuple[TrustedWebhook, ...]:
-    """Only enabled D-INVITES guilds can enable its official vote alerts."""
+    """Observe only a provider's explicitly configured Discord webhook feed.
+
+    TDL's signed JSON event API is an alternative integration for a backend;
+    here we process its official formatted Discord-webhook delivery, not an
+    untrusted chat message or a request to cast a vote.
+    """
     entries = raw.get("vote_notifications", [])
     if not isinstance(entries, list) or len(entries) > 12:
         raise ValueError("vote_notifications must be a list of at most 12 sources")
-    enabled_guilds = {
+    dinvites_guilds = {
         str(item.get("guild_id"))
         for item in raw.get("services", [])
         if isinstance(item, dict) and item.get("enabled", True) is not False
         and str(item.get("application_id")) == DISCORDINVITES_BOT
     }
+    tdl_guilds = active_guilds(raw)
     seen: set[tuple[str, str]] = set()
     results: list[TrustedWebhook] = []
     for entry in entries:
-        if not isinstance(entry, dict) or entry.get("provider") != "d-invites":
-            raise ValueError("Only D-INVITES provider vote notifications are supported")
+        if not isinstance(entry, dict):
+            raise ValueError("Invalid vote-notification entry")
+        provider = entry.get("provider")
+        if provider not in {"d-invites", TDL_KEY}:
+            raise ValueError("Unsupported vote notification provider")
         guild_id = _id(entry.get("guild_id"))
         channel_id = _id(entry.get("channel_id"))
         webhook_id = _id(entry.get("webhook_id"))
         phrase = entry.get("vote_phrase")
-        if guild_id not in enabled_guilds:
-            raise ValueError("Vote webhook guild must have configured, enabled D-INVITES")
-        if (not isinstance(phrase, str) or not 12 <= len(phrase) <= 160
-                or "vote" not in phrase.lower() or phrase.strip() != phrase
-                or "\n" in phrase or "\r" in phrase):
-            raise ValueError("vote_phrase must be an exact, distinctive vote notice phrase")
+        permitted_guilds = dinvites_guilds if provider == "d-invites" else tdl_guilds
+        if guild_id not in permitted_guilds:
+            raise ValueError("Vote notification guild must have the corresponding enabled service")
+        minimum = 12 if provider == "d-invites" else 7
+        keyword = "vote" if provider == "d-invites" else "upvot"
+        if (not isinstance(phrase, str) or not minimum <= len(phrase) <= 160
+                or keyword not in phrase.casefold() or phrase.strip() != phrase
+                or "\\n" in phrase or "\\r" in phrase):
+            raise ValueError("Use a distinctive vote or upvote notice phrase from the provider")
         key = (channel_id, webhook_id)
         if key in seen:
-            raise ValueError("Duplicate webhook source is not allowed")
+            raise ValueError("Each provider requires a different webhook identity")
         seen.add(key)
-        results.append(TrustedWebhook("d-invites", guild_id, channel_id,
+        results.append(TrustedWebhook(provider, guild_id, channel_id,
                                       webhook_id, phrase))
     return tuple(results)
-
 
 def _timestamp(value: Any) -> float | None:
     if not isinstance(value, datetime):
