@@ -1,5 +1,33 @@
 # MultiBump Easy Mode (Android / Termux)
 
+## v15.3: optional automatic provider vote-notification receipts
+
+DiscordInvites can send an official **New Vote** notification into your Discord
+server via a webhook. When the owner configures that source, MultiBump now
+observes those webhook messages and can backfill up to 200 recent messages
+on reconnect. Only the exact configured **guild, channel, webhook ID, and
+unique vote-event phrase** count as trusted provider notifications. Duplicate
+message IDs cannot be counted twice, and notifications survive restarts.
+
+**One-time setup, Android:** From the main menu choose **8**, then **1**.
+Create a Discord webhook in your selected staff/bump channel, and configure
+DiscordInvites dashboard → server Settings → Webhooks to send **New Vote**
+notifications to that URL. Set the customizable event message to exactly:
+`The 420 Lobby received a new vote`. The setup menu asks for the notification
+channel and private Discord webhook URL **with hidden input**. It extracts and
+stores only the numeric webhook ID, never the secret token or entire URL.
+Restart the running bumper after changing this local config so it reads the
+new observer rules. Option **3** (status) and option **8** show the provider
+notification count from the last 24 hours. No fake votes or owner-account vote
+credits are created by webhook messages; they only show that the directory
+reported an event.
+
+This source requires the provider dashboard to be configured once. If there
+is no webhook configured, the observer is disabled and all existing bump
+behavior stays unchanged. **Unattended server-vote submission remains
+unsupported**, because no authorized provider submission API has been found.
+
+
 ## v15.2: factual support across all six existing bump bots (Nov 17, 2026)
 
 **Main menu 8 now displays a read-only vote-capability report for every configured
