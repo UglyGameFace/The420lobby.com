@@ -20,7 +20,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-      - name: Check MultiBump Android v14 source and regressions
+      - name: Check MultiBump Android v15 source and regressions
         working-directory: tools/multibump-android
         run: |
           python -m compileall -q .
