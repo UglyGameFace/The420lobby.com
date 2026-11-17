@@ -357,7 +357,7 @@ def menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
         print(f"{add_number}. Add another free voting website")
         print(f"{remove_number}. Remove a saved voting website")
         print("0. Back to bumps")
-        choice = input("Choose: ").strip()
+        choice = input("Choose [Enter = Discordify]: ").strip() or "1"
         if choice == "0":
             return
         try:
