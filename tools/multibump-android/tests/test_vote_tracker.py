@@ -1,5 +1,7 @@
 """Offline tests for free directory voting: no real logins or vote submissions."""
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Barrier
 import sqlite3
 from tempfile import TemporaryDirectory
 import unittest
@@ -77,6 +79,30 @@ class VoteTrackerTests(unittest.TestCase):
                 self.assertEqual(count, 2)
             finally:
                 ledger.close()
+
+    def test_two_termux_sessions_cannot_record_same_vote_concurrently(self):
+        with TemporaryDirectory() as td:
+            db_path = Path(td) / "state.sqlite3"
+            VoteLedger(db_path).close()
+            barrier = Barrier(2)
+
+            def record_in_session():
+                ledger = VoteLedger(db_path)
+                try:
+                    barrier.wait(timeout=5)
+                    try:
+                        ledger.record_self_report(target(), now=100000)
+                        return "recorded"
+                    except ValueError:
+                        return "blocked"
+                finally:
+                    ledger.close()
+
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                results = list(pool.map(lambda _: record_in_session(), range(2)))
+            self.assertEqual(sorted(results), ["blocked", "recorded"])
+            with sqlite3.connect(db_path) as db:
+                self.assertEqual(db.execute("SELECT COUNT(*) FROM vote_events").fetchone()[0], 1)
 
     def test_different_services_independent_and_survive_restart(self):
         with TemporaryDirectory() as td:
