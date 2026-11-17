@@ -213,7 +213,7 @@ class VoteReceiptTests(unittest.TestCase):
         }]
         raw["vote_notifications"].append({
             "provider": TDL_KEY, "guild_id": GUILD, "channel_id": CHANNEL,
-            "webhook_id": "1531117218291646608", "vote_phrase": "upvoted",
+            "webhook_id": "1531117218291646608", "vote_phrase": "upvot",
         })
         rules = configured_webhooks(raw)
         receipt = observe(msg(webhook="1531117218291646608",
@@ -276,7 +276,7 @@ class VoteReceiptTests(unittest.TestCase):
                 self.assertTrue(setup_tdl_notifications(path))
             saved = read_config(path)
             self.assertEqual(saved["vote_notifications"][0]["provider"], TDL_KEY)
-            self.assertEqual(saved["vote_notifications"][0]["vote_phrase"], "upvoted")
+            self.assertEqual(saved["vote_notifications"][0]["vote_phrase"], "upvot")
             self.assertNotIn(token, path.read_text())
             self.assertEqual(len(saved["services"]), 1)
 
