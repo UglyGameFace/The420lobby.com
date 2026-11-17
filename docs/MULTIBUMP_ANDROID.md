@@ -33,3 +33,28 @@ The GitHub workflow runs these offline checks without installing the self-bot de
 - No guarantees for inaccessible public history, bot-specific semantics, message deletion, or race conditions.
 - Manual bump reminders and Android client scheduling do **not** share state; disable overlapping schedules for the same service.
 - CI validates source and simulated events, not production Discord behavior or user-account policy compliance.
+
+## v15 free directory voting (November 17, 2026)
+
+A phone-first `Free directory votes` menu and standalone `multibump-votes`
+Termux launcher now track manually confirmed free server-directory votes while
+the v14 bump observer and SQLite schedule continue unchanged.
+
+- Known free directory presets: Discordify and Discadia. The 420 Lobby
+  Discordify listing URL is owner-supplied; Discadia and other directory links
+  must be pasted from the actual server listing.
+- Each directory has an independent account-level cooldown (24 hours by
+  default). Multiple server listings on the same provider share this floor
+  to avoid treating one Discord account as multiple voters.
+- The verified website performs sign-in and voting; the client only opens its
+  HTTPS listing and allows the user to self-report success. It cannot infer
+  success from a click, OAuth authorization, or elapsed time.
+- Local SQLite `vote_state` and `vote_events` are separate from `schedule`,
+  `dispatch_clock`, and public bump events. Existing configs/state remain.
+- Upgrade: use the main-branch Git checkout and `easy-install.sh` described
+  in `tools/multibump-android/README.md` after the feature merges, not the
+  earlier v14 ZIP.
+- No automated vote submission, Discord credential reuse, undocumented voting
+  API calls or login simulation are implemented. Discordify's published terms
+  prohibit self-bots and abusive automation. Android and provider acceptance
+  remain unverified until tested by the user on device.
