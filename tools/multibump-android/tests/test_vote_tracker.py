@@ -195,7 +195,7 @@ class VoteTrackerTests(unittest.TestCase):
             self.assertIn("CHECK ON WEBSITE", labels)
 
     def test_one_tap_opens_lobby_and_one_confirmation_records_vote(self):
-        from vote_tracker import menu
+        from vote_tracker import manual_menu as menu
         with TemporaryDirectory() as td:
             config, state = Path(td) / "config.json", Path(td) / "state.sqlite3"
             with patch("builtins.input", side_effect=["1", "yes", "0"]), \
