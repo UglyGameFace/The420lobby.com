@@ -149,6 +149,7 @@ class V13InstallSmokeTests(unittest.TestCase):
                 self.assertIn('vote_tracker.py', (project / name).read_text())
                 self.assertIn('vote_capabilities.py', (project / name).read_text())
                 self.assertIn('vote_receipts.py', (project / name).read_text())
+                self.assertIn('tdl_voting.py', (project / name).read_text())
                 self.assertIn('vote_tracker.sh', (project / name).read_text())
                 self.assertIn('bumper.py', (project / name).read_text())
         self.assertTrue((project / 'response_reader.py').is_file())
