@@ -155,6 +155,9 @@ class VoteLedger:
             raise ValueError("Invalid vote cooldown.")
         now = time.time() if now is None else now
         with self.db:
+            # Lock before reading eligibility: two Termux sessions must not
+            # both record the same directory/account vote at once.
+            self.db.execute("BEGIN IMMEDIATE")
             previous = self.state(provider)
             if previous and previous[1] > now:
                 raise ValueError("This account's next vote is not eligible yet.")
