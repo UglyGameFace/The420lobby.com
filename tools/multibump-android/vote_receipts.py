@@ -85,7 +85,7 @@ def configured_webhooks(raw: dict) -> tuple[TrustedWebhook, ...]:
         keyword = "vote" if provider == "d-invites" else "upvot"
         if (not isinstance(phrase, str) or not minimum <= len(phrase) <= 160
                 or keyword not in phrase.casefold() or phrase.strip() != phrase
-                or "\\n" in phrase or "\\r" in phrase):
+                or "\n" in phrase or "\r" in phrase):
             raise ValueError("Use a distinctive vote or upvote notice phrase from the provider")
         key = (channel_id, webhook_id)
         if key in seen:
