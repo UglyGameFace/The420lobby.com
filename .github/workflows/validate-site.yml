@@ -10,6 +10,27 @@ permissions:
   contents: read
 
 jobs:
+  site-regression-independent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install website dependencies (security audit remains separately enforced)
+        run: npm install --no-audit --no-fund
+      - name: Typecheck site
+        run: npm run typecheck
+      - name: Website backend regressions
+        run: node --test tests/*.test.mjs
+      - name: Build website
+        run: npm run build
+      - name: Compile Cloudflare Pages Functions
+        run: npx --yes wrangler@4 pages functions build --outdir=.wrangler/functions-build
+
   tdl-signed-webhook:
     runs-on: ubuntu-latest
     timeout-minutes: 10
