@@ -10,6 +10,7 @@ No requests are made to directory sites and no user credentials are used.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from contextlib import closing
 from datetime import datetime, timezone
 import sqlite3
 import time
@@ -193,7 +194,7 @@ def recent_count(db_path: Any, *, now: float | None = None) -> dict[str, int]:
         return {}
     now = time.time() if now is None else now
     try:
-        with sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True) as db:
+        with closing(sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True)) as db:
             found = db.execute("""SELECT name FROM sqlite_master
                 WHERE type='table' AND name='provider_vote_notices'""").fetchone()
             if not found:
