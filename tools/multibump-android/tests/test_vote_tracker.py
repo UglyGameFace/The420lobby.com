@@ -218,6 +218,16 @@ class VoteTrackerTests(unittest.TestCase):
             self.assertFalse(state.exists())
             self.assertEqual(len(read_config(config)["vote_targets"]), 1)
 
+    def test_enter_defaults_to_discordify_not_extra_setup(self):
+        from vote_tracker import menu
+        with TemporaryDirectory() as td:
+            config, state = Path(td) / "config.json", Path(td) / "state.sqlite3"
+            with patch("builtins.input", side_effect=["", "y", "0"]), \
+                 patch("vote_tracker.open_link", return_value=True) as browser:
+                menu(config, state)
+            browser.assert_called_once_with(DISCORDIFY_LOBBY, "discordify")
+            self.assertIn("discordify", read_states(state))
+
     def test_cooldown_blocks_reopening_and_second_confirmation(self):
         from vote_tracker import menu
         with TemporaryDirectory() as td:
