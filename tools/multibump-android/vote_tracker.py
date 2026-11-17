@@ -21,6 +21,7 @@ from urllib.parse import urlsplit
 from manage import read_config, save_config
 from vote_capabilities import format_capabilities
 from vote_receipts import configured_webhooks, recent_count
+from tdl_voting import active_guilds, setup_in_menu as setup_tdl_vote_service, TDL_WEBHOOK_GUIDE
 
 ROOT = Path(__file__).resolve().parent
 CONFIG = ROOT / "config.json"
@@ -203,7 +204,8 @@ def show_vote_status(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
     for line in format_capabilities(raw):
         print(line)
     notices = recent_count(db_path)
-    print(f"\nD-INVITES provider vote notices in last 24h: {notices.get('d-invites', 0)}")
+    print(f"\nTDL upvote notices in last 24h: {notices.get('thediscordlist', 0)}")
+    print(f"D-INVITES provider vote notices in last 24h: {notices.get('d-invites', 0)}")
     print("Trusted Discord webhook notices do not establish which account voted.")
     targets = configured_targets(raw)
     print("\nOPTIONAL MANUAL VOTE HISTORY (SELF-REPORTED, NOT VERIFIED)")
@@ -458,24 +460,96 @@ def setup_discordinvites_notifications(config_path: Path = CONFIG) -> bool:
     return True
 
 
+def setup_tdl_notifications(config_path: Path = CONFIG) -> bool:
+    """Opt in to official formatted TDL listing.upvoted Discord notifications.
+
+    The provider must first be configured with a Discord webhook target on the
+    listing's Manage → Webhooks page. Only the numeric Discord webhook ID is
+    persisted; no secret token, Discord credential, or account auth is stored.
+    """
+    raw = read_config(config_path)
+    guilds = sorted(active_guilds(raw))
+    if not guilds:
+        print("Enable TheDiscordList vote-only support first (option 1).")
+        return False
+    if len(guilds) == 1:
+        guild_id = guilds[0]
+    else:
+        for i, guild in enumerate(guilds, 1):
+            print(f"{i}. Server ending {guild[-5:]}")
+        answer = input("Server number [Enter = back]: ").strip()
+        if not answer:
+            return False
+        if not answer.isdecimal() or not 1 <= int(answer) <= len(guilds):
+            raise ValueError("Choose an existing TDL server.")
+        guild_id = guilds[int(answer)-1]
+
+    print("\nTHE DISCORD LIST | VERIFIED UPVOTE NOTIFICATIONS")
+    print("Create a Discord webhook for a private server channel.")
+    print("On your TheDiscordList listing: Manage > Webhooks > New endpoint.")
+    print("Paste the Discord webhook URL and enable ONLY listing.upvoted.")
+    print("Official guide:", TDL_WEBHOOK_GUIDE)
+    channel_candidates = [str(item.get("channel_id")) for item in raw["services"]
+                          if str(item.get("guild_id")) == guild_id
+                          and item.get("enabled", True) is not False]
+    if not channel_candidates:
+        raise ValueError("No configured bump channel found for this server.")
+    channel_id = channel_candidates[-1]
+    from home import parse_channel_link
+    copied_link = input("Notification channel message link [Enter = bump channel]: ").strip()
+    if copied_link:
+        parsed = parse_channel_link(copied_link)
+        if parsed is None or parsed[0] != guild_id:
+            raise ValueError("Notification channel must belong to the selected server.")
+        channel_id = parsed[1]
+    webhook_url = getpass.getpass("Discord webhook URL (hidden; never saved): ")
+    webhook_id = parse_discord_webhook_id(webhook_url)
+    rules = raw.setdefault("vote_notifications", [])
+    if not isinstance(rules, list):
+        raise ValueError("vote_notifications must be an array.")
+    candidate = {
+        "provider": "thediscordlist", "guild_id": guild_id,
+        "channel_id": channel_id, "webhook_id": webhook_id,
+        # Only the listing.upvoted event should be enabled for this webhook.
+        # The formatted notification is expected to say "upvoted".
+        "vote_phrase": "upvoted",
+    }
+    rules[:] = [rule for rule in rules if not (
+        isinstance(rule, dict) and rule.get("provider") == "thediscordlist"
+        and str(rule.get("guild_id")) == guild_id)]
+    rules.append(candidate)
+    configured_webhooks(raw)
+    save_config(config_path, raw)
+    print("TDL vote notifications saved. Restart the running bumper to watch them.")
+    print("Votes must still be cast by individual members using /upvote.")
+    return True
+
+
 def menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
     """Show all configured services by default, never launch a browser."""
     while True:
         for line in format_capabilities(read_config(config_path)):
             print(line)
         notices = recent_count(db_path)
-        print(f"\nD-INVITES provider vote notifications seen (24h): {notices.get('d-invites', 0)}")
-        print("These are webhook notices, not proof your personal account voted.")
-        print("1. Connect D-INVITES provider vote notifications (one-time)")
-        print("2. Optional: manual voting links and self-reported notes")
+        print(f"\nTDL upvote notifications (24h): {notices.get('thediscordlist', 0)}")
+        print(f"D-INVITES vote notifications (24h): {notices.get('d-invites', 0)}")
+        print("Provider notices do not establish which account voted.")
+        print("1. Add TheDiscordList official /upvote service (no browser voting)")
+        print("2. Connect TDL provider upvote notifications (one-time)")
+        print("3. Connect D-INVITES provider vote notifications (one-time)")
+        print("4. Optional manual voting links and self-reported notes")
         print("0. Back to bumper")
         choice = input("Choose [Enter = back]: ").strip()
         if choice in {"", "0"}:
             return
         try:
             if choice == "1":
-                setup_discordinvites_notifications(config_path)
+                setup_tdl_vote_service(config_path)
             elif choice == "2":
+                setup_tdl_notifications(config_path)
+            elif choice == "3":
+                setup_discordinvites_notifications(config_path)
+            elif choice == "4":
                 manual_menu(config_path, db_path)
             else:
                 print("Choose one of the displayed numbers.")
