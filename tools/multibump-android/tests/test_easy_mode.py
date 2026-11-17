@@ -156,7 +156,7 @@ class EasyModeTests(unittest.TestCase):
             (project / '.venv-debian' / 'pyvenv.cfg').write_text('home = /usr/bin')
             (project / 'config.json').write_text('KEEP-CONFIG')
             (project / 'bump_state.sqlite3').write_bytes(b'KEEP-STATE')
-            for filename in ('easy-install.sh', 'multibump.sh', 'home.py', 'credentials.py', 'status_view.py'):
+            for filename in ('easy-install.sh', 'multibump.sh', 'home.py', 'credentials.py', 'status_view.py', 'vote_tracker.py', 'vote_tracker.sh'):
                 (source / filename).write_bytes((ROOT / filename).read_bytes())
             # Test launcher rather than running the actual multi-page UI.
             (bin_dir / 'python').write_text('#!/bin/bash\nprintf "launched easy UI\\n"\n')
@@ -176,6 +176,8 @@ class EasyModeTests(unittest.TestCase):
             self.assertEqual((project / 'home.py').read_bytes(), (ROOT / 'home.py').read_bytes())
             self.assertEqual((project / 'credentials.py').read_bytes(), (ROOT / 'credentials.py').read_bytes())
             self.assertEqual((project / 'status_view.py').read_bytes(), (ROOT / 'status_view.py').read_bytes())
+            self.assertEqual((project / 'vote_tracker.py').read_bytes(), (ROOT / 'vote_tracker.py').read_bytes())
+            self.assertTrue((bin_dir / 'multibump-votes').is_symlink())
 
 
 if __name__ == '__main__':
