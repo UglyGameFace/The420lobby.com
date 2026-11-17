@@ -24,3 +24,19 @@ cd ~/storage/downloads && unzip -oq MultiBump-v14.zip && bash multibump-selfbot/
 
 Choose 3 for read-only status, or 2 to start. Running `multibump` later reopens the menu.
 
+
+## v15 free directory voting — November 17, 2026
+
+- Added independent SQLite-backed, per-provider account eligibility tracking,
+  HTTPS listing validation and explicit self-reported vote recording.
+- Android menu option 8 opens the dedicated vote controls; `multibump-votes`
+  launches them in a second Termux session without stopping MultiBump.
+- User's Discordify listing is prefilled; Discadia and custom directories
+  require real listing links. The website, not this client, authenticates and
+  casts each vote.
+- Installer copies new tracker and launcher while retaining all existing
+  bump configuration and SQLite data. No cloud manager synchronization.
+- Regression tests added for provider-wide cooldowns, persistence, link safety,
+  no false confirmation, and legacy bump database compatibility.
+- Release is **not** confirmed live: require exact-head CI and Android manual
+  vote acceptance verification. Automated voting is intentionally unsupported.
