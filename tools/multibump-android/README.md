@@ -1,5 +1,22 @@
 # MultiBump Easy Mode (Android / Termux)
 
+
+## V15: vote in one action
+
+From the main MultiBump screen select **8. Vote for The 420 Lobby (free websites)**.
+The first choice is ready immediately:
+
+1. **The 420 Lobby on Discordify**. Select **1** to open the official listing in your Android browser. No prior setup, URL, channel ID, or Discord token is required.
+2. Tap **Vote Now** on Discordify. You may need to sign in to that website with Discord.
+3. Return to the existing Termux prompt. Enter **y** only after the website confirms the vote succeeded. MultiBump records your confirmation and shows the next local 24-hour check time.
+
+If the website rejected or did not confirm the vote, press Enter instead. No vote is counted, no timer is started, and no bump schedule changes. Local voting status is **not** a verification of the website's vote totals.
+
+Other directories appear as additional numbered choices after being added once. The two advanced actions at the bottom are **Add another free voting website** and **Remove a saved voting website**.
+
+**To keep bumping while you vote**, open a second Termux session and type \`multibump-votes\`. Voting opens the official site. It does not attempt automatic OAuth, website vote submission or vote verification.
+
+
 ## v15: free server-directory votes (Android)
 
 MultiBump now includes **free directory voting alongside bumping**. This is a
@@ -7,8 +24,9 @@ separate **manual, account-level 24-hour vote ledger**, not an automatic vote
 sender. Opening a listing or completing Discord OAuth **never** marks a vote
 successful. Only record it after the directory visibly confirms the vote.
 
-- **Option 8** in `multibump`: add an official voting link, open it on Android,
-  record an actual confirmed vote, or remove the link.
+- **Option 8** in `multibump`: one numbered choice opens the prefilled
+  Discordify listing. Confirm success when you return; adding another directory
+  is optional.
 - **`multibump-votes`** in a *second Termux session*: use the vote menu while the
   original bumper continues to run. No credentials, database reset or cloud
   manager connection is needed.
