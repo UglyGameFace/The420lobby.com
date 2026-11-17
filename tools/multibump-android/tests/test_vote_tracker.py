@@ -178,7 +178,7 @@ class VoteTrackerTests(unittest.TestCase):
                     "SELECT name FROM sqlite_master WHERE name='vote_state'").fetchone())
 
     def test_first_launch_offers_lobby_without_configuration_or_discord_login(self):
-        from vote_tracker import quick_targets, menu
+        from vote_tracker import quick_targets, manual_menu as menu
         with TemporaryDirectory() as td:
             config, state = Path(td) / "config.json", Path(td) / "state.sqlite3"
             targets = quick_targets(config)
@@ -208,7 +208,7 @@ class VoteTrackerTests(unittest.TestCase):
                 self.assertEqual(db.execute("SELECT COUNT(*) FROM vote_events").fetchone()[0], 1)
 
     def test_cancel_after_browser_does_not_claim_a_vote(self):
-        from vote_tracker import menu
+        from vote_tracker import manual_menu as menu
         with TemporaryDirectory() as td:
             config, state = Path(td) / "config.json", Path(td) / "state.sqlite3"
             with patch("builtins.input", side_effect=["1", "", "0"]), \
@@ -219,7 +219,7 @@ class VoteTrackerTests(unittest.TestCase):
             self.assertEqual(len(read_config(config)["vote_targets"]), 1)
 
     def test_enter_defaults_to_discordify_not_extra_setup(self):
-        from vote_tracker import menu
+        from vote_tracker import manual_menu as menu
         with TemporaryDirectory() as td:
             config, state = Path(td) / "config.json", Path(td) / "state.sqlite3"
             with patch("builtins.input", side_effect=["", "y", "0"]), \
@@ -229,7 +229,7 @@ class VoteTrackerTests(unittest.TestCase):
             self.assertIn("discordify", read_states(state))
 
     def test_cooldown_blocks_reopening_and_second_confirmation(self):
-        from vote_tracker import menu
+        from vote_tracker import manual_menu as menu
         with TemporaryDirectory() as td:
             config, state = Path(td) / "config.json", Path(td) / "state.sqlite3"
             with patch("builtins.input", side_effect=["1", "y", "1", "0"]), \
