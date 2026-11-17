@@ -155,6 +155,55 @@ class VoteReceiptTests(unittest.TestCase):
             self.assertEqual(len(stored["services"]), 1)
             self.assertNotIn("token", stored["vote_notifications"][0])
 
+    def test_bot_event_integration_records_webhook_without_dispatching_vote_or_bump(self):
+        import time
+        from unittest.mock import patch
+        from bumper import run_bot
+        rules_config = raw_config()
+        service = svc()
+        class Channel:
+            id = int(CHANNEL)
+            guild = NS(id=int(GUILD))
+            def history(self, *, limit, after):
+                async def empty():
+                    if False:
+                        yield None
+                return empty()
+        channel = Channel()
+        class FakeClient:
+            user = NS(id=1531117218291646605)
+            closed = False
+            def event(self, handler):
+                setattr(self, handler.__name__, handler)
+                return handler
+            def get_channel(self, cid):
+                return channel
+            def is_closed(self):
+                return self.closed
+            async def wait_until_ready(self):
+                return None
+            async def start(self, token):
+                await self.on_ready()
+                await self.on_message(msg(mid=60606))
+                self.closed = True
+                await asyncio.sleep(0)
+        client = FakeClient()
+        with TemporaryDirectory() as td:
+            path = Path(td) / "state.sqlite3"
+            store = Store(path, rng=Mock(randint=Mock(side_effect=lambda lo, hi: lo)))
+            store.init_services([service], now=time.time() + 3600)
+            before = store.states()
+            with patch.dict("sys.modules", {"discord": NS(Client=lambda: client)}), \
+                 patch("vote_receipts.time.time", return_value=NOW):
+                asyncio.run(run_bot(rules_config, [service], store,
+                                    token_override="OFFLINE_TEST_ONLY"))
+            self.assertEqual(store.states(), before)
+            self.assertEqual(store.db.execute(
+                "SELECT COUNT(*) FROM provider_vote_notices").fetchone()[0], 1)
+            self.assertEqual(store.db.execute(
+                "SELECT COUNT(*) FROM events WHERE event='attempt'").fetchone()[0], 0)
+            store.close()
+
     def test_bounded_backfill_is_idempotent_and_failure_is_reported(self):
         rules = configured_webhooks(raw_config())
         class Channel:
