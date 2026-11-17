@@ -1,5 +1,27 @@
 # MultiBump Easy Mode (Android / Termux)
 
+## v15.2: factual support across all six existing bump bots (Nov 17, 2026)
+
+**Main menu 8 now displays a read-only vote-capability report for every configured
+bump bot, without opening a browser or silently claiming a vote.** It identifies
+Discadia and Discordify as server-vote websites, D-INVITES as a directory whose
+rules prohibit automated votes, OneBump's /vote as a vote for the *bot* rather
+than The 420 Lobby, DISBOARD as bump-only, and Discodus as unverified.
+
+No automatic server-vote submission is enabled because no provider-authorized
+server-vote submission endpoint was established. Discordify's published
+`/api/bot/vote-status` endpoint verifies votes for **bot** listings; it
+does not cast or verify a vote for a **server** listing. DiscordInvites
+prohibits scripted/automated votes, so adding a hidden HTTP call, captcha
+workaround, or logged-in account replay would be false completion and may
+damage the directory listing or Discord account.
+
+The earlier optional manual vote-link/history screen is still reachable by
+**choosing 1 explicitly after viewing the six-service support report**.
+It is never launched automatically and is not the requested auto-voting
+feature. Bump schedules, private credentials and SQLite history are unchanged.
+
+
 
 ## V15: vote in one action
 
