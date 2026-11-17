@@ -201,10 +201,13 @@ def show_vote_status(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
     raw = read_config(config_path)
     for line in format_capabilities(raw):
         print(line)
+    notices = recent_count(db_path)
+    print(f"\nD-INVITES provider vote notices in last 24h: {notices.get('d-invites', 0)}")
+    print("Trusted Discord webhook notices do not establish which account voted.")
     targets = configured_targets(raw)
     print("\nOPTIONAL MANUAL VOTE HISTORY (SELF-REPORTED, NOT VERIFIED)")
     if not targets:
-        print("No manual voting records configured. This does not mean voting is available.")
+        print("Manual votes not recorded; this does not mean voting is available.")
         return
     states = read_states(db_path)
     now = time.time()
