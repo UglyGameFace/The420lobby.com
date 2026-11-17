@@ -119,6 +119,42 @@ class VoteReceiptTests(unittest.TestCase):
             store.close()
             self.assertEqual(recent_count(path, now=NOW), {})
 
+    def test_private_webhook_url_parser_extracts_id_never_token(self):
+        from vote_tracker import parse_discord_webhook_id
+        url = "https://discord.com/api/webhooks/" + WEBHOOK + "/SECRET." + "x" * 30
+        self.assertEqual(parse_discord_webhook_id(url), WEBHOOK)
+        for bad in (
+            "http://discord.com/api/webhooks/" + WEBHOOK + "/SECRET." + "x" * 30,
+            "https://discord.com.evil.example/api/webhooks/" + WEBHOOK + "/SECRET." + "x" * 30,
+            "https://discord.com/api/webhooks/" + WEBHOOK + "/short",
+            "https://discord.com/api/webhooks/" + WEBHOOK + "/SECRET." + "x" * 30 + "?token=yes",
+            "https://discord.com/api/webhooks/" + WEBHOOK + "/SECRET." + "x" * 30 + "#token",
+        ):
+            with self.subTest(url=bad), self.assertRaises(ValueError):
+                parse_discord_webhook_id(bad)
+
+    def test_android_wizard_never_writes_webhook_token(self):
+        from manage import read_catalog, add, save_config, read_config
+        from vote_tracker import setup_discordinvites_notifications
+        from unittest.mock import patch
+        with TemporaryDirectory() as td:
+            config = Path(td) / "config.json"
+            raw = {"services": []}
+            add(raw, read_catalog(), profile="d-invites", guild_id=GUILD,
+                channel_id=CHANNEL, non_interactive=True)
+            save_config(config, raw)
+            token = "SecretTokenForMyWebhook" + "x" * 18
+            url = "https://discord.com/api/webhooks/" + WEBHOOK + "/" + token
+            with patch("builtins.input", return_value=""), \
+                 patch("vote_tracker.getpass.getpass", return_value=url):
+                self.assertTrue(setup_discordinvites_notifications(config))
+            self.assertNotIn(token, config.read_text())
+            stored = read_config(config)
+            self.assertEqual(len(configured_webhooks(stored)), 1)
+            self.assertEqual(stored["vote_notifications"][0]["webhook_id"], WEBHOOK)
+            self.assertEqual(len(stored["services"]), 1)
+            self.assertNotIn("token", stored["vote_notifications"][0])
+
     def test_bounded_backfill_is_idempotent_and_failure_is_reported(self):
         rules = configured_webhooks(raw_config())
         class Channel:
