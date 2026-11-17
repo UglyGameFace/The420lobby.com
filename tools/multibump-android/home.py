@@ -248,6 +248,9 @@ def main() -> int:
         raw = read_config(CONFIG)
         count = sum(bool(s.get("enabled", True)) for s in raw["services"])
         print(f"\n{count} bump service(s) enabled")
+        from tdl_voting import active_guilds
+        tdl_count = len(active_guilds(raw))
+        print(f"{tdl_count} TheDiscordList vote-only server(s) configured")
         print("1. Add multiple bump bots")
         print("2. START bumper")
         print("3. View status")
