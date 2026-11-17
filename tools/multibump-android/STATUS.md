@@ -56,3 +56,20 @@ Choose 3 for read-only status, or 2 to start. Running `multibump` later reopens 
 - Website npm dependency audit, real Android validation, and provider
   authorization remain separate blockers. This PR must stay draft until scope
   is reconciled with the owner's original automatic voting goal.
+
+## v15.3: provider notification support (November 17, 2026)
+
+- An optional D-INVITES / DiscordInvites official vote-event notification
+  observer now validates the exact configured Discord webhook identity,
+  channel, guild, age, and customized vote-event phrase.
+- Each matching event is stored once in a separate append-only SQLite table
+  with bounded history reconciliation on reconnect. It never changes the
+  bump dispatcher or owner vote eligibility. No user/member identities stored.
+- The Android setup wizard accepts a private Discord webhook URL using hidden
+  input and persists only its numeric ID, never the URL token.
+- The observer is off when not configured. Offline tests cover the full
+  synthetic Discord event path, spoofed IDs, duplicates, restart persistence,
+  scheduling isolation, and secret handling.
+- Notifications are **provider-reported events**, not cryptographic vote
+  proofs and not automated vote submission. The original vote-auto-cast goal
+  is blocked by vendor API/terms, not marked complete.
