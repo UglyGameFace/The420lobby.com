@@ -196,10 +196,13 @@ def display_time(timestamp: float) -> str:
 
 
 def show_vote_status(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
-    targets = configured_targets(read_config(config_path))
-    print("\nFREE VOTES | SEPARATE FROM BUMPS")
+    raw = read_config(config_path)
+    for line in format_capabilities(raw):
+        print(line)
+    targets = configured_targets(raw)
+    print("\nOPTIONAL MANUAL VOTE HISTORY (SELF-REPORTED, NOT VERIFIED)")
     if not targets:
-        print("No saved vote history yet. Option 8 opens The 420 Lobby on Discordify.")
+        print("No manual voting records configured. This does not mean voting is available.")
         return
     states = read_states(db_path)
     now = time.time()
