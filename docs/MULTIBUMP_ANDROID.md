@@ -99,3 +99,28 @@ matching notification; it does not identify the current account's vote or
 establish a cryptographically signed provider response. No automatic vote is
 submitted. The Android menu offers the one-time setup under option 8 → 1.
 See `tools/multibump-android/README.md` for setup and limitations.
+
+## v15.4: TheDiscordList official server voting (November 17, 2026)
+
+Seven directories are now represented in the vote support UI: six existing
+bump profiles plus TheDiscordList as a separate, vote-only profile.
+
+The owner can activate the vote-only profile in Termux with menu 8 → 1.
+TheDiscordList's official bot is 1522501063456985179; members run
+`/upvote` within their own server every 12h. This avoids opening a browser
+for each **vote** but is not unattended user-account automation. The owner
+still must authorize the bot's Discord installation and create/claim an
+active TheDiscordList listing.
+
+The provider's documented `listing.upvoted` event is available through
+webhooks. Menu 8 → 2 configures an official Discord-webhook **notification
+observer**, storing only numeric webhook identity and event observations,
+not secret URL/token, voter accounts, or self-reported owner eligibility.
+It is separate from existing bump dispatch and D-INVITES notifications.
+`tools/multibump-android/VOTE_PROVIDER_APIS.md` records exact official
+API endpoints and other provider blockers. TheDiscordList also publishes
+a read-only/search MCP interface, not a vote-submission tool.
+
+A live vote and official webhook-event delivery remain unverified; the
+branch must not be advertised as full automatic voting or merged solely
+because offline tests pass.
