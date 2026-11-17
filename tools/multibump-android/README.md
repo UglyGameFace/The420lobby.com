@@ -1,121 +1,58 @@
 # MultiBump Easy Mode (Android / Termux)
 
-## v15.3: optional automatic provider vote-notification receipts
+## Current: v15.4, TheDiscordList vote-only integration
 
-DiscordInvites can send an official **New Vote** notification into your Discord
-server via a webhook. When the owner configures that source, MultiBump now
-observes those webhook messages and can backfill up to 200 recent messages
-on reconnect. Only the exact configured **guild, channel, webhook ID, and
-unique vote-event phrase** count as trusted provider notifications. Duplicate
-message IDs cannot be counted twice, and notifications survive restarts.
+TheDiscordList (TDL) is now available as a **separate, officially documented
+server voting service** alongside the six existing bump services.
+It is **NOT** added to the automatic bump dispatcher because its actual
+slash command is **/upvote** and must be invoked by a person.
 
-**One-time setup, Android:** From the main menu choose **8**, then **1**.
-Create a Discord webhook in your selected staff/bump channel, and configure
-DiscordInvites dashboard → server Settings → Webhooks to send **New Vote**
-notifications to that URL. Set the customizable event message to exactly:
-`The 420 Lobby received a new vote`. The setup menu asks for the notification
-channel and private Discord webhook URL **with hidden input**. It extracts and
-stores only the numeric webhook ID, never the secret token or entire URL.
-Restart the running bumper after changing this local config so it reads the
-new observer rules. Option **3** (status) and option **8** show the provider
-notification count from the last 24 hours. No fake votes or owner-account vote
-credits are created by webhook messages; they only show that the directory
-reported an event.
-
-This source requires the provider dashboard to be configured once. If there
-is no webhook configured, the observer is disabled and all existing bump
-behavior stays unchanged. **Unattended server-vote submission remains
-unsupported**, because no authorized provider submission API has been found.
-
-
-## v15.2: factual support across all six existing bump bots (Nov 17, 2026)
-
-**Main menu 8 now displays a read-only vote-capability report for every configured
-bump bot, without opening a browser or silently claiming a vote.** It identifies
-Discadia and Discordify as server-vote websites, D-INVITES as a directory whose
-rules prohibit automated votes, OneBump's /vote as a vote for the *bot* rather
-than The 420 Lobby, DISBOARD as bump-only, and Discodus as unverified.
-
-No automatic server-vote submission is enabled because no provider-authorized
-server-vote submission endpoint was established. Discordify's published
-`/api/bot/vote-status` endpoint verifies votes for **bot** listings; it
-does not cast or verify a vote for a **server** listing. DiscordInvites
-prohibits scripted/automated votes, so adding a hidden HTTP call, captcha
-workaround, or logged-in account replay would be false completion and may
-damage the directory listing or Discord account.
-
-The earlier optional manual vote-link/history screen is still reachable by
-**choosing 1 explicitly after viewing the six-service support report**.
-It is never launched automatically and is not the requested auto-voting
-feature. Bump schedules, private credentials and SQLite history are unchanged.
-
-
-
-## V15: vote in one action
-
-From the main MultiBump screen select **8. Vote for The 420 Lobby (free websites)**.
-The first choice is ready immediately:
-
-1. **The 420 Lobby on Discordify**. Press **Enter** (or type **1**) to open the official listing in your Android browser. No prior setup, URL, channel ID, or Discord token is required.
-2. Tap **Vote Now** on Discordify. You may need to sign in to that website with Discord.
-3. Return to the existing Termux prompt. Enter **y** only after the website confirms the vote succeeded. MultiBump records your confirmation and shows the next local 24-hour check time.
-
-If the website rejected or did not confirm the vote, press Enter instead. No vote is counted, no timer is started, and no bump schedule changes. Local voting status is **not** a verification of the website's vote totals.
-
-Other directories appear as additional numbered choices after being added once. The two advanced actions at the bottom are **Add another free voting website** and **Remove a saved voting website**.
-
-**To keep bumping while you vote**, open a second Termux session and type \`multibump-votes\`. Voting opens the official site. It does not attempt automatic OAuth, website vote submission or vote verification.
-
-
-## v15: free server-directory votes (Android)
-
-MultiBump now includes **free directory voting alongside bumping**. This is a
-separate **manual, account-level 24-hour vote ledger**, not an automatic vote
-sender. Opening a listing or completing Discord OAuth **never** marks a vote
-successful. Only record it after the directory visibly confirms the vote.
-
-- **Option 8** in `multibump`: one numbered choice opens the prefilled
-  Discordify listing. Confirm success when you return; adding another directory
-  is optional.
-- **`multibump-votes`** in a *second Termux session*: use the vote menu while the
-  original bumper continues to run. No credentials, database reset or cloud
-  manager connection is needed.
-- **Discordify** has a free server vote once per 24 hours *across all servers*
-  for that account. The 420 Lobby's owner-supplied official listing URL is the
-  default: `https://discordify.net/server/the-420-lobby`. The user completes
-  Discord sign-in and votes on the real website.
-- **Discadia** has free directory voting; paste the URL of your own specific
-  server listing. Other free voting directories can be added with an HTTPS
-  listing and their documented account cooldown (24-168 hours).
-- All account-level votes for the *same directory* share one clock across
-  multiple server listings. Different directories have separate clocks.
-- Bump `schedule`, public bump cooldowns, command timers, and shared send
-  queue are unchanged. The vote ledger is stored in separate
-  `vote_state`/`vote_events` tables in the existing private SQLite database.
-- MultiBump cannot verify a vote externally without a provider-authorized,
-  user-scoped confirmation API. Status is explicitly labeled **self-reported**.
-  No hidden website endpoints, captcha bypass, automated OAuth, fake votes or
-  multi-account vote farming are attempted.
-
-**Update an existing Termux installation from GitHub main** (this preserves
-`config.json`, your saved login and `bump_state.sqlite3`):
+**To update your existing Android install without losing settings:**
 
 ```bash
-pkg install -y git
-cd "$HOME"
-if [ -d multibump-source/.git ]; then
-  git -C multibump-source pull --ff-only
-else
-  git clone --depth 1 https://github.com/UglyGameFace/The420lobby.com.git multibump-source
-fi
-bash "$HOME/multibump-source/tools/multibump-android/easy-install.sh"
+cd ~/multibump-v15-source &&
+git pull --ff-only &&
+bash tools/multibump-android/easy-install.sh
 ```
 
-The old v14 ZIP instructions below apply only to the earlier package. To get
-vote support, use the updated repository source once this change is on main.
+**In the MultiBump menu:**
+- Choose **8 → 1** once to add the official TDL **vote-only** service for
+  your configured Discord server. Existing six bump bots stay intact.
+- Add the [official TDL bot](https://thediscordlist.com/tdl)
+  (application ID `1522501063456985179`) to that server by authorizing
+  its installation in Discord. **Create or claim your server's free listing**
+  at https://thediscordlist.com/listings/create if it is not already public.
+- Members can then run `/upvote` **inside Discord**, without opening a
+  voting website. TDL enforces one real vote **per member per server every
+  12 hours** and replies whether it counted.
+- Optional: choose **8 → 2** to observe real TDL `listing.upvoted`
+  notifications. Create a Discord webhook in a private channel; on your
+  TheDiscordList listing, open **Manage → Webhooks → New endpoint**, paste
+  that Discord webhook URL, and subscribe to **only** `listing.upvoted`.
+  Return to the one-time Termux wizard and enter the URL in its **hidden**
+  prompt; only the numeric webhook ID is saved. Restart the running
+  bumper so it picks up the observer configuration.
+- **8 → 3** is the older D-INVITES vote-notification configuration.
+  **8 → 4** contains optional legacy manual vote links/history; it does
+  not submit votes or verify provider acceptance.
 
+Menu **3** also shows the last 24 hours of trusted provider webhook notices.
+These are directory-reported **community vote events**, not proof the
+current account voted. They are stored in SQLite independently of bump
+schedules and self-reported vote clocks.
 
-**Once set up, type `multibump` for bumps or `multibump-votes` for voting in another Termux session.** No need to use Python filenames, remember a folder, edit JSON, or reinstall Debian.
+**Realistic limitation:** TheDiscordList's public bot and official
+`listing.upvoted` webhook support member voting and event tracking.
+No approved unattended server-vote **submission** API exists in the
+official documentation inspected. The site explicitly prohibits automated
+ranking manipulation, and Discord does not permit user-account self-bots.
+We do **not** simulate /upvote from the logged-in user, use private
+website endpoints, or count an unconfirmed click as a vote.
+
+For verified endpoint names, policy evidence, and safe
+integration alternatives, see [VOTE_PROVIDER_APIS.md](./VOTE_PROVIDER_APIS.md).
+
+## Historical versions (not the current voting setup)
 
 ## Upgrade from previous MultiBump (keeps your settings)
 
