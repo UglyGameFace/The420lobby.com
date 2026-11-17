@@ -511,8 +511,8 @@ def setup_tdl_notifications(config_path: Path = CONFIG) -> bool:
         "provider": "thediscordlist", "guild_id": guild_id,
         "channel_id": channel_id, "webhook_id": webhook_id,
         # Only the listing.upvoted event should be enabled for this webhook.
-        # The formatted notification is expected to say "upvoted".
-        "vote_phrase": "upvoted",
+        # Only listing.upvoted event is subscribed; match upvote/upvoted text.
+        "vote_phrase": "upvot",
     }
     rules[:] = [rule for rule in rules if not (
         isinstance(rule, dict) and rule.get("provider") == "thediscordlist"
