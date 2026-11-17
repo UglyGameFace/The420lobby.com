@@ -81,7 +81,7 @@ def configured_webhooks(raw: dict) -> tuple[TrustedWebhook, ...]:
         permitted_guilds = dinvites_guilds if provider == "d-invites" else tdl_guilds
         if guild_id not in permitted_guilds:
             raise ValueError("Vote notification guild must have the corresponding enabled service")
-        minimum = 12 if provider == "d-invites" else 7
+        minimum = 12 if provider == "d-invites" else 5
         keyword = "vote" if provider == "d-invites" else "upvot"
         if (not isinstance(phrase, str) or not minimum <= len(phrase) <= 160
                 or keyword not in phrase.casefold() or phrase.strip() != phrase
