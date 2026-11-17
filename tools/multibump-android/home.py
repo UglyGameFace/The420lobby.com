@@ -255,7 +255,7 @@ def main() -> int:
         print("5. Add Discordify + D-INVITES (reuse your bump channel)")
         print("6. Saved login (change / forget)")
         print("7. Timing (extra wait after cooldown)")
-        print("8. Free directory votes (separate from bumps)")
+        print("8. Vote for The 420 Lobby (free websites)")
         print("0. Exit")
         choice = input("Choose: ").strip()
         try:
