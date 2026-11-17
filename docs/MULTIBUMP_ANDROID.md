@@ -85,3 +85,17 @@ Automated website submissions and success verification are **not implemented**
 and cannot be claimed as complete without provider permission and a published
 approved interface. The current feature PR remains draft, with independently
 passing Android regressions but existing website dependency-audit blockers.
+
+## v15.3 provider vote notification receipts
+
+MultiBump can now passively observe the official DiscordInvites New Vote
+Discord-webhook event *after one-time setup*. It requires exact guild, channel,
+webhook ID, and vote-message phrase; only the numeric webhook ID is saved,
+never the URL/token. Receipts are stored and deduplicated separately from
+bump schedules and from the owner's local self-reported vote clock.
+
+The event proves only that the trusted configured Discord webhook posted the
+matching notification; it does not identify the current account's vote or
+establish a cryptographically signed provider response. No automatic vote is
+submitted. The Android menu offers the one-time setup under option 8 → 1.
+See `tools/multibump-android/README.md` for setup and limitations.
