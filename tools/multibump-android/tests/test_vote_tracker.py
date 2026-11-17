@@ -177,6 +177,68 @@ class VoteTrackerTests(unittest.TestCase):
                 self.assertIsNone(db.execute(
                     "SELECT name FROM sqlite_master WHERE name='vote_state'").fetchone())
 
+    def test_first_launch_offers_lobby_without_configuration_or_discord_login(self):
+        from vote_tracker import quick_targets, menu
+        with TemporaryDirectory() as td:
+            config, state = Path(td) / "config.json", Path(td) / "state.sqlite3"
+            targets = quick_targets(config)
+            self.assertEqual(len(targets), 1)
+            self.assertEqual(targets[0]["url"], DISCORDIFY_LOBBY)
+            self.assertFalse(config.exists())
+            self.assertFalse(state.exists())
+            with patch("builtins.input", return_value="0"), patch("builtins.print") as output:
+                menu(config, state)
+            self.assertFalse(config.exists())
+            self.assertFalse(state.exists())
+            labels = "\n".join(str(call.args[0]) for call in output.call_args_list)
+            self.assertIn("1. The 420 Lobby on Discordify", labels)
+            self.assertIn("CHECK ON WEBSITE", labels)
+
+    def test_one_tap_opens_lobby_and_one_confirmation_records_vote(self):
+        from vote_tracker import menu
+        with TemporaryDirectory() as td:
+            config, state = Path(td) / "config.json", Path(td) / "state.sqlite3"
+            with patch("builtins.input", side_effect=["1", "yes", "0"]), \
+                 patch("vote_tracker.open_link", return_value=True) as browser:
+                menu(config, state)
+            browser.assert_called_once_with(DISCORDIFY_LOBBY, "discordify")
+            self.assertEqual(len(read_config(config)["vote_targets"]), 1)
+            self.assertIn("discordify", read_states(state))
+            with sqlite3.connect(state) as db:
+                self.assertEqual(db.execute("SELECT COUNT(*) FROM vote_events").fetchone()[0], 1)
+
+    def test_cancel_after_browser_does_not_claim_a_vote(self):
+        from vote_tracker import menu
+        with TemporaryDirectory() as td:
+            config, state = Path(td) / "config.json", Path(td) / "state.sqlite3"
+            with patch("builtins.input", side_effect=["1", "", "0"]), \
+                 patch("vote_tracker.open_link", return_value=True):
+                menu(config, state)
+            self.assertEqual(read_states(state), {})
+            self.assertFalse(state.exists())
+            self.assertEqual(len(read_config(config)["vote_targets"]), 1)
+
+    def test_cooldown_blocks_reopening_and_second_confirmation(self):
+        from vote_tracker import menu
+        with TemporaryDirectory() as td:
+            config, state = Path(td) / "config.json", Path(td) / "state.sqlite3"
+            with patch("builtins.input", side_effect=["1", "y", "1", "0"]), \
+                 patch("vote_tracker.open_link", return_value=True) as browser:
+                menu(config, state)
+            browser.assert_called_once()
+            with sqlite3.connect(state) as db:
+                self.assertEqual(db.execute("SELECT COUNT(*) FROM vote_events").fetchone()[0], 1)
+
+    def test_existing_other_directory_is_available_after_quick_default(self):
+        from vote_tracker import quick_targets
+        with TemporaryDirectory() as td:
+            config = Path(td) / "config.json"
+            add_target(config, "discadia", "Discadia", OTHER)
+            self.assertEqual([t["provider"] for t in quick_targets(config)],
+                             ["discordify", "discadia"])
+            add_target(config, "discordify", "Discordify", DISCORDIFY_LOBBY)
+            self.assertEqual(len(quick_targets(config)), 2)
+
     def test_bad_cooldowns_and_untrusted_config_rejected(self):
         with TemporaryDirectory() as td:
             config = Path(td) / "config.json"
