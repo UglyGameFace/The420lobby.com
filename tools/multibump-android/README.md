@@ -6,7 +6,7 @@
 From the main MultiBump screen select **8. Vote for The 420 Lobby (free websites)**.
 The first choice is ready immediately:
 
-1. **The 420 Lobby on Discordify**. Select **1** to open the official listing in your Android browser. No prior setup, URL, channel ID, or Discord token is required.
+1. **The 420 Lobby on Discordify**. Press **Enter** (or type **1**) to open the official listing in your Android browser. No prior setup, URL, channel ID, or Discord token is required.
 2. Tap **Vote Now** on Discordify. You may need to sign in to that website with Discord.
 3. Return to the existing Termux prompt. Enter **y** only after the website confirms the vote succeeded. MultiBump records your confirmation and shows the next local 24-hour check time.
 
