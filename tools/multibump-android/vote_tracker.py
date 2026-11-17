@@ -198,7 +198,7 @@ def show_vote_status(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
     targets = configured_targets(read_config(config_path))
     print("\nFREE VOTES | SEPARATE FROM BUMPS")
     if not targets:
-        print("No voting targets. Choose menu option 8 to add an official listing link.")
+        print("No saved vote history yet. Option 8 opens The 420 Lobby on Discordify.")
         return
     states = read_states(db_path)
     now = time.time()
@@ -282,47 +282,99 @@ def add_interactive(config_path: Path) -> None:
         print("This exact voting listing is already configured.")
 
 
+def quick_targets(config_path: Path) -> list[dict]:
+    """Put the owner's ready-made listing first; don't modify config on view."""
+    targets = configured_targets(read_config(config_path))
+    default = {
+        "provider": "discordify", "label": "The 420 Lobby on Discordify",
+        "url": DISCORDIFY_LOBBY, "cooldown_seconds": DAY,
+    }
+    return [next((entry for entry in targets if entry["provider"] == "discordify"
+                  and entry["url"] == DISCORDIFY_LOBBY), default)] + [
+                      entry for entry in targets
+                      if not (entry["provider"] == "discordify"
+                              and entry["url"] == DISCORDIFY_LOBBY)
+                  ]
+
+
+def short_status(target: dict, states: dict, now: float) -> str:
+    """A self-reported timer, never a claim about the website's real state."""
+    state = states.get(target["provider"])
+    if state is None:
+        return "CHECK ON WEBSITE"
+    if state[1] <= now:
+        return "READY TO CHECK"
+    return f"NEXT CHECK {display_time(state[1])}"
+
+
+def vote_once(target: dict, config_path: Path, db_path: Path, *,
+              now: float | None = None) -> None:
+    """One action opens the listing and asks about the website result.
+
+    We do not submit, infer or simulate a vote. The user can return from the
+    Android browser to this still-running prompt when ready.
+    """
+    now = time.time() if now is None else now
+    state = read_states(db_path).get(target["provider"])
+    if state and state[1] > now:
+        print(f"\nAlready recorded here. Check again after {display_time(state[1])}.")
+        print("This is your local timer; the directory determines actual eligibility.")
+        return
+
+    # The main Lobby Discordify target is already known. The first tap saves
+    # it once; no URL entry, bot ID, account token or setup wizard needed.
+    add_target(config_path, target["provider"], target["label"], target["url"],
+               cooldown_seconds=target["cooldown_seconds"])
+    print(f"\nOpening {target['label']}...")
+    open_link(target["url"], target["provider"])
+    print("On the website, sign in if asked and tap Vote Now.")
+    print("Return to Termux only after the website shows your vote succeeded.")
+    answer = input("Website said your vote SUCCEEDED? [y/N]: ").strip().lower()
+    if answer not in ("y", "yes"):
+        print("Not recorded. You can check again whenever you want.")
+        return
+    ledger = VoteLedger(db_path)
+    try:
+        due = ledger.record_self_report(target)
+    finally:
+        ledger.close()
+    print(f"Vote recorded (your confirmation). Next check {display_time(due)}.")
+    print("No bump cooldowns or commands were changed.")
+
+
 def menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
+    """One numbered tap per directory, with advanced setup out of the way."""
     while True:
-        show_vote_status(config_path, db_path)
-        print("\n1. Add free voting directory")
-        print("2. Open an official voting page")
-        print("3. Record vote after website confirms success")
-        print("4. Remove a voting target")
-        print("0. Back")
+        targets = quick_targets(config_path)
+        states = read_states(db_path)
+        now = time.time()
+        print("\nTHE 420 LOBBY | FREE VOTES")
+        print("Tap a number to open its website and vote.")
+        for number, target in enumerate(targets, 1):
+            print(f"{number}. {target['label']}  [{short_status(target, states, now)}]")
+        add_number = len(targets) + 1
+        remove_number = add_number + 1
+        print(f"{add_number}. Add another free voting website")
+        print(f"{remove_number}. Remove a saved voting website")
+        print("0. Back to bumps")
         choice = input("Choose: ").strip()
         if choice == "0":
             return
         try:
-            if choice == "1":
+            if choice == str(add_number):
                 add_interactive(config_path)
-            elif choice in {"2", "3", "4"}:
-                targets = configured_targets(read_config(config_path))
-                idx = choose_target(targets)
-                if idx is None:
-                    continue
-                target = targets[idx]
-                if choice == "2":
-                    open_link(target["url"], target["provider"])
-                    print("Return here after voting. Opening the page never marks success.")
-                elif choice == "3":
-                    if input("Did the website CONFIRM your vote succeeded? [y/N]: ").strip().lower() == "y":
-                        ledger = VoteLedger(db_path)
-                        try:
-                            due = ledger.record_self_report(target)
-                        finally:
-                            ledger.close()
-                        print(f"Self-reported vote saved. Eligible again no earlier than {display_time(due)}.")
-                    else:
-                        print("Not recorded. No cooldown was changed.")
-                elif choice == "4":
-                    if input("Remove this voting link? History is retained. [y/N]: ").strip().lower() == "y":
-                        remove_target(config_path, idx)
+            elif choice == str(remove_number):
+                saved = configured_targets(read_config(config_path))
+                index = choose_target(saved)
+                if index is not None and input("Remove this link? [y/N]: ").strip().lower() == "y":
+                    remove_target(config_path, index)
+                    print("Saved link removed. Vote history and bump settings remain.")
+            elif choice.isdecimal() and 1 <= int(choice) <= len(targets):
+                vote_once(targets[int(choice) - 1], config_path, db_path)
             else:
-                print("Choose a number shown above.")
+                print("Choose one of the numbers shown.")
         except (OSError, ValueError, sqlite3.Error) as exc:
-            print(f"Voting action could not be completed: {exc}")
-
+            print(f"Could not complete this voting action: {exc}")
 
 if __name__ == "__main__":
     menu()
