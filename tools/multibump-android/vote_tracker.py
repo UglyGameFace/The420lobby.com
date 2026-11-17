@@ -7,6 +7,7 @@ never attempts to automate a Discord user account or claim website verification.
 from __future__ import annotations
 
 from datetime import datetime
+from contextlib import closing
 import getpass
 import ipaddress
 from pathlib import Path
@@ -182,7 +183,7 @@ def read_states(db_path: Path) -> dict[str, tuple[float, float]]:
     if not db_path.is_file():
         return {}
     try:
-        with sqlite3.connect(f"{db_path.resolve().as_uri()}?mode=ro", uri=True, timeout=3) as db:
+        with closing(sqlite3.connect(f"{db_path.resolve().as_uri()}?mode=ro", uri=True, timeout=3)) as db:
             table = db.execute("""SELECT 1 FROM sqlite_master
                 WHERE type='table' AND name='vote_state'""").fetchone()
             if not table:
