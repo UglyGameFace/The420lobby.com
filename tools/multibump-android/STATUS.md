@@ -73,3 +73,27 @@ Choose 3 for read-only status, or 2 to start. Running `multibump` later reopens 
 - Notifications are **provider-reported events**, not cryptographic vote
   proofs and not automated vote submission. The original vote-auto-cast goal
   is blocked by vendor API/terms, not marked complete.
+
+## v15.4: official TheDiscordList vote-only integration (November 17, 2026)
+
+- Registered an independently configured `vote_services` profile for the
+  official TheDiscordList bot (application 1522501063456985179). An owner
+  chooses menu 8 → 1 once for a configured guild; it never joins the bump
+  dispatcher's `services` array or issues `/upvote` as a user.
+- Official member `/upvote` counts once per server/member every 12h after
+  the bot is installed and the server listing is public. Both installation
+  and listing ownership remain user-controlled Discord actions.
+- Optional TDL `listing.upvoted` provider event webhook: menu 8 → 2;
+  filters exact guild, channel, webhook ID, creation date and message text;
+  append-only deduped provider notices separate from D-INVITES and bump state.
+  Only the numeric webhook ID is persisted, never the webhook token.
+- Seven-provider verified API/policy matrix is documented in
+  `VOTE_PROVIDER_APIS.md`. TDL's signed JSON and bot stats endpoints do
+  not grant automatic user vote submission. The directory prohibits
+  scripted ranking manipulation.
+- Added regression tests for one-guild and multi-guild opt-in, idempotent
+  settings, source checking, no automatic transport, and private webhook
+  configuration. TDL live webhook formatting and provider acceptance
+  require on-device verification.
+- Status: implementation validated in offline Android CI; website npm
+  security audit remains a separate failure; PR draft, not production-live.
