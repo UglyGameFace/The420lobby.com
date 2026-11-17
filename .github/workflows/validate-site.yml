@@ -10,6 +10,21 @@ permissions:
   contents: read
 
 jobs:
+  tdl-signed-webhook:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node for provider webhook unit tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Verify signed TDL receipts, replay protection and webhook routing
+        run: |
+          node --check functions/_lib/tdl-vote-webhook.mjs
+          node --test tests/tdl-vote-webhook.test.mjs
+
   multibump-android:
     runs-on: ubuntu-latest
     timeout-minutes: 10
