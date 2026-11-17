@@ -17,6 +17,7 @@ import time
 from urllib.parse import urlsplit
 
 from manage import read_config, save_config
+from vote_capabilities import format_capabilities
 
 ROOT = Path(__file__).resolve().parent
 CONFIG = ROOT / "config.json"
@@ -342,8 +343,8 @@ def vote_once(target: dict, config_path: Path, db_path: Path, *,
     print("No bump cooldowns or commands were changed.")
 
 
-def menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
-    """One numbered tap per directory, with advanced setup out of the way."""
+def manual_menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
+    """Optional old manual listing workflow, never called automatically."""
     while True:
         targets = quick_targets(config_path)
         states = read_states(db_path)
@@ -375,6 +376,22 @@ def menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
                 print("Choose one of the numbers shown.")
         except (OSError, ValueError, sqlite3.Error) as exc:
             print(f"Could not complete this voting action: {exc}")
+
+def menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
+    """Show all configured services by default, never launch a browser."""
+    while True:
+        for line in format_capabilities(read_config(config_path)):
+            print(line)
+        print("\n1. Optional: view manual voting links and self-reported history")
+        print("0. Back to bumper")
+        choice = input("Choose [Enter = back]: ").strip()
+        if choice in {"", "0"}:
+            return
+        if choice == "1":
+            manual_menu(config_path, db_path)
+        else:
+            print("Choose one of the displayed numbers.")
+
 
 if __name__ == "__main__":
     menu()
