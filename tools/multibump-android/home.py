@@ -194,7 +194,7 @@ def run_bumper(path: Path = CONFIG):
     if not (ROOT / ".venv-debian" / "pyvenv.cfg").exists():
         print("The Debian Python setup is missing. Use 'bash install-termux.sh' once.")
         return
-    print("\nStarting MultiBump v15. If opted in, your saved login will be reused.")
+    print("\nStarting MultiBump v15.1. If opted in, your saved login will be reused.")
     print("Discord prohibits self-bots; using a human account risks account termination.")
     print("Press Ctrl+C to stop and return to this menu.\n")
     try:
@@ -243,7 +243,7 @@ def edit_timing(path: Path = CONFIG):
 
 
 def main() -> int:
-    print("\nMULTIBUMP v15  |  EASY MODE")
+    print("\nMULTIBUMP v15.1  |  EASY MODE")
     while True:
         raw = read_config(CONFIG)
         count = sum(bool(s.get("enabled", True)) for s in raw["services"])
