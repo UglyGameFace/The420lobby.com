@@ -9,7 +9,7 @@ fi
 target="$HOME/multibump-selfbot"
 mkdir -p "$target"
 if [[ "$source_dir" != "$target" ]]; then
-  for filename in bumper.py response_reader.py shared_bump.py status_view.py vote_capabilities.py vote_tracker.py vote_tracker.sh command_lookup.py engine.py manage.py home.py credentials.py doctor.py requirements.txt service_catalog.json README.md STATUS.md run-termux.sh install-termux.sh setup-debian.sh easy-install.sh multibump.sh config.example.json .gitignore; do
+  for filename in bumper.py response_reader.py shared_bump.py status_view.py vote_capabilities.py vote_receipts.py vote_tracker.py vote_tracker.sh command_lookup.py engine.py manage.py home.py credentials.py doctor.py requirements.txt service_catalog.json README.md STATUS.md run-termux.sh install-termux.sh setup-debian.sh easy-install.sh multibump.sh config.example.json .gitignore; do
     if [[ -f "$source_dir/$filename" ]]; then
       cp -f "$source_dir/$filename" "$target/$filename"
     fi
