@@ -97,3 +97,44 @@ Choose 3 for read-only status, or 2 to start. Running `multibump` later reopens 
   require on-device verification.
 - Status: implementation validated in offline Android CI; website npm
   security audit remains a separate failure; PR draft, not production-live.
+
+## v15.4 signed TDL provider receipts / Cloudflare integration — November 17, 2026
+
+**Objective:** Real, verified TDL server upvote receipts without unreliable
+browser handoff or self-reported success. Unattended vote submission is not
+available through an authorized provider API and is prohibited by TDL rules.
+
+**Code:** `functions/_lib/tdl-vote-webhook.mjs` handles TDL's signed
+`listing.upvoted` JSON event at `POST /api/tdl/vote-webhook` on the public
+site, with exact server listing ID, HMAC-SHA256 raw-body verification,
+5-minute timestamp tolerance, body-size limit, exact UUID delivery ID,
+replay deduplication and fail-closed secrets/DB checks. It stores no voter
+names, Discord IDs, payloads, or webhook tokens. `webhook.ping` is
+acknowledged but never counted as a vote.
+
+**Production DB migration:** Cloudflare D1 `the420lobby-arcade`
+(`7821b56b-0e32-4798-afa8-bf29220d70b1`) was safely updated with
+`tdl_vote_receipts` and `tdl_votes_recent` on Nov 17. A separate read
+of `sqlite_master` confirmed both exist. No previous tables or bump rows
+were changed. SQL is committed as `migrations/0005_tdl_vote_receipts.sql`.
+
+**Validation:** Exact-head CI jobs `multibump-android`,
+`tdl-signed-webhook` (signed valid/invalid/stale/wrong-listing/duplicate
+requests, route, no voter-data retention) and
+`site-regression-independent` (Node tests, typecheck, production static
+build, Pages function compilation) passed. The original website `test`
+job remains red on the independent unpatched picomatch high-severity audit;
+no security suppression introduced.
+
+**Live blockers:** Production Pages project `the420lobby-com` still deploys
+`main` at SHA `45c2a853`; the signed webhook route is only in draft PR #67.
+Cloudflare production environment does **not** have
+`TDL_WEBHOOK_SECRET` configured. The listing owner must create/claim the
+TDL listing, authorize the official bot, configure the JSON webhook and
+copy its one-time signing secret into an encrypted Cloudflare Production
+secret. Neither an accepted live member vote nor its delivery has been
+verified. No changes were made to users' live Discord accounts.
+
+**Next:** Preserve the PR and all passing tests; finish provider-owned OAuth
+and webhook secret setup, reconcile website dependency advisory without
+false-green suppression, then deploy and verify a genuine signed event.
