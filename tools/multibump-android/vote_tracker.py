@@ -7,6 +7,7 @@ never attempts to automate a Discord user account or claim website verification.
 from __future__ import annotations
 
 from datetime import datetime
+import getpass
 import ipaddress
 from pathlib import Path
 import re
@@ -18,6 +19,7 @@ from urllib.parse import urlsplit
 
 from manage import read_config, save_config
 from vote_capabilities import format_capabilities
+from vote_receipts import configured_webhooks, recent_count
 
 ROOT = Path(__file__).resolve().parent
 CONFIG = ROOT / "config.json"
@@ -380,20 +382,101 @@ def manual_menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
         except (OSError, ValueError, sqlite3.Error) as exc:
             print(f"Could not complete this voting action: {exc}")
 
+def parse_discord_webhook_id(secret_url: str) -> str:
+    """Extract only the webhook ID. Never persist or print its token."""
+    if not isinstance(secret_url, str) or len(secret_url) > 400:
+        raise ValueError("Invalid Discord webhook URL.")
+    url = urlsplit(secret_url.strip())
+    if (url.scheme != "https" or url.hostname not in {"discord.com", "discordapp.com"}
+            or url.username or url.password or url.port is not None
+            or url.query or url.fragment):
+        raise ValueError("Paste a normal private Discord webhook URL.")
+    matched = re.fullmatch(
+        r"/api(?:/v\d{1,2})?/webhooks/(\d{15,22})/[A-Za-z0-9._-]{20,}",
+        url.path)
+    if not matched:
+        raise ValueError("Expected Discord webhook URL with an ID and token.")
+    return matched.group(1)
+
+
+def setup_discordinvites_notifications(config_path: Path = CONFIG) -> bool:
+    """A one-time receipt setup; no webhook token enters config or source."""
+    raw = read_config(config_path)
+    services = [item for item in raw["services"] if item.get("enabled", True) is not False
+                and str(item.get("application_id")) == "678211574183362571"]
+    if not services:
+        print("D-INVITES is not configured as a bump service yet.")
+        return False
+    print("\nCONNECT OFFICIAL D-INVITES VOTE NOTIFICATIONS")
+    print("In DiscordInvites server settings, enable the New Vote webhook event.")
+    print("Use a Discord webhook in a private staff channel. Keep the URL secret.")
+    print("Set its custom notification text to: The 420 Lobby received a new vote")
+    if len(services) == 1:
+        chosen = services[0]
+    else:
+        for index, item in enumerate(services, 1):
+            print(f"{index}. {item['label']} (guild {str(item['guild_id'])[-5:]})")
+        answer = input("Server number [Enter = back]: ").strip()
+        if not answer:
+            return False
+        if not answer.isdecimal() or not 1 <= int(answer) <= len(services):
+            raise ValueError("Select an existing D-INVITES server.")
+        chosen = services[int(answer) - 1]
+    # Default to the existing bump channel. Allow a different channel by
+    # pasting one Discord message link, never raw IDs or bot tokens.
+    from home import parse_channel_link
+    link = input("Notification channel message link [Enter = bump channel]: ").strip()
+    guild_id, channel_id = str(chosen["guild_id"]), str(chosen["channel_id"])
+    if link:
+        location = parse_channel_link(link)
+        if location is None or location[0] != guild_id:
+            raise ValueError("Link must be from the selected Discord server.")
+        channel_id = location[1]
+    secret_url = getpass.getpass("Private Discord webhook URL (hidden; never saved): ")
+    webhook_id = parse_discord_webhook_id(secret_url)
+    # Deliberately no token in the persisted record.
+    rules = raw.setdefault("vote_notifications", [])
+    if not isinstance(rules, list):
+        raise ValueError("vote_notifications must be a list.")
+    entry = {
+        "provider": "d-invites", "guild_id": guild_id,
+        "channel_id": channel_id, "webhook_id": webhook_id,
+        "vote_phrase": "The 420 Lobby received a new vote",
+    }
+    rules[:] = [item for item in rules if not (
+        isinstance(item, dict) and item.get("provider") == "d-invites"
+        and str(item.get("guild_id")) == guild_id)]
+    rules.append(entry)
+    configured_webhooks(raw)
+    save_config(config_path, raw)
+    print("Vote notifications configured. Restart the running bumper to observe them.")
+    print("Receipts show real provider webhook messages, not automatic vote submissions.")
+    return True
+
+
 def menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
     """Show all configured services by default, never launch a browser."""
     while True:
         for line in format_capabilities(read_config(config_path)):
             print(line)
-        print("\n1. Optional: view manual voting links and self-reported history")
+        notices = recent_count(db_path)
+        print(f"\nD-INVITES provider vote notifications seen (24h): {notices.get('d-invites', 0)}")
+        print("These are webhook notices, not proof your personal account voted.")
+        print("1. Connect D-INVITES provider vote notifications (one-time)")
+        print("2. Optional: manual voting links and self-reported notes")
         print("0. Back to bumper")
         choice = input("Choose [Enter = back]: ").strip()
         if choice in {"", "0"}:
             return
-        if choice == "1":
-            manual_menu(config_path, db_path)
-        else:
-            print("Choose one of the displayed numbers.")
+        try:
+            if choice == "1":
+                setup_discordinvites_notifications(config_path)
+            elif choice == "2":
+                manual_menu(config_path, db_path)
+            else:
+                print("Choose one of the displayed numbers.")
+        except (OSError, ValueError) as exc:
+            print(f"Could not configure vote notifications: {exc}")
 
 
 if __name__ == "__main__":
