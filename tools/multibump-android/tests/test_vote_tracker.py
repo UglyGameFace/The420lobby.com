@@ -130,6 +130,36 @@ class VoteTrackerTests(unittest.TestCase):
             self.assertFalse(db_path.exists())
             self.assertEqual(read_states(db_path), {})
 
+    def test_vote_record_does_not_change_existing_bump_schedule_or_queue(self):
+        from engine import Service, Store
+        from unittest.mock import Mock
+        with TemporaryDirectory() as td:
+            db_path = Path(td) / "state.sqlite3"
+            service = Service("disboard-test", "DISBOARD", 123456789012345678,
+                              123456789012345679, 302050872383242240, "bump",
+                              7200, ("bump done",), ("cooldown",), {},
+                              302050872383242240)
+            store = Store(db_path, rng=Mock(randint=Mock(side_effect=lambda low, high: low)))
+            try:
+                store.init_services([service], now=100000)
+                prior_states = store.states()
+                prior_due = store.next_attempt_at(service)
+                prior_dispatch = store.db.execute(
+                    "SELECT next_send_at FROM dispatch_clock").fetchone()
+                ledger = VoteLedger(db_path)
+                try:
+                    ledger.record_self_report(target(), now=100001)
+                finally:
+                    ledger.close()
+                self.assertEqual(store.states(), prior_states)
+                self.assertEqual(store.next_attempt_at(service), prior_due)
+                self.assertEqual(store.db.execute(
+                    "SELECT next_send_at FROM dispatch_clock").fetchone(), prior_dispatch)
+                self.assertEqual(store.db.execute(
+                    "SELECT COUNT(*) FROM events").fetchone()[0], 0)
+            finally:
+                store.close()
+
     def test_legacy_bump_database_status_remains_read_only(self):
         with TemporaryDirectory() as td:
             base = Path(td)
