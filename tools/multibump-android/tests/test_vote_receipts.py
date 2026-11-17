@@ -1,0 +1,157 @@
+"""Offline tests: exact-source provider vote notifications, never generated votes."""
+import asyncio
+from datetime import datetime, timezone
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from types import SimpleNamespace as NS
+import unittest
+from unittest.mock import Mock
+
+from engine import Service, Store
+from vote_receipts import (
+    configured_webhooks, observe, VoteNoticeLedger, recent_count,
+    recover_history,
+)
+
+NOW = 1794740000.0
+GUILD = "1514374173517152418"
+CHANNEL = "1514374173517152419"
+WEBHOOK = "1531117218291646606"
+BOT = "678211574183362571"
+PHRASE = "The 420 Lobby received a new vote"
+
+
+def raw_config():
+    return {
+        "services": [{"id": "d-invites", "guild_id": GUILD,
+                      "application_id": BOT, "enabled": True}],
+        "vote_notifications": [{
+            "provider": "d-invites", "guild_id": GUILD, "channel_id": CHANNEL,
+            "webhook_id": WEBHOOK, "vote_phrase": PHRASE,
+        }],
+    }
+
+
+def svc():
+    return Service("d-invites", "D-INVITES", int(GUILD), int(CHANNEL), int(BOT),
+                   "bump", 7200, ("bump done",), ("cooldown",), {},
+                   int(BOT))
+
+
+def msg(*, webhook=WEBHOOK, guild=GUILD, channel=CHANNEL, content=PHRASE,
+        age=30, mid=9999):
+    return NS(webhook_id=int(webhook) if webhook else None, id=mid,
+              author=NS(id=123456789012345678),
+              channel=NS(id=int(channel), guild=NS(id=int(guild))),
+              guild=NS(id=int(guild)), content=content, embeds=[],
+              created_at=datetime.fromtimestamp(NOW-age, timezone.utc))
+
+
+class VoteReceiptTests(unittest.TestCase):
+    def test_config_requires_enabled_service_and_valid_exact_source(self):
+        rules = configured_webhooks(raw_config())
+        self.assertEqual(len(rules), 1)
+        self.assertEqual(rules[0].webhook_id, WEBHOOK)
+        self.assertEqual(configured_webhooks({"services": []}), ())
+        invalid = raw_config()
+        invalid["services"][0]["enabled"] = False
+        with self.assertRaises(ValueError):
+            configured_webhooks(invalid)
+        for key, value in [("provider", "discordify"), ("webhook_id", "bad"),
+                           ("vote_phrase", "hello")]:
+            invalid = raw_config()
+            invalid["vote_notifications"][0][key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                configured_webhooks(invalid)
+
+    def test_observe_exact_channel_guild_webhook_and_message(self):
+        rules = configured_webhooks(raw_config())
+        receipt = observe(msg(), rules, now=NOW)
+        self.assertEqual(receipt.provider, "d-invites")
+        self.assertEqual(receipt.message_id, "9999")
+        for overrides in (
+            {"webhook": "1531117218291646607"},
+            {"webhook": None},
+            {"guild": "1514374173517152417"},
+            {"channel": "1514374173517152417"},
+            {"content": "Vote reminder: The 420 Lobby"},
+            {"age": 86401},
+            {"age": -90},
+        ):
+            with self.subTest(**overrides):
+                self.assertIsNone(observe(msg(**overrides), rules, now=NOW))
+
+    def test_observation_deduplicates_survives_restart_and_does_not_touch_bumps(self):
+        with TemporaryDirectory() as td:
+            path = Path(td) / "state.sqlite3"
+            store = Store(path, rng=Mock(randint=Mock(side_effect=lambda a, b: a)))
+            service = svc()
+            store.init_services([service], now=100)
+            before_states = store.states()
+            before_due = store.next_attempt_at(service)
+            before_queue = store.db.execute(
+                "SELECT next_send_at FROM dispatch_clock").fetchone()
+            ledger = VoteNoticeLedger(store.db)
+            proof = observe(msg(), configured_webhooks(raw_config()), now=NOW)
+            self.assertTrue(ledger.record(proof, now=NOW))
+            self.assertFalse(ledger.record(proof, now=NOW))
+            self.assertEqual(store.states(), before_states)
+            self.assertEqual(store.next_attempt_at(service), before_due)
+            self.assertEqual(store.db.execute(
+                "SELECT next_send_at FROM dispatch_clock").fetchone(), before_queue)
+            self.assertIsNone(store.db.execute(
+                "SELECT 1 FROM sqlite_master WHERE name='vote_state'").fetchone())
+            store.close()
+            self.assertEqual(recent_count(path, now=NOW), {"d-invites": 1})
+            store = Store(path)
+            try:
+                ledger = VoteNoticeLedger(store.db)
+                self.assertFalse(ledger.record(proof, now=NOW))
+            finally:
+                store.close()
+
+    def test_status_read_only_without_database(self):
+        with TemporaryDirectory() as td:
+            path = Path(td) / "state.sqlite3"
+            self.assertEqual(recent_count(path, now=NOW), {})
+            self.assertFalse(path.exists())
+            store = Store(path)
+            store.close()
+            self.assertEqual(recent_count(path, now=NOW), {})
+
+    def test_bounded_backfill_is_idempotent_and_failure_is_reported(self):
+        rules = configured_webhooks(raw_config())
+        class Channel:
+            def history(self, *, limit, after):
+                self.limit = limit
+                async def pages():
+                    yield msg(mid=50)
+                    yield msg(mid=51)
+                    yield msg(mid=52, webhook="1531117218291646607")
+                return pages()
+        channel = Channel()
+        client = NS(get_channel=lambda _: channel)
+        with TemporaryDirectory() as td:
+            store = Store(Path(td) / "state.sqlite3")
+            ledger = VoteNoticeLedger(store.db)
+            async def backfill():
+                return await recover_history(client, rules, ledger, clock=lambda: NOW)
+            self.assertEqual(asyncio.run(backfill()), {
+                "channels_checked": 1, "new_notices": 2,
+                "failures": 0, "possibly_truncated": 0,
+            })
+            self.assertEqual(channel.limit, 200)
+            self.assertEqual(asyncio.run(backfill())["new_notices"], 0)
+            store.close()
+            class BadClient:
+                def get_channel(self, _):
+                    raise RuntimeError("history unavailable")
+            store = Store(Path(td) / "state.sqlite3")
+            ledger = VoteNoticeLedger(store.db)
+            self.assertEqual(asyncio.run(recover_history(
+                BadClient(), rules, ledger, clock=lambda: NOW))["failures"], 1)
+            store.close()
+
+
+if __name__ == "__main__":
+    unittest.main()
