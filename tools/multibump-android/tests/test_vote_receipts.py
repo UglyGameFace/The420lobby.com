@@ -204,6 +204,82 @@ class VoteReceiptTests(unittest.TestCase):
                 "SELECT COUNT(*) FROM events WHERE event='attempt'").fetchone()[0], 0)
             store.close()
 
+    def test_tdl_listing_upvoted_webhook_is_an_observed_provider_event(self):
+        from tdl_voting import TDL_APP_ID, TDL_KEY
+        raw = raw_config()
+        raw["vote_services"] = [{
+            "provider": TDL_KEY, "application_id": TDL_APP_ID,
+            "guild_id": GUILD, "mode": "member_slash_command", "enabled": True,
+        }]
+        raw["vote_notifications"].append({
+            "provider": TDL_KEY, "guild_id": GUILD, "channel_id": CHANNEL,
+            "webhook_id": "1531117218291646608", "vote_phrase": "upvoted",
+        })
+        rules = configured_webhooks(raw)
+        receipt = observe(msg(webhook="1531117218291646608",
+                              content="The 420 Lobby was upvoted by a member"),
+                          rules, now=NOW)
+        self.assertIsNotNone(receipt)
+        self.assertEqual(receipt.provider, TDL_KEY)
+        self.assertIsNone(observe(msg(webhook=WEBHOOK, content="upvoted"),
+                                  rules, now=NOW))
+        self.assertIsNone(observe(msg(webhook="1531117218291646608",
+                                      content="Listing bumped!"),
+                                  rules, now=NOW))
+        with TemporaryDirectory() as td:
+            store = Store(Path(td) / "state.sqlite3")
+            ledger = VoteNoticeLedger(store.db)
+            self.assertTrue(ledger.record(receipt, now=NOW))
+            self.assertFalse(ledger.record(receipt, now=NOW))
+            store.close()
+            self.assertEqual(recent_count(Path(td) / "state.sqlite3", now=NOW),
+                             {TDL_KEY: 1})
+
+    def test_tdl_notifications_require_selected_official_vote_only_service(self):
+        from tdl_voting import TDL_APP_ID, TDL_KEY
+        raw = raw_config()
+        raw["vote_notifications"].append({
+            "provider": TDL_KEY, "guild_id": GUILD, "channel_id": CHANNEL,
+            "webhook_id": "1531117218291646608", "vote_phrase": "upvoted",
+        })
+        with self.assertRaises(ValueError):
+            configured_webhooks(raw)
+        raw["vote_services"] = [{
+            "provider": TDL_KEY, "application_id": TDL_APP_ID,
+            "guild_id": GUILD, "mode": "member_slash_command", "enabled": True,
+        }]
+        self.assertEqual(len(configured_webhooks(raw)), 2)
+        raw["vote_notifications"][-1]["webhook_id"] = WEBHOOK
+        with self.assertRaises(ValueError):
+            configured_webhooks(raw)
+
+    def test_tdl_android_webhook_setup_never_persists_token(self):
+        from tdl_voting import TDL_APP_ID, TDL_KEY
+        from vote_tracker import setup_tdl_notifications
+        from manage import read_catalog, add, save_config, read_config
+        from unittest.mock import patch
+        with TemporaryDirectory() as td:
+            path = Path(td) / "config.json"
+            raw = {"services": []}
+            add(raw, read_catalog(), profile="disboard", guild_id=GUILD,
+                channel_id=CHANNEL, non_interactive=True)
+            raw["vote_services"] = [{
+                "provider": TDL_KEY, "guild_id": GUILD,
+                "application_id": TDL_APP_ID,
+                "mode": "member_slash_command", "enabled": True,
+            }]
+            save_config(path, raw)
+            token = "secret"+("x" * 38)
+            url = "https://discord.com/api/webhooks/1531117218291646608/" + token
+            with patch("builtins.input", return_value=""), \
+                 patch("vote_tracker.getpass.getpass", return_value=url):
+                self.assertTrue(setup_tdl_notifications(path))
+            saved = read_config(path)
+            self.assertEqual(saved["vote_notifications"][0]["provider"], TDL_KEY)
+            self.assertEqual(saved["vote_notifications"][0]["vote_phrase"], "upvoted")
+            self.assertNotIn(token, path.read_text())
+            self.assertEqual(len(saved["services"]), 1)
+
     def test_bounded_backfill_is_idempotent_and_failure_is_reported(self):
         rules = configured_webhooks(raw_config())
         class Channel:
