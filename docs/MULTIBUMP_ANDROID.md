@@ -58,3 +58,30 @@ the v14 bump observer and SQLite schedule continue unchanged.
   API calls or login simulation are implemented. Discordify's published terms
   prohibit self-bots and abusive automation. Android and provider acceptance
   remain unverified until tested by the user on device.
+
+
+## v15.2 vote-capability correction (November 17, 2026)
+
+An owner test revealed the previous v15.x free-vote feature was a
+Discordify-only manual browser link, not automatic voting. The current
+feature branch corrects the default interface to show **all configured bump
+providers** and their separate server-vote support, without invoking any
+vote endpoint, browser or slash command.
+
+- DISBOARD: no proven server-voting feature
+- OneBump: /vote supports votes for the OneBump **bot** on Top.gg,
+  not The 420 Lobby's server
+- Discodus: free server voting not verified
+- Discadia and Discordify: site-based member server votes, with no documented,
+  permitted automatic server-vote submission API established
+- D-INVITES / DiscordInvites: real member votes exist; provider terms prohibit
+  bots, scripts and automatic vote generation. Official vote event notifications
+  and custom Discord webhooks report votes; they do not submit them
+
+The previous local self-reported voting history is retained only as an explicit
+optional manual tool, never as proof of a vote. The six existing bump services,
+their command schedules, saved credentials, and SQLite state remain unchanged.
+Automated website submissions and success verification are **not implemented**
+and cannot be claimed as complete without provider permission and a published
+approved interface. The current feature PR remains draft, with independently
+passing Android regressions but existing website dependency-audit blockers.
