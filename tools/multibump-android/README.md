@@ -52,6 +52,49 @@ website endpoints, or count an unconfirmed click as a vote.
 For verified endpoint names, policy evidence, and safe
 integration alternatives, see [VOTE_PROVIDER_APIS.md](./VOTE_PROVIDER_APIS.md).
 
+## First-party signed TDL vote receipts on The 420 Lobby
+
+The site's Pages backend now has `POST /api/tdl/vote-webhook`, handling real
+`listing.upvoted` events with HMAC-SHA256, five-minute timestamp validation,
+unique `X-TDL-Delivery` IDs, and a private D1 receipt table. It **never**
+submits a vote, stores member IDs, or trusts an unauthenticated webhook.
+
+**Owner-only activation after deploying the GitHub PR:**
+
+1. In TDL, create/claim The 420 Lobby listing for Discord server
+   `1514374173517152418`, then install TDL's official bot. These require
+   your Discord permissions and OAuth approval.
+2. In that listing's **Manage → Webhooks → New endpoint**, choose the
+   server-to-server **JSON** webhook endpoint:
+   `https://the420lobby.com/api/tdl/vote-webhook`
+   and subscribe to **listing.upvoted** only.
+3. Copy the endpoint-specific **signing secret** shown once. In your Cloudflare
+   dashboard → **Workers & Pages → the420lobby-com → Settings → Variables and
+   Secrets → Production**, add an **encrypted secret**
+   named `TDL_WEBHOOK_SECRET` containing exactly the TDL secret. Do not
+   enter it in chat, source code, GitHub variables or the Termux client.
+   Redeploy the new site build if Cloudflare requires it for the binding.
+4. Use the provider's **Send test** button. That triggers `webhook.ping`,
+   acknowledged but not recorded as a vote. A separate genuine member
+   `/upvote` generates the first recorded receipt. Check the event delivery
+   log for HTTP 200.
+5. The migration `migrations/0005_tdl_vote_receipts.sql` creates an isolated
+   table for delivery IDs and receipt timestamps, not voter identities.
+   **The production D1 table and index have already been created and
+   verified** on November 17, 2026. No bump tables were changed.
+
+The endpoint fails closed with HTTP 503 until the encrypted signing secret is
+configured. It rejects expired/tampered/wrong-listing requests. The TDL
+provider's documented signature is over **raw request bytes**, not re-encoded
+JSON. The corresponding unit tests and route validation run in the
+`tdl-signed-webhook` CI job.
+
+**Do not confuse the two webhook paths.** Option 8 → 2 in Termux accepts
+TDL's **Discord-formatted** webhook and monitors it through Discord messages.
+The first-party Pages endpoint above accepts **signed JSON** directly. For
+the most reliable verification, use the signed JSON integration. Both are
+observers, never automated vote submitters.
+
 ## Historical versions (not the current voting setup)
 
 ## Upgrade from previous MultiBump (keeps your settings)
