@@ -40,3 +40,19 @@ Choose 3 for read-only status, or 2 to start. Running `multibump` later reopens 
   no false confirmation, and legacy bump database compatibility.
 - Release is **not** confirmed live: require exact-head CI and Android manual
   vote acceptance verification. Automated voting is intentionally unsupported.
+
+## v15.2: correct auto-voting scope (November 17, 2026)
+
+- Root cause of misleading v15.1: it only listed a single hard-coded
+  Discordify vote page and labeled an external browser handoff as voting support.
+- Main menu 8 and status now inspect all six configured application IDs,
+  distinguishing *server votes* from OneBump bot votes and bump-only services.
+- No browser opens when inspecting status. Old manual vote history is retained
+  explicitly as a separate optional tool and is never treated as verified.
+- No real auto-submit endpoint has been verified/authorized. DiscordInvites
+  explicitly prohibits automated votes. No requests to unauthorized endpoints,
+  user-token automation, or invented successful votes are added.
+- Full offline regression and exact-head CI must pass before considering merge.
+- Website npm dependency audit, real Android validation, and provider
+  authorization remain separate blockers. This PR must stay draft until scope
+  is reconciled with the owner's original automatic voting goal.
