@@ -1,6 +1,53 @@
 # MultiBump Easy Mode (Android / Termux)
 
-**Once set up, type just `multibump` in Termux.** No need to use Python filenames, remember a folder, edit JSON, or reinstall Debian.
+## v15: free server-directory votes (Android)
+
+MultiBump now includes **free directory voting alongside bumping**. This is a
+separate **manual, account-level 24-hour vote ledger**, not an automatic vote
+sender. Opening a listing or completing Discord OAuth **never** marks a vote
+successful. Only record it after the directory visibly confirms the vote.
+
+- **Option 8** in `multibump`: add an official voting link, open it on Android,
+  record an actual confirmed vote, or remove the link.
+- **`multibump-votes`** in a *second Termux session*: use the vote menu while the
+  original bumper continues to run. No credentials, database reset or cloud
+  manager connection is needed.
+- **Discordify** has a free server vote once per 24 hours *across all servers*
+  for that account. The 420 Lobby's owner-supplied official listing URL is the
+  default: `https://discordify.net/server/the-420-lobby`. The user completes
+  Discord sign-in and votes on the real website.
+- **Discadia** has free directory voting; paste the URL of your own specific
+  server listing. Other free voting directories can be added with an HTTPS
+  listing and their documented account cooldown (24-168 hours).
+- All account-level votes for the *same directory* share one clock across
+  multiple server listings. Different directories have separate clocks.
+- Bump `schedule`, public bump cooldowns, command timers, and shared send
+  queue are unchanged. The vote ledger is stored in separate
+  `vote_state`/`vote_events` tables in the existing private SQLite database.
+- MultiBump cannot verify a vote externally without a provider-authorized,
+  user-scoped confirmation API. Status is explicitly labeled **self-reported**.
+  No hidden website endpoints, captcha bypass, automated OAuth, fake votes or
+  multi-account vote farming are attempted.
+
+**Update an existing Termux installation from GitHub main** (this preserves
+`config.json`, your saved login and `bump_state.sqlite3`):
+
+```bash
+pkg install -y git
+cd "$HOME"
+if [ -d multibump-source/.git ]; then
+  git -C multibump-source pull --ff-only
+else
+  git clone --depth 1 https://github.com/UglyGameFace/The420lobby.com.git multibump-source
+fi
+bash "$HOME/multibump-source/tools/multibump-android/easy-install.sh"
+```
+
+The old v14 ZIP instructions below apply only to the earlier package. To get
+vote support, use the updated repository source once this change is on main.
+
+
+**Once set up, type `multibump` for bumps or `multibump-votes` for voting in another Termux session.** No need to use Python filenames, remember a folder, edit JSON, or reinstall Debian.
 
 ## Upgrade from previous MultiBump (keeps your settings)
 
