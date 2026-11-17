@@ -11,7 +11,7 @@ if [[ "$source_dir" != "$HOME" && "$source_dir" != "$HOME/"* ]]; then
   mkdir -p "$target"
   echo "Moving runnable files to Termux private storage: $target"
   # Preserve user configuration and history if a previous installation exists.
-  for filename in bumper.py response_reader.py shared_bump.py status_view.py vote_capabilities.py vote_tracker.py vote_tracker.sh command_lookup.py engine.py manage.py home.py credentials.py doctor.py requirements.txt service_catalog.json README.md STATUS.md run-termux.sh install-termux.sh setup-debian.sh easy-install.sh multibump.sh config.example.json .gitignore; do
+  for filename in bumper.py response_reader.py shared_bump.py status_view.py vote_capabilities.py vote_receipts.py vote_tracker.py vote_tracker.sh command_lookup.py engine.py manage.py home.py credentials.py doctor.py requirements.txt service_catalog.json README.md STATUS.md run-termux.sh install-termux.sh setup-debian.sh easy-install.sh multibump.sh config.example.json .gitignore; do
     [[ -f "$source_dir/$filename" ]] && cp -f "$source_dir/$filename" "$target/$filename"
   done
   for filename in config.json bump_state.sqlite3; do
