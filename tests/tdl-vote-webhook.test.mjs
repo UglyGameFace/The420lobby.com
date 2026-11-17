@@ -65,7 +65,7 @@ test("TDL signed delivery is stored once and does not retain voter identity", as
 test("TDL API route works on main site and rejects unsigned requests", async () => {
   const db = fakeDb();
   const env = {DB: db, TDL_WEBHOOK_SECRET: SECRET, SITE_ORIGIN: "https://the420lobby.com"};
-  const context = {request: signed(), env, next: async () => new Response("static")};
+  const context = {request: signed(event(), {when: Math.floor(Date.now() / 1000)}), env, next: async () => new Response("static")};
   const accepted = await handleRequest(context);
   assert.equal(accepted.status, 200);
   assert.equal(db.items.size, 1);
