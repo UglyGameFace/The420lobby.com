@@ -21,7 +21,7 @@ from urllib.parse import urlsplit
 from manage import read_config, save_config
 from vote_capabilities import format_capabilities
 from vote_receipts import configured_webhooks, recent_count
-from tdl_voting import active_guilds, setup_in_menu as setup_tdl_vote_service, TDL_WEBHOOK_GUIDE
+from tdl_voting import active_guilds, setup_in_menu as setup_tdl_vote_service, TDL_WEBHOOK_GUIDE, change_auto_vote_in_menu
 
 ROOT = Path(__file__).resolve().parent
 CONFIG = ROOT / "config.json"
@@ -538,6 +538,7 @@ def menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
         print("2. Connect TDL provider upvote notifications (one-time)")
         print("3. Connect D-INVITES provider vote notifications (one-time)")
         print("4. Optional manual voting links and self-reported notes")
+        print("5. TDL /upvote through the bumper schedule (unofficial, account risk)")
         print("0. Back to bumper")
         choice = input("Choose [Enter = back]: ").strip()
         if choice in {"", "0"}:
@@ -551,6 +552,8 @@ def menu(config_path: Path = CONFIG, db_path: Path = STATE) -> None:
                 setup_discordinvites_notifications(config_path)
             elif choice == "4":
                 manual_menu(config_path, db_path)
+            elif choice == "5":
+                change_auto_vote_in_menu(config_path)
             else:
                 print("Choose one of the displayed numbers.")
         except (OSError, ValueError) as exc:
