@@ -181,6 +181,9 @@ def show_status(path: Path = CONFIG, db_path: Path = STATE):
     timing = Timing.from_config(raw)
     print(f"Timing: cooldown + {timing.extra_delay_min_seconds / 60:g}..{timing.extra_delay_max_seconds / 60:g} minutes extra")
     labels = {str(s["id"]): str(s.get("label", s["id"])) for s in raw["services"]}
+    from tdl_voting import configured_auto_vote_services
+    for vote in configured_auto_vote_services(raw):
+        labels[vote.key] = vote.label
     show_local_status(db_path, labels)
     from vote_tracker import show_vote_status
     show_vote_status(path, db_path)
