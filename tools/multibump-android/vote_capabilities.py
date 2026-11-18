@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
-from tdl_voting import TDL_APP_ID, active_guilds, candidate_guilds
+from tdl_voting import TDL_APP_ID, active_guilds, candidate_guilds, configured_vote_services
 
 # Keys are official application IDs from the existing six-service catalog,
 # not mutable display labels or guessed /vote commands.
@@ -111,9 +111,13 @@ def format_capabilities(config: dict[str, Any]) -> list[str]:
     # TDL is vote-only. Never add it to engine.load_config().services or
     # the recurring slash-command bumper; its /upvote requires a real member.
     enabled_tdl = active_guilds(config)
+    automated_guilds = {str(item["guild_id"]) for item in configured_vote_services(config)
+                        if item.get("enabled", True) is not False and item.get("auto_submit", False) is True}
     if enabled_tdl:
         for guild in sorted(enabled_tdl):
-            lines.append(f"{len(services)+1}. TheDiscordList [VOTE ONLY /upvote; SETUP SAVED]")
+            status = ("SCHEDULED /upvote; UNOFFICIAL SELF-BOT RISK"
+                      if guild in automated_guilds else "VOTE ONLY /upvote; SETUP SAVED")
+            lines.append(f"{len(services)+1}. TheDiscordList [{status}]")
             lines.append(f"   Guild ending {guild[-5:]}; members vote every 12h. "
                          "Official bot/listing activation not remotely verified.")
     elif candidate_guilds(config):
