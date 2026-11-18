@@ -181,7 +181,12 @@ def show_status(path: Path = CONFIG, db_path: Path = STATE):
     timing = Timing.from_config(raw)
     print(f"Timing: cooldown + {timing.extra_delay_min_seconds / 60:g}..{timing.extra_delay_max_seconds / 60:g} minutes extra")
     labels = {str(s["id"]): str(s.get("label", s["id"])) for s in raw["services"]}
+    from tdl_voting import configured_auto_vote_services
+    for vote in configured_auto_vote_services(raw):
+        labels[vote.key] = vote.label
     show_local_status(db_path, labels)
+    from vote_tracker import show_vote_status
+    show_vote_status(path, db_path)
 
 
 def run_bumper(path: Path = CONFIG):
@@ -192,7 +197,7 @@ def run_bumper(path: Path = CONFIG):
     if not (ROOT / ".venv-debian" / "pyvenv.cfg").exists():
         print("The Debian Python setup is missing. Use 'bash install-termux.sh' once.")
         return
-    print("\nStarting MultiBump v14. If opted in, your saved login will be reused.")
+    print("\nStarting MultiBump v15.4. If opted in, your saved login will be reused.")
     print("Discord prohibits self-bots; using a human account risks account termination.")
     print("Press Ctrl+C to stop and return to this menu.\n")
     try:
@@ -241,11 +246,14 @@ def edit_timing(path: Path = CONFIG):
 
 
 def main() -> int:
-    print("\nMULTIBUMP v14  |  EASY MODE")
+    print("\nMULTIBUMP v15.4  |  EASY MODE")
     while True:
         raw = read_config(CONFIG)
         count = sum(bool(s.get("enabled", True)) for s in raw["services"])
         print(f"\n{count} bump service(s) enabled")
+        from tdl_voting import active_guilds
+        tdl_count = len(active_guilds(raw))
+        print(f"{tdl_count} TheDiscordList vote-only server(s) configured")
         print("1. Add multiple bump bots")
         print("2. START bumper")
         print("3. View status")
@@ -253,6 +261,7 @@ def main() -> int:
         print("5. Add Discordify + D-INVITES (reuse your bump channel)")
         print("6. Saved login (change / forget)")
         print("7. Timing (extra wait after cooldown)")
+        print("8. Server votes (TDL /upvote + providers)")
         print("0. Exit")
         choice = input("Choose: ").strip()
         try:
@@ -273,6 +282,9 @@ def main() -> int:
                 manage_login()
             elif choice == "7":
                 edit_timing()
+            elif choice == "8":
+                from vote_tracker import menu as vote_menu
+                vote_menu(CONFIG, STATE)
             else:
                 print("Choose a number shown above.")
         except (OSError, ValueError) as exc:
