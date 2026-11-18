@@ -19,6 +19,7 @@ from response_reader import message_body, response_matches, evaluate
 from command_lookup import CommandIndex
 from shared_bump import public_evidence, recover_public_history
 from vote_receipts import configured_webhooks, VoteNoticeLedger, observe, recover_history as recover_vote_history
+from tdl_voting import configured_auto_vote_services
 
 log = logging.getLogger("multibump")
 
@@ -282,9 +283,12 @@ def main():
         list_states(args.state)
         return
     config, services = load_config(args.config)
-    print(f"Configuration valid: {len(services)} service(s)")
+    vote_services = configured_auto_vote_services(config)
+    services.extend(vote_services)
+    print(f"Configuration valid: {len(services) - len(vote_services)} bumps, {len(vote_services)} scheduled TDL vote(s)")
     for s in services:
-        print(f"  {s.key}: /{s.command_name} app={s.application_id} cooldown={s.cooldown_seconds}s")
+        kind = "VOTE (unofficial account automation)" if s.key.startswith("vote-tdl-") else "BUMP"
+        print(f"  [{kind}] {s.key}: /{s.command_name} app={s.application_id} cooldown={s.cooldown_seconds}s")
     if args.check:
         return
     token_override = None
