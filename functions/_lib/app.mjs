@@ -5,6 +5,7 @@ import {startArcadeV2Run, finishArcadeV2Run, arcadeV2Leaderboards, ARCADE_V2_RUL
 import {getCheers, joinCheers, sparkCheers, cheersPresence} from "./cheers.mjs";
 import {handleBumpManager} from "./bump-manager.mjs";
 import {readShieldStatus} from "./shield-status.mjs";
+import {handleTDLVoteWebhook} from "./tdl-vote-webhook.mjs";
 
 export async function handleRequest(context, options = {}) {
   const {request, env} = context;
@@ -63,6 +64,9 @@ export async function handleRequest(context, options = {}) {
     } else if (path === "/api/shield/status") {
       allowMethod(request, ["GET"]);
       response = await readShieldStatus(request, env, options.fetcher);
+    } else if (path === "/api/tdl/vote-webhook") {
+      allowMethod(request, ["POST"]);
+      response = await handleTDLVoteWebhook(request, env);
     } else if (path === "/api/bump-manager" || path.startsWith("/api/bump-manager/")) {
       allowMethod(request, ["GET", "POST"]);
       response = await handleBumpManager(request, env, path);

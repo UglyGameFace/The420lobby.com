@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class TermuxInstallTests(unittest.TestCase):
     def test_shell_scripts_have_valid_syntax(self):
-        for name in ("install-termux.sh", "setup-debian.sh", "run-termux.sh", "easy-install.sh", "multibump.sh"):
+        for name in ("install-termux.sh", "setup-debian.sh", "run-termux.sh", "easy-install.sh", "multibump.sh", "vote_tracker.sh"):
             with self.subTest(script=name):
                 completed = subprocess.run(["bash", "-n", str(ROOT / name)], capture_output=True, text=True)
                 self.assertEqual(completed.returncode, 0, completed.stderr)
@@ -102,7 +102,7 @@ class TermuxInstallTests(unittest.TestCase):
             scripts.mkdir()
             source = temp / "extracted"
             source.mkdir()
-            for filename in ("install-termux.sh", "requirements.txt", "setup-debian.sh", "run-termux.sh", "multibump.sh", "easy-install.sh", "home.py", "credentials.py"):
+            for filename in ("install-termux.sh", "requirements.txt", "setup-debian.sh", "run-termux.sh", "multibump.sh", "easy-install.sh", "home.py", "credentials.py", "vote_tracker.py", "vote_tracker.sh"):
                 (source / filename).write_bytes((ROOT / filename).read_bytes())
             (source / "config.json").write_text('{"services": []}')
             destination = home / "multibump-selfbot"
@@ -126,6 +126,7 @@ class TermuxInstallTests(unittest.TestCase):
             self.assertTrue((destination / "run-termux.sh").exists())
             self.assertEqual((destination / "credentials.py").read_bytes(), (ROOT / "credentials.py").read_bytes())
             self.assertTrue((scripts / "multibump").is_symlink())
+            self.assertTrue((scripts / "multibump-votes").is_symlink())
             commands = log.read_text()
             self.assertIn("pkg install -y python proot-distro", commands)
             self.assertIn("proot install debian:bookworm --name multibump-debian", commands)
@@ -145,6 +146,11 @@ class V13InstallSmokeTests(unittest.TestCase):
                 self.assertIn('response_reader.py', (project / name).read_text())
                 self.assertIn('shared_bump.py', (project / name).read_text())
                 self.assertIn('status_view.py', (project / name).read_text())
+                self.assertIn('vote_tracker.py', (project / name).read_text())
+                self.assertIn('vote_capabilities.py', (project / name).read_text())
+                self.assertIn('vote_receipts.py', (project / name).read_text())
+                self.assertIn('tdl_voting.py', (project / name).read_text())
+                self.assertIn('vote_tracker.sh', (project / name).read_text())
                 self.assertIn('bumper.py', (project / name).read_text())
         self.assertTrue((project / 'response_reader.py').is_file())
         self.assertTrue((project / 'shared_bump.py').is_file())

@@ -18,6 +18,8 @@ from engine import Store, Timing, load_config
 from response_reader import message_body, response_matches, evaluate
 from command_lookup import CommandIndex
 from shared_bump import public_evidence, recover_public_history
+from vote_receipts import configured_webhooks, VoteNoticeLedger, observe, recover_history as recover_vote_history
+from tdl_voting import configured_auto_vote_services
 
 log = logging.getLogger("multibump")
 
@@ -59,6 +61,12 @@ async def run_bot(config, services, store, token_override: str | None = None):
     service_worker = None
     shared_sync_ready = asyncio.Event()
     sync_lock = asyncio.Lock()
+    try:
+        vote_rules = configured_webhooks(config)
+    except ValueError as exc:
+        log.warning("Vote notification observer disabled (invalid configuration): %s", exc)
+        vote_rules = ()
+    vote_ledger = VoteNoticeLedger(store.db) if vote_rules else None
     by_channel = {}
     for service in services:
         by_channel.setdefault(service.channel_id, []).append(service)
@@ -77,6 +85,15 @@ async def run_bot(config, services, store, token_override: str | None = None):
                 log.info("%s: observed %s from configured directory bot; next attempt no earlier than %s",
                          service.label, evidence.event, next_attempt_text(store.next_attempt_at(service)))
 
+    def accept_vote_notification(message):
+        if not vote_ledger:
+            return
+        proof = observe(message, vote_rules)
+        if proof and vote_ledger.record(proof):
+            log.info("Observed new %s vote notification via configured Discord webhook; "
+                     "does not establish which account voted or modify bump cooldowns",
+                     proof.provider)
+
     async def reconcile_public_messages():
         async with sync_lock:
             shared_sync_ready.clear()
@@ -86,6 +103,11 @@ async def run_bot(config, services, store, token_override: str | None = None):
                 log.info("Public bump history: %s channels checked, %s observations, %s failures, %s possibly truncated",
                          summary["channels_checked"], summary["new_observations"],
                          summary["failures"], summary["possibly_truncated"])
+                if vote_ledger:
+                    vote_summary = await recover_vote_history(client, vote_rules, vote_ledger, logger=log)
+                    log.info("Provider vote notifications: %s channels checked, %s new notices, %s failures, %s possibly truncated",
+                             vote_summary["channels_checked"], vote_summary["new_notices"],
+                             vote_summary["failures"], vote_summary["possibly_truncated"])
             finally:
                 shared_sync_ready.set()
 
@@ -235,12 +257,14 @@ async def run_bot(config, services, store, token_override: str | None = None):
     @client.event
     async def on_message(message):
         accept_public_message(message)
+        accept_vote_notification(message)
 
     @client.event
     async def on_message_edit(before, after):
         # If a bot edits an empty embed into a confirmation, creation time
         # remains authoritative and the message ID deduplicates the event.
         accept_public_message(after)
+        accept_vote_notification(after)
 
     await client.start(token)
 
@@ -259,9 +283,12 @@ def main():
         list_states(args.state)
         return
     config, services = load_config(args.config)
-    print(f"Configuration valid: {len(services)} service(s)")
+    vote_services = configured_auto_vote_services(config)
+    services.extend(vote_services)
+    print(f"Configuration valid: {len(services) - len(vote_services)} bumps, {len(vote_services)} scheduled TDL vote(s)")
     for s in services:
-        print(f"  {s.key}: /{s.command_name} app={s.application_id} cooldown={s.cooldown_seconds}s")
+        kind = "VOTE (unofficial account automation)" if s.key.startswith("vote-tdl-") else "BUMP"
+        print(f"  [{kind}] {s.key}: /{s.command_name} app={s.application_id} cooldown={s.cooldown_seconds}s")
     if args.check:
         return
     token_override = None

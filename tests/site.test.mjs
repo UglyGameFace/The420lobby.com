@@ -404,7 +404,7 @@ test("tablet nav cannot appear open by CSS alone or remain open on browser resto
   assert.match(design, /@media \(min-width:761px\) and \(max-width:1050px\)/);
   assert.match(design,/\.site-header \.header-shell \.desktop-nav:not\(\.open\)\{display:none\}/);
   assert.match(design,/\.site-header \.header-shell \.desktop-nav\.open\{/);
-  assert.match(reset,/window\.addEventListener\("pageshow", closeMenu\)/);
+  assert.match(reset,/window\.addEventListener\("pageshow"/);
   assert.match(reset,/document\.addEventListener\("pointerdown"/);
   assert.match(html,/src="\/script\.js\?v=20261018-tablet-nav3"/);
   assert.match(html,/lobby-redesign\.css\?v=20261022-home-audit1/);

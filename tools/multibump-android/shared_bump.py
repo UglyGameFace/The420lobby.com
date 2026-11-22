@@ -96,13 +96,16 @@ def public_evidence(message: Any, service: Service, *, self_id: int | None = Non
 async def recover_public_history(client: Any, services: list[Service], store: Any,
                                  *, self_id: int | None = None,
                                  logger: Any = None,
-                                 clock: Callable[[], float] = time.time,
+                                 clock: Callable[[], float] | None = None,
                                  limit: int = 200) -> dict[str, int]:
     """Backfill bounded public history before dispatching due commands.
 
     A failed or truncated history scan is reported, not misrepresented as
     complete evidence. This never invokes any directory command.
     """
+    # Resolve default clock at call time so simulated time and late restarts
+    # cannot be pinned to an import-time function reference.
+    clock = time.time if clock is None else clock
     groups: dict[int, list[Service]] = {}
     for svc in services:
         groups.setdefault(svc.channel_id, []).append(svc)

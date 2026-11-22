@@ -1,6 +1,10 @@
 # MultiBump project status
 
-Updated 2026-11-15
+Updated 2026-11-22. Current direction: preserve the original human-account
+auto-bumper. The inviteable-bot conversion has been withdrawn; see
+[MULTIBUMP_PUBLIC_STATUS.md](MULTIBUMP_PUBLIC_STATUS.md) for the correction,
+resource shutdown evidence and remaining distribution work. Earlier entries
+below retain their historical scope and validation dates.
 
 ## Objective
 Provide versioned source and offline regression coverage for the standalone Android v14 cooldown observer, while maintaining the separate owner-gated cloud manual-reminder manager.
@@ -72,3 +76,13 @@ Provide versioned source and offline regression coverage for the standalone Andr
 - Signed connector failures are categorized into safe codes (401, 403, 503, timeout, invalid response) and shown without leaking keys. The browser can refresh evidence, including when returning from Android background, and never equates stale heartbeat with a live bot.
 - GitHub CI and private signed database retrieval are started concurrently to avoid unnecessary serial latency.
 - A production deployment and green CI do not on their own prove an authenticated user opened the new status page or that the Supabase Edge Function responded. Confirm this separately from the actual user session and provider logs.
+
+
+## 2026-11-22: Preserve the original automatic method
+
+The owner explicitly requires the existing human-account slash-command
+execution. The proposed inviteable-bot/reminder replacement was withdrawn
+from PR #67. The Android transport and its existing per-server scheduling
+remain authoritative. The separate private Shield reminder manager is
+unchanged. Current correction and validation are in
+[MULTIBUMP_PUBLIC_STATUS.md](MULTIBUMP_PUBLIC_STATUS.md).

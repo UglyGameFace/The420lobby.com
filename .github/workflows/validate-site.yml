@@ -10,27 +10,70 @@ permissions:
   contents: read
 
 jobs:
+  site-regression-independent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install website dependencies (security audit remains separately enforced)
+        run: npm ci --no-audit --no-fund
+      - name: Typecheck site
+        run: npm run typecheck
+      - name: Website backend regressions
+        run: node --test tests/*.test.mjs
+      - name: Build website
+        run: npm run build
+      - name: Compile Cloudflare Pages Functions
+        run: npx --yes wrangler@4 pages functions build --outdir=.wrangler/functions-build
+
+  tdl-signed-webhook:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node for provider webhook unit tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Verify signed TDL receipts, replay protection and webhook routing
+        run: |
+          node --check functions/_lib/tdl-vote-webhook.mjs
+          node --test tests/tdl-vote-webhook.test.mjs
+
+  multibump-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python 3.13 for MultiBump
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Check MultiBump Android v15 source and regressions
+        working-directory: tools/multibump-android
+        run: |
+          python -m compileall -q .
+          python -m unittest discover -s tests -q
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set up Python for the Android companion
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - name: Check MultiBump Android v14 source and regressions
-        working-directory: tools/multibump-android
-        run: |
-          python -m compileall -q .
-          python -m unittest discover -s tests -q
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "24"
       - name: Install website and arcade dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Dependency security audit
         run: npm audit --audit-level=high
       - name: Typecheck new React arcade
@@ -63,7 +106,6 @@ jobs:
         run: npx --yes wrangler@4 deploy --dry-run --config wrangler.bump.jsonc
       - name: Install browser smoke-test tooling
         run: |
-          npm install --no-save playwright@1.56.1
           npx playwright install --with-deps chromium firefox webkit
       - name: MultiBump manager mobile and auth browser checks
         run: node tests/bump-manager-browser.mjs

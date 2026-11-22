@@ -1,6 +1,142 @@
 # MultiBump Easy Mode (Android / Termux)
 
-**Once set up, type just `multibump` in Termux.** No need to use Python filenames, remember a folder, edit JSON, or reinstall Debian.
+## Current execution method: the existing human-account client
+
+MultiBump still sends directory slash commands through the account signed in
+on this phone. Its saved login, SQLite cooldowns, command spacing and public
+confirmation observer remain in the original scheduler. There is no
+MultiBump bot to invite or Developer Portal application to configure.
+
+To add another server to the same installation, choose **1. Add multiple
+bump bots**, select its services and paste a message link from **that server's
+bump channel**. Repeat for each server, then choose **2. START bumper**.
+The signed-in account must already have access to those servers/channels;
+each configured server/service retains its own cooldown and history.
+The directory providers' own bots must already be installed there.
+
+There are two supported account arrangements for this existing client:
+
+- **Their own human account:** the other owner runs a separate installation
+  with their own saved login, configuration and SQLite history.
+- **Your human account, with permission:** you keep your login on your own
+  installation and add the authorized server's bump-channel link there.
+  The server owner must approve that account's use, and the account must
+  already have access to the server and channel. Removing/disabling those
+  services and restarting the client stops that server's scheduled work.
+
+The account owner must also consent to automation. Server permission does
+not require handing over a Discord login or granting the other server
+access to your configuration/history. Do not distribute your saved login,
+personal config or SQLite database. The current client records local
+configuration, not independently verified server-owner consent. A public
+dashboard must add its own server approval and revocation workflow before
+it can offer shared-account hosting. These local installation instructions
+do not establish that hosted service.
+
+## TheDiscordList vote-only integration and optional scheduling
+
+TheDiscordList (TDL) is now available as a **separate, officially documented
+server voting service** alongside the six existing bump services.
+Its actual slash command is **/upvote**. Adding the vote service alone
+leaves submission manual; the existing client also has a separate explicit
+opt-in for scheduling it through the same human-account transport.
+
+**To update your existing Android install without losing settings:**
+
+```bash
+cd ~/multibump-v15-source &&
+git pull --ff-only &&
+bash tools/multibump-android/easy-install.sh
+```
+
+**In the MultiBump menu:**
+- Choose **8 → 1** once to add the official TDL **vote-only** service for
+  your configured Discord server. Existing six bump bots stay intact.
+- Add the [official TDL bot](https://thediscordlist.com/tdl)
+  (application ID `1522501063456985179`) to that server by authorizing
+  its installation in Discord. **Create or claim your server's free listing**
+  at https://thediscordlist.com/listings/create if it is not already public.
+- Members can then run `/upvote` **inside Discord**, without opening a
+  voting website. TDL enforces one real vote **per member per server every
+  12 hours** and replies whether it counted.
+- Optional: choose **8 → 2** to observe real TDL `listing.upvoted`
+  notifications. Create a Discord webhook in a private channel; on your
+  TheDiscordList listing, open **Manage → Webhooks → New endpoint**, paste
+  that Discord webhook URL, and subscribe to **only** `listing.upvoted`.
+  Return to the one-time Termux wizard and enter the URL in its **hidden**
+  prompt; only the numeric webhook ID is saved. Restart the running
+  bumper so it picks up the observer configuration.
+- **8 → 3** is the older D-INVITES vote-notification configuration.
+  **8 → 4** contains optional legacy manual vote links/history; it does
+  not submit votes or verify provider acceptance.
+- **8 → 5** controls the existing optional human-account `/upvote` schedule
+  for a selected configured server. It is off by default. When explicitly
+  enabled, it shares the bumper's persisted command queue and response
+  checks, with a separate 12-hour vote cooldown. Restart the running client
+  after changing it. This is unofficial account automation, not a provider
+  vote-submission API; external acceptance is not guaranteed.
+
+Menu **3** also shows the last 24 hours of trusted provider webhook notices.
+These are directory-reported **community vote events**, not proof the
+current account voted. They are stored in SQLite independently of bump
+schedules and self-reported vote clocks.
+
+**Realistic limitation:** TheDiscordList's public bot and official
+`listing.upvoted` webhook support member voting and event tracking.
+No approved unattended server-vote **submission** API exists in the
+official documentation inspected. The site explicitly prohibits automated
+ranking manipulation, and Discord does not permit user-account self-bots.
+The optional account scheduler uses the existing Discord slash-command
+transport. It does not use private website endpoints or count an
+unconfirmed command/click as a successful vote.
+
+For verified endpoint names, policy evidence, and safe
+integration alternatives, see [VOTE_PROVIDER_APIS.md](./VOTE_PROVIDER_APIS.md).
+
+## First-party signed TDL vote receipts on The 420 Lobby
+
+The site's Pages backend now has `POST /api/tdl/vote-webhook`, handling real
+`listing.upvoted` events with HMAC-SHA256, five-minute timestamp validation,
+unique `X-TDL-Delivery` IDs, and a private D1 receipt table. It **never**
+submits a vote, stores member IDs, or trusts an unauthenticated webhook.
+
+**Owner-only activation after deploying the GitHub PR:**
+
+1. In TDL, create/claim The 420 Lobby listing for Discord server
+   `1514374173517152418`, then install TDL's official bot. These require
+   your Discord permissions and OAuth approval.
+2. In that listing's **Manage → Webhooks → New endpoint**, choose the
+   server-to-server **JSON** webhook endpoint:
+   `https://the420lobby.com/api/tdl/vote-webhook`
+   and subscribe to **listing.upvoted** only.
+3. Copy the endpoint-specific **signing secret** shown once. In your Cloudflare
+   dashboard → **Workers & Pages → the420lobby-com → Settings → Variables and
+   Secrets → Production**, add an **encrypted secret**
+   named `TDL_WEBHOOK_SECRET` containing exactly the TDL secret. Do not
+   enter it in chat, source code, GitHub variables or the Termux client.
+   Redeploy the new site build if Cloudflare requires it for the binding.
+4. Use the provider's **Send test** button. That triggers `webhook.ping`,
+   acknowledged but not recorded as a vote. A separate genuine member
+   `/upvote` generates the first recorded receipt. Check the event delivery
+   log for HTTP 200.
+5. The migration `migrations/0005_tdl_vote_receipts.sql` creates an isolated
+   table for delivery IDs and receipt timestamps, not voter identities.
+   **The production D1 table and index have already been created and
+   verified** on November 17, 2026. No bump tables were changed.
+
+The endpoint fails closed with HTTP 503 until the encrypted signing secret is
+configured. It rejects expired/tampered/wrong-listing requests. The TDL
+provider's documented signature is over **raw request bytes**, not re-encoded
+JSON. The corresponding unit tests and route validation run in the
+`tdl-signed-webhook` CI job.
+
+**Do not confuse the two webhook paths.** Option 8 → 2 in Termux accepts
+TDL's **Discord-formatted** webhook and monitors it through Discord messages.
+The first-party Pages endpoint above accepts **signed JSON** directly. For
+the most reliable verification, use the signed JSON integration. Both are
+observers, never automated vote submitters.
+
+## Historical versions (not the current voting setup)
 
 ## Upgrade from previous MultiBump (keeps your settings)
 
