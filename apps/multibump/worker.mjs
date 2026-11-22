@@ -68,7 +68,10 @@ export async function handle(request, env, ctx = { waitUntil: () => {} }, sender
       method(request, "GET");
       return secure(
         new Response(HTML, {
-          headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" },
+          headers: {
+            "Content-Type": "text/html; charset=utf-8",
+            "Cache-Control": "no-cache",
+          },
         }),
       );
     }
@@ -152,14 +155,16 @@ export async function handle(request, env, ctx = { waitUntil: () => {} }, sender
           data,
           200,
           action === "export"
-            ? { "Content-Disposition": 'attachment; filename="multibump-' + guildId + '.json"' }
+            ? {
+                "Content-Disposition": 'attachment; filename="multibump-' + guildId + '.json"',
+              }
             : {},
         ),
       );
     }
     if (action === "channels") {
       method(request, "GET");
-      const data = await channels(env, guildId, sender);
+      const data = await channels(env, guildId, s.user_id, sender);
       return secure(json({ channels: data.channels, roles: data.roles }));
     }
     method(request, "POST");

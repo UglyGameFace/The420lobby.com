@@ -72,3 +72,8 @@ Provide versioned source and offline regression coverage for the standalone Andr
 - Signed connector failures are categorized into safe codes (401, 403, 503, timeout, invalid response) and shown without leaking keys. The browser can refresh evidence, including when returning from Android background, and never equates stale heartbeat with a live bot.
 - GitHub CI and private signed database retrieval are started concurrently to avoid unnecessary serial latency.
 - A production deployment and green CI do not on their own prove an authenticated user opened the new status page or that the Supabase Edge Function responded. Confirm this separately from the actual user session and provider logs.
+
+
+## 2026-11-22: Public MultiBump
+
+The multi-server product is implemented separately under `apps/multibump/`, with its own Worker, D1 database and Discord application connection. Current public delivery/validation/blockers are recorded in [MULTIBUMP_PUBLIC_STATUS.md](MULTIBUMP_PUBLIC_STATUS.md). This does not convert the owner-only Shield manager or copy its private settings into public tenants.

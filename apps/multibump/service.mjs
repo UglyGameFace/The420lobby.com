@@ -22,16 +22,26 @@ export function permissionsFor(guild, roles, member, channel) {
   if (own) bits = (bits & ~BigInt(own.deny)) | BigInt(own.allow);
   return bits;
 }
-export async function channels(env, guildId, sender = fetch) {
-  const [guild, list, roles, member] = await Promise.all([
+export async function channels(env, guildId, userId, sender = fetch) {
+  if (!ID.test(userId || "")) throw new Fault(403, "member", "Discord membership is required.");
+  const [guild, list, roles, member, actor] = await Promise.all([
     discord(env, "/guilds/" + guildId, {}, sender),
     discord(env, "/guilds/" + guildId + "/channels", {}, sender),
     discord(env, "/guilds/" + guildId + "/roles", {}, sender),
     discord(env, "/guilds/" + guildId + "/members/" + env.DISCORD_CLIENT_ID, {}, sender),
+    discord(env, "/guilds/" + guildId + "/members/" + userId, {}, sender),
   ]);
   const usable = list
-    .filter((c) => [0, 5].includes(c.type) && c.guild_id === guildId)
-    .map((c) => ({ ...c, botPermissions: permissionsFor(guild, roles, member, c) }));
+    .filter(
+      (c) =>
+        [0, 5].includes(c.type) &&
+        c.guild_id === guildId &&
+        (permissionsFor(guild, roles, actor, c) & 1024n) !== 0n,
+    )
+    .map((c) => ({
+      ...c,
+      botPermissions: permissionsFor(guild, roles, member, c),
+    }));
   return {
     guild,
     channels: usable
@@ -46,7 +56,7 @@ export async function setup(env, guildId, userId, body, sender = fetch, now = Da
   fields(body, ["channelId", "roleId"]);
   if (!ID.test(body.channelId || "") || (body.roleId != null && !ID.test(body.roleId)))
     throw new Fault(400, "channel", "Choose a server channel and an optional notification role.");
-  const available = await channels(env, guildId, sender);
+  const available = await channels(env, guildId, userId, sender);
   if (!available.channels.some((c) => c.id === body.channelId))
     throw new Fault(
       403,

@@ -118,7 +118,11 @@ async function fixture() {
     if (path.includes("/webhooks/")) return Response.json({ id: "423456789012345678" });
     const gid = path.split("/")[4];
     if (/^\/api\/v10\/guilds\/\d+$/.test(path))
-      return Response.json({ id: gid, name: gid === A ? "Server A" : "Server B", owner_id: USER });
+      return Response.json({
+        id: gid,
+        name: gid === A ? "Server A" : "Server B",
+        owner_id: USER,
+      });
     if (path.endsWith("/channels"))
       return Response.json([
         {
@@ -134,7 +138,8 @@ async function fixture() {
         { id: gid, name: "@everyone", permissions: "84992" },
         { id: ROLE, name: "Bump helpers", permissions: "0", mentionable: true },
       ]);
-    if (path.includes("/members/")) return Response.json({ user: { id: BOT }, roles: [] });
+    if (path.includes("/members/"))
+      return Response.json({ user: { id: path.split("/").at(-1) }, roles: [] });
     if (path.includes("/messages") && options.method === "POST")
       return Response.json({ id: "523456789012345678" });
     if (path.includes("/messages")) return Response.json(messages);
@@ -162,7 +167,11 @@ async function fixture() {
           Cookie: COOKIE + "=" + token,
           ...(body === undefined
             ? {}
-            : { Origin: BASE, "Content-Type": "application/json", "X-CSRF-Token": csrf }),
+            : {
+                Origin: BASE,
+                "Content-Type": "application/json",
+                "X-CSRF-Token": csrf,
+              }),
           ...extra,
         },
         ...(body === undefined ? {} : { body: JSON.stringify(body) }),
@@ -317,11 +326,21 @@ test("channel and role validation reject cross-server channels and privilege-lac
   const f = await fixture();
   assert.equal((await f.request("/api/guilds/" + A + "/setup", { channelId: CB })).status, 403);
   assert.equal(
-    (await f.request("/api/guilds/" + A + "/setup", { channelId: CA, roleId: A })).status,
+    (
+      await f.request("/api/guilds/" + A + "/setup", {
+        channelId: CA,
+        roleId: A,
+      })
+    ).status,
     400,
   );
   assert.equal(
-    (await f.request("/api/guilds/" + A + "/setup", { channelId: CA, roleId: ROLE })).status,
+    (
+      await f.request("/api/guilds/" + A + "/setup", {
+        channelId: CA,
+        roleId: ROLE,
+      })
+    ).status,
     200,
   );
   const a = await snapshot(f.env, A);
@@ -356,8 +375,9 @@ test("permission evaluation follows everyone, role and member overwrites includi
     0n,
   );
   assert.ok(
-    permissionsFor(guild, [{ id: A, permissions: "8" }], member, { permission_overwrites: [] }) &
-      2048n,
+    permissionsFor(guild, [{ id: A, permissions: "8" }], member, {
+      permission_overwrites: [],
+    }) & 2048n,
   );
 });
 test("service initialization is conservative and reports remain separate from confirmations", async () => {
@@ -410,7 +430,11 @@ test("provider receipts are idempotent, ordered and cannot shorten a later admin
   assert.equal(await receipt(f.env, A, c), true);
   assert.equal(await receipt(f.env, A, c), false);
   assert.equal(
-    await receipt(f.env, A, { ...c, sourceId: "723456789012345679", at: NOW - 5000 }),
+    await receipt(f.env, A, {
+      ...c,
+      sourceId: "723456789012345679",
+      at: NOW - 5000,
+    }),
     true,
   );
   const data = await snapshot(f.env, A);
@@ -655,7 +679,9 @@ test("listing URLs are per server, restricted to their provider and never create
   const f = await fixture();
   await f.install();
   await f.install(B);
-  await voteLink(f.env, A, "discordify", { url: "https://discordify.net/server/test-a" });
+  await voteLink(f.env, A, "discordify", {
+    url: "https://discordify.net/server/test-a",
+  });
   assert.equal(
     (await snapshot(f.env, A)).voting.find((p) => p.id === "discordify").listingUrl,
     "https://discordify.net/server/test-a",
@@ -707,7 +733,10 @@ test("catch-up persists backward page boundaries and recent edited responses are
   assert.equal(g.monitor_before, rows.at(-1).id);
   assert.equal(g.monitor_cursor, null);
   f.setMessages([
-    message({ id: snowflake(NOW - 12000), timestamp: new Date(NOW - 12000).toISOString() }),
+    message({
+      id: snowflake(NOW - 12000),
+      timestamp: new Date(NOW - 12000).toISOString(),
+    }),
   ]);
   await poll(f.env, g, f.sender, NOW + 60001);
   g = await f.env.DB.prepare("SELECT * FROM mb_guilds WHERE guild_id=?").bind(A).first();
@@ -729,4 +758,27 @@ test("provider adverts without slash-command context never count, while success 
       NOW,
     ),
   );
+});
+
+test("server managers cannot configure channels hidden from their own membership", async () => {
+  const f = await fixture();
+  const restricted = async (url, options) => {
+    const response = await f.sender(url, options);
+    const path = new URL(url).pathname;
+    if (path === "/api/v10/guilds/" + A)
+      return Response.json({ ...(await response.json()), owner_id: B });
+    if (path.endsWith("/channels"))
+      return Response.json(
+        (await response.json()).map((c) => ({
+          ...c,
+          permission_overwrites: [{ id: USER, type: 1, allow: "0", deny: "1024" }],
+        })),
+      );
+    return response;
+  };
+  await assert.rejects(
+    setup(f.env, A, USER, { channelId: CA }, restricted, NOW),
+    (error) => error.status === 403,
+  );
+  assert.equal((await snapshot(f.env, A)).guild, null);
 });
