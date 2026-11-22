@@ -62,10 +62,24 @@ checks cannot establish provider acceptance. PR #67 stays draft/unmerged.
 
 ## Next
 
+The owner has resolved the account model: support both **each server
+owner's own human account** and **the existing operator's human account
+with permission**. Account-owner consent and server-owner authorization
+are separate requirements. Do not ask the owner to choose only one mode.
+
 Keep the existing human-account transport as the product requirement.
 Current Easy Mode already accepts multiple server/channel message links and
-preserves independent service schedules. Instructions are in
-`tools/multibump-android/README.md`. Resolve whether the requested public
-service runs through the owner's existing account or each server owner's
-own account before designing hosting or collecting any new credentials.
-Do not resume the inviteable-bot activation path.
+preserves independent service schedules. An owner's separate installation
+uses their own account; the existing operator can add authorized servers to
+the current installation. Neither arrangement needs a MultiBump bot token.
+Instructions and existing limits are in `tools/multibump-android/README.md`.
+
+The public hosted service is still unimplemented. Its next cohesive outcome
+must connect the dashboard to the original human-account runner, offer both
+account arrangements, require server-specific approval and permit either
+owner to revoke shared use. Keep Discord account credentials on the
+account owner's runner; a server administrator's dashboard access must not
+expose or replace them. A Discord OAuth application may authenticate the
+dashboard, but must not replace the execution method with a Discord bot.
+Do not resume the inviteable-bot activation path or claim the existing local
+configuration establishes independently verified server-owner consent.

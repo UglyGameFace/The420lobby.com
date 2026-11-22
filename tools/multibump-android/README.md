@@ -14,10 +14,24 @@ The signed-in account must already have access to those servers/channels;
 each configured server/service retains its own cooldown and history.
 The directory providers' own bots must already be installed there.
 
-Another owner can use a separate copy with their own account and settings.
-Do not distribute your saved login, personal config or SQLite database.
-These local installation instructions do not establish a hosted public
-human-account service.
+There are two supported account arrangements for this existing client:
+
+- **Their own human account:** the other owner runs a separate installation
+  with their own saved login, configuration and SQLite history.
+- **Your human account, with permission:** you keep your login on your own
+  installation and add the authorized server's bump-channel link there.
+  The server owner must approve that account's use, and the account must
+  already have access to the server and channel. Removing/disabling those
+  services and restarting the client stops that server's scheduled work.
+
+The account owner must also consent to automation. Server permission does
+not require handing over a Discord login or granting the other server
+access to your configuration/history. Do not distribute your saved login,
+personal config or SQLite database. The current client records local
+configuration, not independently verified server-owner consent. A public
+dashboard must add its own server approval and revocation workflow before
+it can offer shared-account hosting. These local installation instructions
+do not establish that hosted service.
 
 ## TheDiscordList vote-only integration and optional scheduling
 
