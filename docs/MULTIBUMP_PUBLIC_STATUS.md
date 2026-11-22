@@ -32,3 +32,11 @@ Implemented: server picker/install link, channel/role setup, six directory sched
 - Discord Developer Portal is at its sign-in page. No dedicated public application's credentials are available. No app/bot creation, Discord installation, live reminder, provider confirmation or real vote receipt is verified.
 - Keep PR #67 draft and distinguish a deployed launch-pending website from an operational Discord service. Do not retire its branch until its work is safely integrated.
 - Next: finish the broader website CI check, connect the dedicated Discord application and run the live acceptance in the README. The implementation is deployed and its encryption key was verified preserved after updating it. No live Discord behavior can be validated before that connection.
+
+
+## Signed-in setup checkpoint
+
+- Owner Discord sign-in is verified in the Developer Portal. The create-app dialog is staged as **MultiBump**, Personal account. No app has been created: its Create action requires accepting the Discord Developer Terms of Service and Developer Policy. Obtain that specific approval before submitting.
+- Latest completed documentation-head workflow `45057547510`: public/Android/webhook/independent-site jobs pass. The broader site passes its functional and cross-browser checks but fails the final full-page screenshot at `tests/browser-smoke.mjs:453` after a 30-second screenshot timeout.
+- The static full-page overview now uses the existing effects-off control, after the normal-state viewport captures and all layout/behavior assertions. Screenshot timeouts and assertions are retained. CI must validate this capture change; it is not yet a proven fix.
+- Production scheduler heartbeat is now present in the dedicated database. No servers are configured and no live Discord reminder delivery is claimed. The deployed public implementation is still `2ca4eca001a7af46261824086691433b8708459d`.

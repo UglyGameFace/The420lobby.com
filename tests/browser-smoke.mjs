@@ -450,7 +450,14 @@ try {
       await page.waitForTimeout(90);
     }
     await page.evaluate(()=>window.scrollTo(0,0));
-    await page.screenshot({path:"artifacts/"+scenario.name+"-full.png",fullPage:true,animations:"disabled",timeout:30000});
+    // A full-document capture resizes the software-rendered WebGL surface.
+    // Use the site's real low-motion control for this static overview; the
+    // viewport captures above already exercise the normal effects state.
+    if (await page.locator("#fx-toggle").getAttribute("aria-pressed") === "true") {
+      await page.locator("#fx-toggle").click();
+    }
+    assert.equal(await page.locator("#fx-toggle").getAttribute("aria-pressed"),"false");
+    await page.screenshot({path:"artifacts/"+scenario.name+"-full-low-motion.png",fullPage:true,animations:"disabled",timeout:30000});
     assert.deepEqual(errors,[],"uncaught browser errors");
     await page.close();
     console.log("PASS "+scenario.name+" "+scenario.size.width+"x"+scenario.size.height+": links, artwork, navigation, effects toggle, no overflow");
