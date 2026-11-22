@@ -1,7 +1,0 @@
-# Local testing only. Use a separate test Discord application and local D1.
-DISCORD_CLIENT_ID=
-DISCORD_CLIENT_SECRET=
-DISCORD_BOT_TOKEN=
-DISCORD_PUBLIC_KEY=
-# A random 32-byte hex key; never reuse a production encryption key locally.
-ENCRYPTION_KEY=

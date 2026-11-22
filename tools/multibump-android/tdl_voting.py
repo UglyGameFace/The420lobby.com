@@ -1,9 +1,10 @@
-"""Official TheDiscordList vote-only integration for MultiBump.
+"""TheDiscordList vote configuration and opt-in account scheduling.
 
 TheDiscordList's official Discord bot (application 1522501063456985179)
 accepts *member-invoked* /upvote once per server per person every 12 hours.
 It does not expose a documented API for submitting server votes on behalf of
-members. This integration is deliberately excluded from the bump dispatcher.
+members. Vote submission is manual by default; explicitly enabled account
+scheduling reuses MultiBump's existing unofficial slash-command transport.
 """
 from __future__ import annotations
 

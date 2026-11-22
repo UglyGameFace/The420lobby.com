@@ -10,35 +10,6 @@ permissions:
   contents: read
 
 jobs:
-  multibump-public:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-      - name: Install pinned public-service tooling
-        run: npm ci --prefix apps/multibump --no-audit --no-fund
-      - name: Audit public-service tooling
-        run: npm audit --prefix apps/multibump --audit-level=high
-      - name: Public MultiBump isolation, permissions, OAuth, commands and scheduler
-        run: npm test --prefix apps/multibump
-      - name: Compile the public Worker without deploying
-        run: npm run build --prefix apps/multibump
-      - name: Install browser
-        run: apps/multibump/node_modules/.bin/playwright install --with-deps chromium
-      - name: Public dashboard mobile and tenant browser checks
-        run: npm run test:browser --prefix apps/multibump
-      - name: Save public dashboard previews
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: multibump-public-previews
-          path: artifacts/multibump-public-*.png
-          if-no-files-found: ignore
-          retention-days: 7
-
   site-regression-independent:
     runs-on: ubuntu-latest
     timeout-minutes: 15

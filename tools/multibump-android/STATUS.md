@@ -1,3 +1,14 @@
+# Current direction — November 22, 2026
+
+The original human-account automatic bumper remains the required execution
+method. The separate inviteable-bot conversion was withdrawn from PR #67.
+Existing bump services, persisted schedules, login handling and opt-in TDL
+account scheduling are preserved. See the current README for setup and
+`../../docs/MULTIBUMP_PUBLIC_STATUS.md` for rollback/validation and remaining
+public-distribution decisions. Entries below are historical checkpoints;
+statements that submission is entirely unsupported predate the explicit
+opt-in account scheduling already present in this branch.
+
 # MultiBump v14 status — November 15, 2026
 
 ## Goal

@@ -1,11 +1,31 @@
 # MultiBump Easy Mode (Android / Termux)
 
-## Current: v15.4, TheDiscordList vote-only integration
+## Current execution method: the existing human-account client
+
+MultiBump still sends directory slash commands through the account signed in
+on this phone. Its saved login, SQLite cooldowns, command spacing and public
+confirmation observer remain in the original scheduler. There is no
+MultiBump bot to invite or Developer Portal application to configure.
+
+To add another server to the same installation, choose **1. Add multiple
+bump bots**, select its services and paste a message link from **that server's
+bump channel**. Repeat for each server, then choose **2. START bumper**.
+The signed-in account must already have access to those servers/channels;
+each configured server/service retains its own cooldown and history.
+The directory providers' own bots must already be installed there.
+
+Another owner can use a separate copy with their own account and settings.
+Do not distribute your saved login, personal config or SQLite database.
+These local installation instructions do not establish a hosted public
+human-account service.
+
+## TheDiscordList vote-only integration and optional scheduling
 
 TheDiscordList (TDL) is now available as a **separate, officially documented
 server voting service** alongside the six existing bump services.
-It is **NOT** added to the automatic bump dispatcher because its actual
-slash command is **/upvote** and must be invoked by a person.
+Its actual slash command is **/upvote**. Adding the vote service alone
+leaves submission manual; the existing client also has a separate explicit
+opt-in for scheduling it through the same human-account transport.
 
 **To update your existing Android install without losing settings:**
 
@@ -35,6 +55,12 @@ bash tools/multibump-android/easy-install.sh
 - **8 → 3** is the older D-INVITES vote-notification configuration.
   **8 → 4** contains optional legacy manual vote links/history; it does
   not submit votes or verify provider acceptance.
+- **8 → 5** controls the existing optional human-account `/upvote` schedule
+  for a selected configured server. It is off by default. When explicitly
+  enabled, it shares the bumper's persisted command queue and response
+  checks, with a separate 12-hour vote cooldown. Restart the running client
+  after changing it. This is unofficial account automation, not a provider
+  vote-submission API; external acceptance is not guaranteed.
 
 Menu **3** also shows the last 24 hours of trusted provider webhook notices.
 These are directory-reported **community vote events**, not proof the
@@ -46,8 +72,9 @@ schedules and self-reported vote clocks.
 No approved unattended server-vote **submission** API exists in the
 official documentation inspected. The site explicitly prohibits automated
 ranking manipulation, and Discord does not permit user-account self-bots.
-We do **not** simulate /upvote from the logged-in user, use private
-website endpoints, or count an unconfirmed click as a vote.
+The optional account scheduler uses the existing Discord slash-command
+transport. It does not use private website endpoints or count an
+unconfirmed command/click as a successful vote.
 
 For verified endpoint names, policy evidence, and safe
 integration alternatives, see [VOTE_PROVIDER_APIS.md](./VOTE_PROVIDER_APIS.md).

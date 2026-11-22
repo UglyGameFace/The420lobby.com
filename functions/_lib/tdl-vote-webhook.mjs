@@ -21,7 +21,7 @@ function equalHex(expectedBytes, providedHex) {
   return mismatch === 0;
 }
 
-export async function signedTDLRequest(request, secret, nowMs = Date.now(), listingId = LOBBY_GUILD_ID) {
+export async function signedTDLRequest(request, secret, nowMs = Date.now()) {
   if (typeof secret !== "string" || secret.length < 16) {
     throw new HttpError(503, "vote_webhook_unconfigured",
       "TDL webhook reception is not configured.");
@@ -82,12 +82,12 @@ export async function signedTDLRequest(request, secret, nowMs = Date.now(), list
   // events with a success ACK but without an event receipt.
   if (payload.event === "webhook.ping") return {delivery, ping: true};
   if (payload.event !== TDL_VOTE_EVENT || payload.listing?.type !== "server" ||
-      String(payload.listing?.id || "") !== listingId ||
+      String(payload.listing?.id || "") !== LOBBY_GUILD_ID ||
       !payload.data || typeof payload.data !== "object" ||
       !payload.data.user?.id) {
     throw new HttpError(422, "unexpected_vote_event", "Not a vote for this server.");
   }
-  return {delivery, ping: false, eventId: payload.id, occurredAt: payload.created_at};
+  return {delivery, ping: false};
 }
 
 export async function handleTDLVoteWebhook(request, env, nowMs = Date.now()) {

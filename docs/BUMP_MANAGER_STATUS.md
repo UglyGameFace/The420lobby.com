@@ -1,6 +1,10 @@
 # MultiBump project status
 
-Updated 2026-11-15
+Updated 2026-11-22. Current direction: preserve the original human-account
+auto-bumper. The inviteable-bot conversion has been withdrawn; see
+[MULTIBUMP_PUBLIC_STATUS.md](MULTIBUMP_PUBLIC_STATUS.md) for the correction,
+resource shutdown evidence and remaining distribution work. Earlier entries
+below retain their historical scope and validation dates.
 
 ## Objective
 Provide versioned source and offline regression coverage for the standalone Android v14 cooldown observer, while maintaining the separate owner-gated cloud manual-reminder manager.
@@ -74,6 +78,11 @@ Provide versioned source and offline regression coverage for the standalone Andr
 - A production deployment and green CI do not on their own prove an authenticated user opened the new status page or that the Supabase Edge Function responded. Confirm this separately from the actual user session and provider logs.
 
 
-## 2026-11-22: Public MultiBump
+## 2026-11-22: Preserve the original automatic method
 
-The multi-server product is implemented separately under `apps/multibump/`, with its own Worker, D1 database and Discord application connection. Current public delivery/validation/blockers are recorded in [MULTIBUMP_PUBLIC_STATUS.md](MULTIBUMP_PUBLIC_STATUS.md). This does not convert the owner-only Shield manager or copy its private settings into public tenants.
+The owner explicitly requires the existing human-account slash-command
+execution. The proposed inviteable-bot/reminder replacement was withdrawn
+from PR #67. The Android transport and its existing per-server scheduling
+remain authoritative. The separate private Shield reminder manager is
+unchanged. Current correction and validation are in
+[MULTIBUMP_PUBLIC_STATUS.md](MULTIBUMP_PUBLIC_STATUS.md).
