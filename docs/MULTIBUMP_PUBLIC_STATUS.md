@@ -1,42 +1,36 @@
 # MultiBump Public status
 
-Updated 2026-11-22. Objective: an inviteable public service with per-server settings, mobile dashboard, supported bump confirmations and signed vote receipts.
+Updated 2026-11-22. Objective: a public Discord service with per-server setup, a mobile dashboard, reminders, supported bump confirmations and signed vote receipts.
 
-## Repository and integration
+## Delivery and repository
 
-- Work extends the existing MultiBump PR #67, branch `feat/multibump-free-vote-tracker-20261117`; no duplicate PR or feature branch created.
-- Current main inspected: `45c2a853ba4dde12a39ad56f7c71e9d141fc8a41`. The only overlapping open PR is #67. Existing open website-art/arcade backlog issues are independent and remain open.
-- Public source: `apps/multibump/`; operational/deployment instructions: its README. Private Shield, owner scheduler and Android transport retain their separate authorization and persistence.
+- Source lives in `apps/multibump/`; activation and operating instructions are in its README.
+- Work extends PR #67 on `feat/multibump-free-vote-tracker-20261117`. Main inspected as `45c2a853ba4dde12a39ad56f7c71e9d141fc8a41`; no conflicting public-service PR or review threads were found. Independent website backlog issues remain open.
+- The public Worker/database are separate from private Shield, the original owner scheduler and the Android transport. No private schedules were copied into public tenants.
+- Implemented: live Discord management-permission checks on tenant APIs; actor-visible channel selection and bot permission checks; isolated schedules/roles/voting links; signed deferred setup/service/status/done/pause/dashboard commands; trusted confirmation parsing and persisted history catch-up; atomic reminder claims; signed tenant-specific TDL receipts; export/deletion and retention.
 
-## Finding and resulting behavior
+## Verified production state
 
-The old manager authorizes a fixed owner and stores services without tenant ownership. Publishing it would expose a private management model. The public service uses its own Worker/D1 schema, live Discord guild-permission checks and independent OAuth credentials. Every setting, vote link, activity entry and integration secret belongs to a guild.
+- `https://bump.the420lobby.com` is attached to Worker `multibump-public`. Deployed executable source is `2ca4eca001a7af46261824086691433b8708459d` (initial deployment `89e451132c4f46fe8b3426e1c2270e5e`; subsequent secret-binding updates retain that code).
+- Dedicated D1 `multibump-public`, UUID `fe41c813-2d54-4d55-bd25-485440a9695f`, has all tables and `0001_public.sql` in the standard migration ledger. The encryption key is an encrypted Worker secret and was verified preserved after updating the Worker.
+- HTTPS homepage/client/health checks pass. The minute cron now records a production `last_tick` heartbeat. Zero servers are configured; no live reminder delivery is claimed.
+- Discord application **MultiBump** was created under the owner's Personal account after explicit approval of the Developer Terms of Service and Developer Policy. Application ID: `1574167873386053712`.
+- Its app ID and public verification key are bound to the dedicated Worker. Discord accepted/saved `https://bump.the420lobby.com/api/discord/interactions`, verifying the signed PING handler.
+- Discord saved OAuth callback `https://bump.the420lobby.com/auth/callback`, the public description, and privacy/terms links. Guild Install is enabled, User Install disabled, with `bot` + `applications.commands` and View Channels/Send Messages/Embed Links/Read Message History defaults (`84992`).
 
-Implemented: server picker/install link, channel/role setup, six directory schedules, manual reports, trusted public-command confirmation parsing, restart-safe reminder claims, persisted catch-up scanning, per-server voting links, signed TDL receipt integration, permission-checked Discord setup/status/service/done/pause/dashboard commands, export/deletion and retention.
+## Validation and CI
 
-## Validation
+- All 140 Node regression tests pass locally, including 26 public backend tests and a navigation lifecycle regression. Site typecheck/build, Android offline suite, public Worker compilation, local/remote D1 migration and both dependency audits passed.
+- Root and public-tooling lockfiles pin patched picomatch 4.0.7 and current Playwright 1.65.1. CI uses `npm ci`; no audit suppression was introduced.
+- Public-service CI passed on implementation source `2ca4eca` and later heads, including workflow `45068118177`: backend tests, audit, Worker build and complete dashboard fixture flows at 320/390/768/1440px. Android, signed-webhook and independent-site jobs also passed. These are fixture checks, not live Discord acceptance.
+- Earlier full-site CI failed first on unsupported Playwright 1.56.1/Ubuntu 26.04, then on an animated full-page capture timeout. The overview now uses the existing effects-off control after normal-state viewport captures and all assertions; subsequent CI passed that capture.
+- Latest broader-site failure in run `45068118177` was `tests/browser-smoke.mjs:89`: the navigation closed between assertions. The real initial `pageshow` can arrive after a visitor opens navigation while other page assets are loading. The production handler now resets only BFCache restores (`persisted:true`); its initial synchronous reset is retained. A behavioral Node test covers initial-load preservation, BFCache restore, outside click, Escape and desktop resize. The browser fixture uses real PageTransitionEvent semantics. Await new CI before calling the entire workflow green.
+- Local browser execution is blocked by the workspace browser sandbox. Remote CI is the acceptance route and retains screenshot artifacts.
 
-- Public backend suite: 26 passing tests covering tenant isolation, current permissions, channel overwrites and actor visibility, OAuth state/session/ciphertext boundaries, signed interaction/deferred/replay handling, signed TDL receipts, vote links, reminder concurrency/failures and polling catch-up/edits.
-- All 139 root Node regressions pass on the final implementation, including the 26 public cases. Site typecheck/build and both Worker compilations pass.
-- Existing Android offline suite passed; its code is unchanged by the public implementation.
-- Root and standalone public-tooling security audits: zero reported vulnerabilities. New root lockfile pins the previously unpinned transitive dependency graph, including patched picomatch 4.0.7. CI now uses `npm ci`; no advisory suppression introduced.
-- Standalone Worker dry-run compilation and local D1 migration passed.
-- GitHub Actions run `45056560204`, source `78d7be363d978fc434fe80d5790283bc1866509d`: public job passed its backend suite, security audit, Worker build and setup/service/report/pause/tenant browser flows at 320/390/768/1440px. This is fixture-backed browser validation, not live Discord acceptance.
-- That run also passed Android, signed-webhook and independent site jobs. The original broader website job reached its browser-tool install and failed because Playwright 1.56.1 does not support the current Ubuntu 26.04 runner. Root tooling now pins Playwright 1.65.1 (the version used successfully by the public job); no checks are suppressed. Implementation source `2ca4eca001a7af46261824086691433b8708459d`, run `45056980750`: public job passed again (26 backend tests and all four browser sizes); Android, signed-webhook and independent site jobs passed. The broader site job passed its updated browser install, manager/arcade/Spark checks and Chromium/Firefox/WebKit checks, and was still running its final responsive smoke step at this checkpoint. Do not claim the entire workflow green from that partial result.
-- Local browser runtime is restricted (download denied; installed Chromium cannot create its process socket). Remote CI is the browser acceptance route; public screenshots are retained as workflow artifacts.
+## Remaining activation and next step
 
-## Production and remaining blockers
-
-- Created dedicated `multibump-public` D1 database `fe41c813-2d54-4d55-bd25-485440a9695f` and applied/verified all public tables and the standard migration ledger. No Lobby/Shield database tables were changed by this provisioning.
-- Public Worker deployment `89e451132c4f46fe8b3426e1c2270e5e` serves `https://bump.the420lobby.com` from implementation source `2ca4eca001a7af46261824086691433b8708459d`. The custom domain is enabled and its D1 binding and encrypted key were re-read. HTTPS homepage/client/health return successfully; health reports `database:true`, `discordConnected:false`, `status:setup_pending`. Session returns `ready:false` and installation returns 503 until the app is connected. Minute cron is configured; the first production heartbeat was still pending when checked six minutes after provisioning (trigger propagation can take longer). No scheduler delivery is claimed.
-- Discord Developer Portal is at its sign-in page. No dedicated public application's credentials are available. No app/bot creation, Discord installation, live reminder, provider confirmation or real vote receipt is verified.
-- Keep PR #67 draft and distinguish a deployed launch-pending website from an operational Discord service. Do not retire its branch until its work is safely integrated.
-- Next: finish the broader website CI check, connect the dedicated Discord application and run the live acceptance in the README. The implementation is deployed and its encryption key was verified preserved after updating it. No live Discord behavior can be validated before that connection.
-
-
-## Signed-in setup checkpoint
-
-- Owner Discord sign-in is verified in the Developer Portal. The create-app dialog is staged as **MultiBump**, Personal account. No app has been created: its Create action requires accepting the Discord Developer Terms of Service and Developer Policy. Obtain that specific approval before submitting.
-- Latest completed documentation-head workflow `45057547510`: public/Android/webhook/independent-site jobs pass. The broader site passes its functional and cross-browser checks but fails the final full-page screenshot at `tests/browser-smoke.mjs:453` after a 30-second screenshot timeout.
-- The static full-page overview now uses the existing effects-off control, after the normal-state viewport captures and all layout/behavior assertions. Screenshot timeouts and assertions are retained. CI must validate this capture change; it is not yet a proven fix.
-- Production scheduler heartbeat is now present in the dedicated database. No servers are configured and no live Discord reminder delivery is claimed. The deployed public implementation is still `2ca4eca001a7af46261824086691433b8708459d`.
+- Bot token and OAuth client secret are not yet bound. Discord exposes these only after **Reset Token** / **Reset Secret**; credential resets must be completed by the owner in the browser. Do not ask for plaintext credentials in chat or commit them. An ephemeral encrypted transfer has been tested for copying the credentials directly into the dedicated Cloudflare secret store without printing plaintext.
+- Message Content Intent is currently off. The owner must approve/enable it before public-message confirmation observation can work. Presence and Server Members intents are unnecessary.
+- The public homepage correctly stays launch-pending and `/install` returns 503 until the complete app configuration exists. The app is created; the public Discord service is not yet operational.
+- Next: owner completes the bot-token reset/copy (and Message Content setting), securely bind `DISCORD_BOT_TOKEN`; repeat for OAuth `DISCORD_CLIENT_SECRET`; register commands; verify OAuth and two independently managed server installations, permissions/reminders/pause, a real public bump confirmation and an authentic signed TDL vote receipt.
+- Keep PR #67 draft/unmerged until activation and live acceptance are complete. Preserve its unmerged branch. No live Discord installation, command, reminder, bump confirmation or vote receipt has been verified.

@@ -78,9 +78,12 @@
       menuButton.setAttribute("aria-expanded", String(open));
       menuButton.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
     });
-    // Restored pages/tabs may retain stale menu classes. Always start closed.
+    // Start closed, and reset restored BFCache pages. The initial pageshow can
+    // arrive after a visitor has opened the menu while images are still loading.
     closeMenu();
-    window.addEventListener("pageshow", closeMenu);
+    window.addEventListener("pageshow", function(event) {
+      if (event.persisted) closeMenu();
+    });
     menu.querySelectorAll("a").forEach(function(link) { link.addEventListener("click",closeMenu); });
     document.addEventListener("keydown", function(event) { if (event.key === "Escape") closeMenu(); });
     document.addEventListener("pointerdown", function(event) {

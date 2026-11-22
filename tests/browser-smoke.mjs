@@ -73,6 +73,9 @@ try {
       assert.equal(await menuButton.isVisible(),true,scenario.name+" hamburger is hidden");
       await menuButton.click();
       assert.equal(await nav.isVisible(),true,scenario.name+" menu should open on tap");
+      await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent("pageshow",{persisted:false})));
+      assert.equal(await menuButton.getAttribute("aria-expanded"),"true",
+        scenario.name+" initial pageshow must preserve a menu the visitor already opened");
       const joinContrast=await page.locator("#primary-nav .nav-join").evaluate(link=>{
         const color=getComputedStyle(link).color,background=getComputedStyle(link).backgroundColor;
         const linear=(part)=>{const v=part/255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;};
@@ -90,7 +93,7 @@ try {
       await page.locator(".logo").click();
       assert.equal(await nav.isVisible(),false,scenario.name+" outside tap should dismiss nav");
       await menuButton.click();
-      await page.evaluate(()=>window.dispatchEvent(new Event("pageshow")));
+      await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent("pageshow",{persisted:true})));
       assert.equal(await nav.isVisible(),false,scenario.name+" BFCache restore should reset nav");
       await menuButton.click();
       await page.keyboard.press("Escape");
@@ -450,9 +453,8 @@ try {
       await page.waitForTimeout(90);
     }
     await page.evaluate(()=>window.scrollTo(0,0));
-    // A full-document capture resizes the software-rendered WebGL surface.
-    // Use the site's real low-motion control for this static overview; the
-    // viewport captures above already exercise the normal effects state.
+    // Pause continuous rendering with the real low-motion control before this
+    // static overview; the viewport captures above exercise normal effects.
     if (await page.locator("#fx-toggle").getAttribute("aria-pressed") === "true") {
       await page.locator("#fx-toggle").click();
     }
