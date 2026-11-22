@@ -10,6 +10,27 @@ permissions:
   contents: read
 
 jobs:
+  multibump-public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install pinned public-service tooling
+        run: npm ci --prefix apps/multibump --no-audit --no-fund
+      - name: Audit public-service tooling
+        run: npm audit --prefix apps/multibump --audit-level=high
+      - name: Public MultiBump isolation, permissions, OAuth, commands and scheduler
+        run: npm test --prefix apps/multibump
+      - name: Compile the public Worker without deploying
+        run: npm run build --prefix apps/multibump
+      - name: Install browser
+        run: apps/multibump/node_modules/.bin/playwright install --with-deps chromium
+      - name: Public dashboard mobile and tenant browser checks
+        run: npm run test:browser --prefix apps/multibump
+
   site-regression-independent:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -21,7 +42,7 @@ jobs:
         with:
           node-version: "24"
       - name: Install website dependencies (security audit remains separately enforced)
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Typecheck site
         run: npm run typecheck
       - name: Website backend regressions
@@ -73,7 +94,7 @@ jobs:
         with:
           node-version: "24"
       - name: Install website and arcade dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Dependency security audit
         run: npm audit --audit-level=high
       - name: Typecheck new React arcade
